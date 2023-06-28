@@ -1,4 +1,4 @@
-package com.supertokens.sdk.recipes.session
+package com.supertokens.sdk.models
 
 import kotlinx.serialization.Serializable
 

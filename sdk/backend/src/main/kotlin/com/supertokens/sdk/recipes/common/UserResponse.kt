@@ -14,9 +14,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserResponse(
-    val status: String,
+    override val status: String,
     val user: User? = null,
-)
+): BaseResponse
 
 
 suspend fun HttpResponse.parseUserResponse(): Either<SuperTokensStatus, User> {

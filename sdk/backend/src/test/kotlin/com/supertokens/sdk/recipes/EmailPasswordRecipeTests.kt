@@ -1,7 +1,18 @@
-package com.supertokens.sdk.recipes.emailpassword
+package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.SuperTokensStatus
+import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
+import com.supertokens.sdk.recipes.emailpassword.FormField
+import com.supertokens.sdk.recipes.emailpassword.emailPassword
+import com.supertokens.sdk.recipes.emailpassword.createResetPasswordToken
+import com.supertokens.sdk.recipes.emailpassword.getUserByEmail
+import com.supertokens.sdk.recipes.emailpassword.emailPasswordGetUserById
+import com.supertokens.sdk.recipes.emailpassword.resetPasswordWithToken
+import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignIn
+import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignUp
+import com.supertokens.sdk.recipes.emailpassword.updateEmail
+import com.supertokens.sdk.recipes.emailpassword.updatePassword
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -59,7 +70,7 @@ class EmailPasswordRecipeTests {
 
     @Test
     fun testGetUserByMail() = runBlocking {
-        val response = superTokens.emailPasswordGetUserByEmail("test@test.de")
+        val response = superTokens.getUserByEmail("test@test.de")
 
         assertTrue(response.isRight)
     }
@@ -71,11 +82,11 @@ class EmailPasswordRecipeTests {
         assertTrue(response.isRight)
         val user = response.get()
 
-        val resetTokenResponse = superTokens.emailPasswordCreateResetPasswordToken(user.id)
+        val resetTokenResponse = superTokens.createResetPasswordToken(user.id)
         assertTrue(resetTokenResponse.isRight)
         val token = resetTokenResponse.get()
 
-        val resetResponse = superTokens.emailPasswordResetPasswordWithToken(token, "a1234567")
+        val resetResponse = superTokens.resetPasswordWithToken(token, "a1234567")
         assertTrue(resetResponse.isRight)
         assertEquals(user.id, resetResponse.get())
     }
@@ -87,8 +98,8 @@ class EmailPasswordRecipeTests {
         assertTrue(response.isRight)
         val user = response.get()
 
-        assertEquals(SuperTokensStatus.OK, superTokens.emailPasswordUpdateEmail(user.id, "test2@test.de"))
-        assertEquals(SuperTokensStatus.OK, superTokens.emailPasswordUpdateEmail(user.id, "test@test.de"))
+        assertEquals(SuperTokensStatus.OK, superTokens.updateEmail(user.id, "test2@test.de"))
+        assertEquals(SuperTokensStatus.OK, superTokens.updateEmail(user.id, "test@test.de"))
     }
 
     @Test
@@ -98,8 +109,8 @@ class EmailPasswordRecipeTests {
         assertTrue(response.isRight)
         val user = response.get()
 
-        assertEquals(SuperTokensStatus.OK, superTokens.emailPasswordUpdatePassword(user.id, "1abcdefg"))
-        assertEquals(SuperTokensStatus.OK, superTokens.emailPasswordUpdatePassword(user.id, "a1234567"))
+        assertEquals(SuperTokensStatus.OK, superTokens.updatePassword(user.id, "1abcdefg"))
+        assertEquals(SuperTokensStatus.OK, superTokens.updatePassword(user.id, "a1234567"))
     }
 
     @Test
@@ -109,9 +120,9 @@ class EmailPasswordRecipeTests {
         assertTrue(response.isRight)
         val user = response.get()
 
-        assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.emailPasswordUpdatePassword(user.id, "abcdefgh"))
-        assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.emailPasswordUpdatePassword(user.id, "12345678"))
-        assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.emailPasswordUpdatePassword(user.id, "abc123"))
+        assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.updatePassword(user.id, "abcdefgh"))
+        assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.updatePassword(user.id, "12345678"))
+        assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.updatePassword(user.id, "abc123"))
     }
 
 }

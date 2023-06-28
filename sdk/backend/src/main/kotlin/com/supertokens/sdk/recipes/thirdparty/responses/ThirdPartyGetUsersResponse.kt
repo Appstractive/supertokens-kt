@@ -1,10 +1,11 @@
-package com.supertokens.sdk.recipes.session.responses
+package com.supertokens.sdk.recipes.thirdparty.responses
 
+import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.common.BaseResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoveSessionsResponse(
+data class ThirdPartyGetUsersResponse(
     override val status: String,
-    val sessionHandlesRevoked: List<String>,
+    val users: List<User>,
 ): BaseResponse

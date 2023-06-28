@@ -26,7 +26,7 @@ fun List<*>.toJsonElement(): JsonElement {
             is Number -> list.add(JsonPrimitive(value))
             is String -> list.add(JsonPrimitive(value))
             is Enum<*> -> list.add(JsonPrimitive(value.toString()))
-            is JsonElement -> value
+            is JsonElement -> list.add(value)
             else -> throw IllegalStateException("Can't serialize unknown collection type: $value")
         }
     }
@@ -53,27 +53,26 @@ fun Map<*, *>.toJsonElement(): JsonElement {
 }
 
 val JsonElement.extractedContent: Any?
-    get(){
-        if( this is JsonPrimitive ) {
-            if( this.isString ){
+    get() {
+        if (this is JsonPrimitive) {
+            if (this.isString) {
                 return this.content
             }
-            return this.jsonPrimitive.booleanOrNull ?:
-            this.jsonPrimitive.intOrNull ?:
-            this.jsonPrimitive.longOrNull ?:
-            this.jsonPrimitive.floatOrNull ?:
-            this.jsonPrimitive.doubleOrNull ?:
-            this.jsonPrimitive.contentOrNull
+            return this.jsonPrimitive.booleanOrNull ?: this.jsonPrimitive.intOrNull ?: this.jsonPrimitive.longOrNull ?: this.jsonPrimitive.floatOrNull
+            ?: this.jsonPrimitive.doubleOrNull ?: this.jsonPrimitive.contentOrNull
         }
-        if( this is JsonArray ){
+        if (this is JsonArray) {
             return this.jsonArray.map {
                 it.extractedContent
             }
         }
-        if( this is JsonObject ){
-            return this.jsonObject.entries.associate {
-                it.key to it.value.extractedContent
-            }
+        if (this is JsonObject) {
+            return this.jsonObject.extractedContent
         }
         return null
+    }
+
+val JsonObject.extractedContent: Map<String, Any?>
+    get() = entries.associate {
+        it.key to it.value.extractedContent
     }

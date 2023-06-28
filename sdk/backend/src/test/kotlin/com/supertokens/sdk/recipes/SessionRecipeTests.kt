@@ -1,7 +1,9 @@
-package com.supertokens.sdk.recipes.emailpassword
+package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.SuperTokensStatus
+import com.supertokens.sdk.recipes.emailpassword.emailPassword
+import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignIn
 import com.supertokens.sdk.recipes.session.SessionRecipe
 import com.supertokens.sdk.recipes.session.session
 import com.supertokens.sdk.recipes.session.createSession

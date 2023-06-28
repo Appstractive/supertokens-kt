@@ -7,7 +7,6 @@ import com.supertokens.sdk.SuperTokensStatus
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.recipes.Recipe
-import com.supertokens.sdk.recipes.common.StatusResponse
 import com.supertokens.sdk.recipes.session.requests.CreateSessionRequest
 import com.supertokens.sdk.recipes.session.requests.RefreshSessionRequest
 import com.supertokens.sdk.recipes.session.requests.RegenerateSessionRequest
@@ -17,25 +16,21 @@ import com.supertokens.sdk.recipes.session.requests.UpdateSessionDataRequest
 import com.supertokens.sdk.recipes.session.requests.VerifySessionRequest
 import com.supertokens.sdk.recipes.session.responses.CreateSessionData
 import com.supertokens.sdk.recipes.session.responses.CreateSessionResponse
+import com.supertokens.sdk.recipes.session.responses.GetSessionData
 import com.supertokens.sdk.recipes.session.responses.GetSessionResponse
 import com.supertokens.sdk.recipes.session.responses.GetSessionsResponse
 import com.supertokens.sdk.recipes.session.responses.RegenerateSessionData
 import com.supertokens.sdk.recipes.session.responses.RegenerateSessionResponse
 import com.supertokens.sdk.recipes.session.responses.RemoveSessionsResponse
-import com.supertokens.sdk.recipes.session.responses.SessionData
 import com.supertokens.sdk.recipes.session.responses.VerifySessionData
 import com.supertokens.sdk.recipes.session.responses.VerifySessionResponse
-import com.supertokens.sdk.toStatus
-import io.ktor.client.call.body
+import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpStatusCode
 import it.czerwinski.kotlin.util.Either
-import it.czerwinski.kotlin.util.Left
 import it.czerwinski.kotlin.util.Right
 
 class SessionRecipe : Recipe {
@@ -63,55 +58,35 @@ class SessionRecipe : Recipe {
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return Left(response.bodyAsText().toStatus())
-        }
-
-        val body = response.body<CreateSessionResponse>()
-
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> Right(
-                CreateSessionData(
-                    session = body.session,
-                    accessToken = body.accessToken,
-                    refreshToken = body.refreshToken,
-                    antiCsrfToken = body.antiCsrfToken,
-                )
+        return response.parse<CreateSessionResponse, CreateSessionData> {
+            CreateSessionData(
+                session = session.toData(),
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+                antiCsrfToken = antiCsrfToken,
             )
-
-            else -> Left(status)
         }
     }
 
-    suspend fun getSession(superTokens: SuperTokens, sessionHandle: String): Either<SuperTokensStatus, SessionData> {
+    suspend fun getSession(superTokens: SuperTokens, sessionHandle: String): Either<SuperTokensStatus, GetSessionData> {
         val response = superTokens.client.get("$PATH_SESSION?sessionHandle=$sessionHandle") {
 
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return Left(response.bodyAsText().toStatus())
-        }
-
-        val body = response.body<GetSessionResponse>()
-
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> Right(
-                SessionData(
-                    userId = body.userId,
-                    expiry = body.expiry,
-                    timeCreated = body.timeCreated,
-                    sessionHandle = body.sessionHandle,
-                    userDataInDatabase = body.userDataInDatabase?.entries?.associate {
-                        it.key to it.value.extractedContent
-                    },
-                    userDataInJWT = body.userDataInJWT?.entries?.associate {
-                        it.key to it.value.extractedContent
-                    },
-                )
+        return response.parse<GetSessionResponse, GetSessionData> {
+            GetSessionData(
+                userId = userId,
+                expiry = expiry,
+                timeCreated = timeCreated,
+                sessionHandle = sessionHandle,
+                userDataInDatabase = userDataInDatabase?.entries?.associate {
+                    it.key to it.value.extractedContent
+                },
+                userDataInJWT = userDataInJWT?.entries?.associate {
+                    it.key to it.value.extractedContent
+                },
             )
-
-            else -> Left(status)
         }
     }
 
@@ -121,18 +96,8 @@ class SessionRecipe : Recipe {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return Left(response.bodyAsText().toStatus())
-        }
-
-        val body = response.body<GetSessionsResponse>()
-
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> Right(
-                body.sessionHandles
-            )
-
-            else -> Left(status)
+        return response.parse<GetSessionsResponse, List<String>> {
+            sessionHandles
         }
     }
 
@@ -152,18 +117,8 @@ class SessionRecipe : Recipe {
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return Left(response.bodyAsText().toStatus())
-        }
-
-        val body = response.body<RemoveSessionsResponse>()
-
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> Right(
-                body.sessionHandlesRevoked,
-            )
-
-            else -> Left(status)
+        return response.parse<RemoveSessionsResponse, List<String>> {
+            sessionHandlesRevoked
         }
     }
 
@@ -191,21 +146,11 @@ class SessionRecipe : Recipe {
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return Left(response.bodyAsText().toStatus())
-        }
-
-        val body = response.body<VerifySessionResponse>()
-
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> Right(
-                VerifySessionData(
-                    session = body.session ?: throw RuntimeException("VerifySession returned OK but no session"),
-                    accessToken = body.accessToken,
-                )
+        return response.parse<VerifySessionResponse, VerifySessionData> {
+            VerifySessionData(
+                session = session?.toData() ?: throw RuntimeException("VerifySession returned OK but no session"),
+                accessToken = this.accessToken,
             )
-
-            else -> Left(status)
         }
     }
 
@@ -228,23 +173,13 @@ class SessionRecipe : Recipe {
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return Left(response.bodyAsText().toStatus())
-        }
-
-        val body = response.body<CreateSessionResponse>()
-
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> Right(
-                CreateSessionData(
-                    session = body.session,
-                    accessToken = body.accessToken,
-                    refreshToken = body.refreshToken,
-                    antiCsrfToken = body.antiCsrfToken,
-                )
+        return response.parse<CreateSessionResponse, CreateSessionData> {
+            CreateSessionData(
+                session = session.toData(),
+                accessToken = accessToken,
+                refreshToken = this.refreshToken,
+                antiCsrfToken = antiCsrfToken,
             )
-
-            else -> Left(status)
         }
     }
 
@@ -266,21 +201,11 @@ class SessionRecipe : Recipe {
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return Left(response.bodyAsText().toStatus())
-        }
-
-        val body = response.body<RegenerateSessionResponse>()
-
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> Right(
-                RegenerateSessionData(
-                    session = body.session ?: throw RuntimeException("RegenerateSession returned OK but no session"),
-                    accessToken = body.accessToken ?: throw RuntimeException("RegenerateSession returned OK but no accessToken"),
-                )
+        return response.parse<RegenerateSessionResponse, RegenerateSessionData> {
+            RegenerateSessionData(
+                session = session?.toData() ?: throw RuntimeException("RegenerateSession returned OK but no session"),
+                accessToken = this.accessToken ?: throw RuntimeException("RegenerateSession returned OK but no accessToken"),
             )
-
-            else -> Left(status)
         }
     }
 
@@ -297,13 +222,7 @@ class SessionRecipe : Recipe {
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return response.bodyAsText().toStatus()
-        }
-
-        val body = response.body<StatusResponse>()
-
-        return body.status.toStatus()
+        return response.parse()
     }
 
     suspend fun updateJwtData(superTokens: SuperTokens, sessionHandle: String, userDataInJWT: Map<String, Any?>): SuperTokensStatus {
@@ -319,13 +238,7 @@ class SessionRecipe : Recipe {
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return response.bodyAsText().toStatus()
-        }
-
-        val body = response.body<StatusResponse>()
-
-        return body.status.toStatus()
+        return response.parse()
     }
 
     companion object {
