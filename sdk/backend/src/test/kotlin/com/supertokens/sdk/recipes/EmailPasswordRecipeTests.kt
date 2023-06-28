@@ -2,9 +2,10 @@ package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.SuperTokensStatus
+import com.supertokens.sdk.recipe
+import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.emailpassword.FormField
-import com.supertokens.sdk.recipes.emailpassword.emailPassword
 import com.supertokens.sdk.recipes.emailpassword.createResetPasswordToken
 import com.supertokens.sdk.recipes.emailpassword.getUserByEmail
 import com.supertokens.sdk.recipes.emailpassword.emailPasswordGetUserById
@@ -29,9 +30,7 @@ class EmailPasswordRecipeTests {
             websiteDomain = "localhost",
         ),
     ) {
-        emailPassword {
-
-        }
+        recipe(EmailPassword)
     }
 
     @Test

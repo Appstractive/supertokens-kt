@@ -2,10 +2,11 @@ package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.SuperTokensStatus
-import com.supertokens.sdk.recipes.emailpassword.emailPassword
+import com.supertokens.sdk.recipe
+import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignIn
 import com.supertokens.sdk.recipes.session.SessionRecipe
-import com.supertokens.sdk.recipes.session.session
+import com.supertokens.sdk.recipes.session.Sessions
 import com.supertokens.sdk.recipes.session.createSession
 import com.supertokens.sdk.recipes.session.getSession
 import com.supertokens.sdk.recipes.session.getSessions
@@ -23,6 +24,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class SessionRecipeTests {
@@ -35,12 +37,8 @@ class SessionRecipeTests {
             websiteDomain = "localhost",
         ),
     ) {
-        emailPassword {
-
-        }
-        session {
-
-        }
+        recipe(EmailPassword)
+        recipe(Sessions)
     }
 
     @Test
@@ -165,8 +163,8 @@ class SessionRecipeTests {
         )
         assertTrue(regenerateSessionsResponse.isRight)
 
+        assertNotNull(regenerateSessionsResponse.get().session.userDataInJWT)
         assertEquals(session.session.handle, regenerateSessionsResponse.get().session.handle)
-        assertNotEquals(null, regenerateSessionsResponse.get().session.userDataInJWT)
     }
 
     @Test

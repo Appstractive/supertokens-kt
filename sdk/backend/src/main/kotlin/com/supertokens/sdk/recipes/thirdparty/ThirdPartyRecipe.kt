@@ -2,10 +2,15 @@ package com.supertokens.sdk.recipes.thirdparty
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.SuperTokensStatus
 import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.Recipe
+import com.supertokens.sdk.recipes.RecipeBuilder
+import com.supertokens.sdk.recipes.RecipeConfig
+import com.supertokens.sdk.recipes.thirdparty.providers.BuildProvider
+import com.supertokens.sdk.recipes.thirdparty.providers.Provider
+import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
+import com.supertokens.sdk.recipes.thirdparty.providers.ProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.recipes.thirdparty.responses.ThirdPartyGetUsersResponse
@@ -18,10 +23,29 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import it.czerwinski.kotlin.util.Either
 
-class ThirdPartyRecipe : Recipe {
+fun <C: ProviderConfig, R: Provider<C>> ThirdPartyConfig.provider(builder: ProviderBuilder<C, R>, configure: C.() -> Unit = {}) {
+    +builder.install(configure)
+}
+
+class ThirdPartyConfig: RecipeConfig {
+
+    var providers: List<BuildProvider> = emptyList()
+        private set
+
+    operator fun BuildProvider.unaryPlus() {
+        providers = providers + this
+    }
+
+}
+
+class ThirdPartyRecipe(
+    private val superTokens: SuperTokens,
+    config: ThirdPartyConfig,
+) : Recipe<ThirdPartyConfig> {
+
+    val providers: List<Provider<*>> = config.providers.map { it.invoke(superTokens, this) }
 
     suspend fun signInUp(
-        superTokens: SuperTokens,
         thirdPartyId: String,
         thirdPartyUserId: String,
         email: String
@@ -49,7 +73,7 @@ class ThirdPartyRecipe : Recipe {
         }
     }
 
-    suspend fun getUsersByEmail(superTokens: SuperTokens, email: String): Either<SuperTokensStatus, List<User>> {
+    suspend fun getUsersByEmail(email: String): Either<SuperTokensStatus, List<User>> {
         val response = superTokens.client.get("$PATH_USERS_BY_EMAIL?email=$email") {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -60,6 +84,8 @@ class ThirdPartyRecipe : Recipe {
         }
     }
 
+    fun getProvider(id: String) = providers.firstOrNull { it.id == id }
+
     companion object {
         const val ID = "thirdparty"
 
@@ -69,18 +95,24 @@ class ThirdPartyRecipe : Recipe {
 
 }
 
-fun SuperTokensConfig.thirdParty(init: ThirdPartyRecipe.() -> Unit) {
-    val recipe = ThirdPartyRecipe()
-    recipe.init()
-    +recipe
+val ThirdParty = object: RecipeBuilder<ThirdPartyConfig, ThirdPartyRecipe>() {
+
+    override fun install(configure: ThirdPartyConfig.() -> Unit): (SuperTokens) -> ThirdPartyRecipe {
+        val config = ThirdPartyConfig().apply(configure)
+
+        return {
+            ThirdPartyRecipe(it, config)
+        }
+    }
+
 }
 
 suspend fun SuperTokens.thirdPartySignInUp(
     thirdPartyId: String,
     thirdPartyUserId: String,
     email: String,
-) = getRecipe<ThirdPartyRecipe>().signInUp(this, thirdPartyId, thirdPartyUserId, email)
+) = getRecipe<ThirdPartyRecipe>().signInUp(thirdPartyId, thirdPartyUserId, email)
 
 suspend fun SuperTokens.getUsersByEmail(
     email: String,
-) = getRecipe<ThirdPartyRecipe>().getUsersByEmail(this, email)
+) = getRecipe<ThirdPartyRecipe>().getUsersByEmail(email)

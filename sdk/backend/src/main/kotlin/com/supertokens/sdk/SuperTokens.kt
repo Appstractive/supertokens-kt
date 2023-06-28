@@ -1,6 +1,9 @@
 package com.supertokens.sdk
 
 import com.supertokens.sdk.recipes.Recipe
+import com.supertokens.sdk.recipes.BuildRecipe
+import com.supertokens.sdk.recipes.RecipeBuilder
+import com.supertokens.sdk.recipes.RecipeConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -22,6 +25,10 @@ data class AppConfig(
     val apiGatewayPath: String? = null,
 )
 
+fun <C: RecipeConfig, R: Recipe<C>> SuperTokensConfig.recipe(builder: RecipeBuilder<C, R>, configure: C.() -> Unit = {}) {
+    +builder.install(configure)
+}
+
 class SuperTokensConfig(
     val connectionURI: String,
     val appConfig: AppConfig,
@@ -31,18 +38,22 @@ class SuperTokensConfig(
 
     var apiKey: String? = null
 
-    var recipes: List<Recipe> = emptyList()
+    var recipes: List<BuildRecipe> = emptyList()
         private set
 
-    operator fun Recipe.unaryPlus() {
+    operator fun BuildRecipe.unaryPlus() {
         recipes = recipes + this
     }
 
 }
 
 class SuperTokens(
-    val config: SuperTokensConfig,
+    private val config: SuperTokensConfig,
 ) {
+
+    val recipes: List<Recipe<*>> = config.recipes.map { it.invoke(this) }
+
+    val appConfig: AppConfig = config.appConfig
 
     @OptIn(ExperimentalSerializationApi::class)
     val client = config.client ?: HttpClient(CIO) {
@@ -68,7 +79,7 @@ class SuperTokens(
         }
     }
 
-    inline fun <reified T : Recipe> getRecipe(): T = config.recipes.filterIsInstance<T>().firstOrNull()
+    inline fun <reified T : Recipe<*>> getRecipe(): T = recipes.filterIsInstance<T>().firstOrNull()
         ?: throw RuntimeException("Recipe ${T::class.java.simpleName} not configured")
 
 }
@@ -77,7 +88,6 @@ fun superTokens(connectionURI: String, appConfig: AppConfig, init: SuperTokensCo
     val config = SuperTokensConfig(
         connectionURI = connectionURI,
         appConfig = appConfig,
-    )
-    config.init()
+    ).apply(init)
     return SuperTokens(config)
 }

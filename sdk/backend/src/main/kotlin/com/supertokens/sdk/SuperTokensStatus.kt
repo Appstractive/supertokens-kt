@@ -17,6 +17,8 @@ sealed class SuperTokensStatus(
     object UnauthorizedError: SuperTokensStatus("UNAUTHORISED")
     object TryRefreshTokenError: SuperTokensStatus("TRY_REFRESH_TOKEN")
 
+    class ThirdPartyProviderError(error: String): SuperTokensStatus(error)
+
     data class UnknownError(val message: String): SuperTokensStatus(message)
 
 }
