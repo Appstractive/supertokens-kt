@@ -21,7 +21,7 @@ data class UserResponse(
 
 suspend fun HttpResponse.parseUserResponse(): Either<SuperTokensStatus, User> {
     if(status != HttpStatusCode.OK) {
-        return Left(SuperTokensStatus.UnknownError(bodyAsText()))
+        return Left(bodyAsText().toStatus())
     }
 
     val body = body<UserResponse>()

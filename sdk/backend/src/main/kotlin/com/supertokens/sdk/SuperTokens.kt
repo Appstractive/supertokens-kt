@@ -10,6 +10,8 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 
 data class AppConfig(
     val name: String,
@@ -32,10 +34,6 @@ class SuperTokensConfig(
     var recipes: List<Recipe> = emptyList()
         private set
 
-    var isInServerlessEnv = false
-
-    var telemetryEnabled = false
-
     operator fun Recipe.unaryPlus() {
         recipes = recipes + this
     }
@@ -46,9 +44,14 @@ class SuperTokens(
     val config: SuperTokensConfig,
 ) {
 
+    @OptIn(ExperimentalSerializationApi::class)
     val client = config.client ?: HttpClient(CIO) {
         install(ContentNegotiation) {
-            json()
+            json(Json {
+                isLenient = true
+                explicitNulls = false
+                encodeDefaults = true
+            })
         }
 
         install(Logging)
@@ -57,10 +60,10 @@ class SuperTokens(
             url(config.connectionURI)
 
             config.apiKey?.let {
-                header("api-key", it)
+                header(Constants.HEADER_API_KEY, it)
             }
 
-            header("cdi-version", "2.21")
+            header(Constants.HEADER_CDI_VERSION, Constants.CDI_VERSION)
             contentType(ContentType.Application.Json)
         }
     }

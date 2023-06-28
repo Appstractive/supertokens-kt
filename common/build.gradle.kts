@@ -35,9 +35,16 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.kotlin.serialization)
+                implementation(libs.kotlin.serialization.json)
             }
         }
-
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.serialization)
+                implementation(libs.kotlin.serialization.json)
+                implementation(libs.test.kotlin)
+            }
+        }
     }
 }
 

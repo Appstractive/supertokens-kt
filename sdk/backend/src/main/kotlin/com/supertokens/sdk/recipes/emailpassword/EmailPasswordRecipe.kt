@@ -1,11 +1,12 @@
 package com.supertokens.sdk.recipes.emailpassword
 
+import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokensStatus
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.Recipe
-import com.supertokens.sdk.recipes.common.StatusResponse
+import com.supertokens.sdk.recipes.common.parseStatusResponse
 import com.supertokens.sdk.recipes.common.parseUserResponse
 import com.supertokens.sdk.recipes.emailpassword.requests.CreateResetPasswordTokenRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignInRequest
@@ -70,7 +71,7 @@ class EmailPasswordRecipe : Recipe {
     suspend fun signUp(superTokens: SuperTokens, email: String, password: String): Either<SuperTokensStatus, User> {
         val response = superTokens.client.post(PATH_SIGNUP) {
 
-            header("rid", ID)
+            header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 EmailPasswordSignUpRequest(
@@ -86,7 +87,7 @@ class EmailPasswordRecipe : Recipe {
     suspend fun signIn(superTokens: SuperTokens, email: String, password: String): Either<SuperTokensStatus, User> {
         val response = superTokens.client.post(PATH_SIGNIN) {
 
-            header("rid", ID)
+            header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 EmailPasswordSignInRequest(
@@ -102,7 +103,7 @@ class EmailPasswordRecipe : Recipe {
     suspend fun getUserById(superTokens: SuperTokens, userId: String): Either<SuperTokensStatus, User> {
 
         val response = superTokens.client.get("$PATH_GET_USER?userId=$userId") {
-            header("rid", ID)
+            header(Constants.HEADER_RECIPE_ID, ID)
         }
 
         return response.parseUserResponse()
@@ -111,7 +112,7 @@ class EmailPasswordRecipe : Recipe {
     suspend fun getUserByEMail(superTokens: SuperTokens, email: String): Either<SuperTokensStatus, User> {
 
         val response = superTokens.client.get("$PATH_GET_USER?email=$email") {
-            header("rid", ID)
+            header(Constants.HEADER_RECIPE_ID, ID)
         }
 
         return response.parseUserResponse()
@@ -119,7 +120,7 @@ class EmailPasswordRecipe : Recipe {
 
     suspend fun createResetPasswordToken(superTokens: SuperTokens, userId: String): Either<SuperTokensStatus, String> {
         val response = superTokens.client.post(PATH_PASSWORD_RESET_TOKEN) {
-            header("rid", ID)
+            header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 CreateResetPasswordTokenRequest(
@@ -142,7 +143,7 @@ class EmailPasswordRecipe : Recipe {
 
     suspend fun resetPasswordWithToken(superTokens: SuperTokens, token: String, newPassword: String): Either<SuperTokensStatus, String> {
         val response = superTokens.client.post(PATH_PASSWORD_RESET) {
-            header("rid", ID)
+            header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 ResetPasswordWithTokenRequest(
@@ -166,7 +167,7 @@ class EmailPasswordRecipe : Recipe {
 
     suspend fun updateEmail(superTokens: SuperTokens, userId: String, email: String): SuperTokensStatus {
         val response = superTokens.client.put(PATH_UPDATE_USER) {
-            header("rid", ID)
+            header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 UpdateUserRequest(
@@ -176,13 +177,7 @@ class EmailPasswordRecipe : Recipe {
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return response.bodyAsText().toStatus()
-        }
-
-        val body = response.body<StatusResponse>()
-
-        return body.status.toStatus()
+        return response.parseStatusResponse()
     }
 
     suspend fun updatePassword(superTokens: SuperTokens, userId: String, password: String, applyPasswordPolicy: Boolean = true): SuperTokensStatus {
@@ -196,7 +191,7 @@ class EmailPasswordRecipe : Recipe {
         }
 
         val response = superTokens.client.put(PATH_UPDATE_USER) {
-            header("rid", ID)
+            header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 UpdateUserRequest(
@@ -206,13 +201,7 @@ class EmailPasswordRecipe : Recipe {
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return response.bodyAsText().toStatus()
-        }
-
-        val body = response.body<StatusResponse>()
-
-        return body.status.toStatus()
+        return response.parseStatusResponse()
     }
 
     companion object {
