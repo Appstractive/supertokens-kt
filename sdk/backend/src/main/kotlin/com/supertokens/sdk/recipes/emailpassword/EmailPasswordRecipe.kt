@@ -47,13 +47,7 @@ data class FormField(
 
 }
 
-class EmailPasswordConfig: RecipeConfig
-
-class EmailPasswordRecipe(
-    private val superTokens: SuperTokens,
-    private val emailPasswordConfig: EmailPasswordConfig,
-) : Recipe<EmailPasswordConfig> {
-
+class EmailPasswordConfig: RecipeConfig {
     var formFields: List<FormField> = listOf(
         FormField(
             id = FormField.FORM_FIELD_EMAIL_ID,
@@ -66,6 +60,14 @@ class EmailPasswordRecipe(
             validate = FormField.DEFAULT_PASSWORD_VALIDATOR,
         ),
     )
+}
+
+class EmailPasswordRecipe(
+    private val superTokens: SuperTokens,
+    config: EmailPasswordConfig,
+) : Recipe<EmailPasswordConfig> {
+
+    val formFields: List<FormField> = config.formFields.toList()
 
     suspend fun signUp(email: String, password: String): User {
         val response = superTokens.client.post(PATH_SIGNUP) {

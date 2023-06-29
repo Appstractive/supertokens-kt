@@ -1,15 +1,13 @@
 package com.supertokens.sdk.recipes.thirdparty.providers.github
 
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
-import com.supertokens.sdk.recipes.thirdparty.providers.Provider
+import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
+import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
-import com.supertokens.sdk.recipes.thirdparty.providers.ProviderConfig
-import com.supertokens.sdk.recipes.thirdparty.providers.ProviderEndpoint
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
+import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
-import com.supertokens.sdk.toStatus
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -18,55 +16,19 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 
-class GithubConfig() : ProviderConfig {
-
-    var scopes: List<String>? = null
-    var authParams: Map<String, String>? = null
-    var clientId: String? = null
-    var clientSecret: String? = null
-    override var isDefault = false
-
-}
+class GithubConfig : OAuthProviderConfig()
 
 class GithubProvider(
     private val superTokens: SuperTokens,
-    private val config: GithubConfig
-) : Provider<GithubConfig>() {
+    config: GithubConfig,
+) : OAuthProvider<GithubConfig>(config) {
 
     override val id = ID
-    override val isDefault = config.isDefault
-
-    val scopes = buildList {
-        addAll(DEFAULT_SCOPES)
-        config.scopes?.let { addAll(it) }
-    }
-
-    val clientId: String = config.clientId ?: throw RuntimeException("clientId not configured for provider Github")
-    val clientSecret: String = config.clientSecret ?: throw RuntimeException("clientSecret not configured for provider Github")
-
-    override fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?) = ProviderEndpoint(
-        url = TOKEN_URL,
-        params = buildMap {
-            set("client_id", clientId)
-            set("client_secret", clientSecret)
-
-            authCode?.let {
-                set("code", it)
-            }
-
-            redirectUrl?.let {
-                set("redirect_uri", it)
-            }
-        }
-    )
-
-    override fun getAuthorizationEndpoint() = ProviderEndpoint(
-        url = AUTH_URL,
-        params = buildMap {
-            set("scope", scopes.joinToString(" "))
-            set("client_id", clientId)
-            config.authParams?.forEach { (key, value) -> set(key, value) }
-        }
+    override val authUrl = AUTH_URL
+    override val tokenUrl = TOKEN_URL
+    override val defaultScopes = listOf(
+        "read:user",
+        "user:email",
     )
 
     override suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo {
@@ -76,7 +38,7 @@ class GithubProvider(
         }
 
         if (response.status != HttpStatusCode.OK) {
-            throw SuperTokensStatusException(response.bodyAsText().toStatus())
+            throw ThirdPartyProviderException(response.bodyAsText())
         }
 
         val body = response.body<GithubGetUserResponse>()
@@ -116,11 +78,6 @@ class GithubProvider(
         const val EMAIL_URL = "https://api.github.com/user/emails"
 
         val HEADER_CONTENT_TYPE = ContentType("application", "vnd.github.v3+json")
-
-        val DEFAULT_SCOPES = listOf(
-            "read:user",
-            "user:email",
-        )
     }
 
 }

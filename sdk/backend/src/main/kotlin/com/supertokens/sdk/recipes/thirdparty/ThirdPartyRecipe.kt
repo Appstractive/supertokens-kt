@@ -48,6 +48,7 @@ class ThirdPartyRecipe(
         thirdPartyUserId: String,
         email: String
     ): ThirdPartySignInUpData {
+        Result
         val response = superTokens.client.post(PATH_SIGN_IN_UP) {
 
             header(Constants.HEADER_RECIPE_ID, ID)

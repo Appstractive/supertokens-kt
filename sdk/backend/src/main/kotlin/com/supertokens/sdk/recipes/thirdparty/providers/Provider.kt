@@ -27,7 +27,7 @@ interface ProviderConfig {
     val isDefault: Boolean
 }
 
-abstract class Provider<C: ProviderConfig> {
+abstract class Provider<out C: ProviderConfig> {
 
     abstract val id: String
     abstract val isDefault: Boolean
@@ -40,7 +40,7 @@ abstract class Provider<C: ProviderConfig> {
 
 typealias BuildProvider = (SuperTokens, ThirdPartyRecipe) -> Provider<*>
 
-abstract class ProviderBuilder<C: ProviderConfig, R: Provider<C>> {
+abstract class ProviderBuilder<out C: ProviderConfig, out R: Provider<C>> {
 
     abstract fun install(configure: C.() -> Unit): (SuperTokens, ThirdPartyRecipe) -> R
 
