@@ -8,8 +8,8 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
+import com.supertokens.sdk.recipes.thirdparty.providers.TokenResponse
 import io.ktor.client.call.body
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -17,9 +17,11 @@ import io.ktor.http.HttpStatusCode
 class FacebookConfig : OAuthProviderConfig()
 
 class FacebookProvider(
-    private val superTokens: SuperTokens,
+    superTokens: SuperTokens,
     config: FacebookConfig,
-): OAuthProvider<FacebookConfig>(config) {
+): OAuthProvider<FacebookConfig>(superTokens, config) {
+
+    override val id = ID
 
     override val authUrl = AUTH_URL
     override val tokenUrl = TOKEN_URL
@@ -27,12 +29,8 @@ class FacebookProvider(
         "email",
     )
 
-    override val id = ID
-
-    override suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo {
-        val response = superTokens.client.get(USER_URL) {
-            bearerAuth(accessToken)
-        }
+    override suspend fun getUserInfo(tokenResponse: TokenResponse): ThirdPartyUserInfo {
+        val response = superTokens.client.get("$USER_URL&access_token=${tokenResponse.accessToken}")
 
         if (response.status != HttpStatusCode.OK) {
             throw ThirdPartyProviderException(response.bodyAsText())
@@ -54,7 +52,7 @@ class FacebookProvider(
 
         const val AUTH_URL = "https://www.facebook.com/v9.0/dialog/oauth"
         const val TOKEN_URL = "https://graph.facebook.com/v9.0/oauth/access_token"
-        const val USER_URL = "https://graph.facebook.com/me"
+        const val USER_URL = "https://graph.facebook.com/me?fields=id,email&format=json"
     }
 }
 

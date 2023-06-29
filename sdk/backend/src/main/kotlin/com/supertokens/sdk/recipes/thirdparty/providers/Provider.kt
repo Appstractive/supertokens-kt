@@ -13,6 +13,11 @@ data class ThirdPartyUserInfo(
     val email: ThirdPartyEmail?,
 )
 
+data class TokenResponse(
+    val accessToken: String,
+    val idToken: String? = null,
+)
+
 data class ProviderEndpoint(
     val url: String,
     val params: Map<String, String>,
@@ -34,7 +39,8 @@ abstract class Provider<out C: ProviderConfig> {
 
     abstract fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?): ProviderEndpoint
     abstract fun getAuthorizationEndpoint(): ProviderEndpoint
-    abstract suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo
+    abstract suspend fun getTokens(authCode: String, redirectUrl: String?): TokenResponse
+    abstract suspend fun getUserInfo(tokenResponse: TokenResponse): ThirdPartyUserInfo
 
 }
 

@@ -8,6 +8,7 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
+import com.supertokens.sdk.recipes.thirdparty.providers.TokenResponse
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -19,9 +20,9 @@ import io.ktor.http.contentType
 class GithubConfig : OAuthProviderConfig()
 
 class GithubProvider(
-    private val superTokens: SuperTokens,
+    superTokens: SuperTokens,
     config: GithubConfig,
-) : OAuthProvider<GithubConfig>(config) {
+) : OAuthProvider<GithubConfig>(superTokens, config) {
 
     override val id = ID
     override val authUrl = AUTH_URL
@@ -31,9 +32,9 @@ class GithubProvider(
         "user:email",
     )
 
-    override suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo {
+    override suspend fun getUserInfo(tokenResponse: TokenResponse): ThirdPartyUserInfo {
         val response = superTokens.client.get(USER_URL) {
-            bearerAuth(accessToken)
+            bearerAuth(tokenResponse.accessToken)
             contentType(HEADER_CONTENT_TYPE)
         }
 
@@ -45,7 +46,7 @@ class GithubProvider(
 
         return ThirdPartyUserInfo(
             id = body.id.toString(),
-            email = getEmail(accessToken)?.let {
+            email = getEmail(tokenResponse.accessToken)?.let {
                 ThirdPartyEmail(
                     id = it.email,
                     isVerified = it.verified

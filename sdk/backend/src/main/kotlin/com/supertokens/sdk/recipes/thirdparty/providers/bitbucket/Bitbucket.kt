@@ -8,6 +8,7 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
+import com.supertokens.sdk.recipes.thirdparty.providers.TokenResponse
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -17,9 +18,9 @@ import io.ktor.http.HttpStatusCode
 class BitbucketConfig: OAuthProviderConfig()
 
 class BitbucketProvider(
-    private val superTokens: SuperTokens,
+    superTokens: SuperTokens,
     config: BitbucketConfig,
-): OAuthProvider<BitbucketConfig>(config) {
+): OAuthProvider<BitbucketConfig>(superTokens, config) {
 
     override val id = ID
 
@@ -41,9 +42,9 @@ class BitbucketProvider(
         )
     }
 
-    override suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo {
+    override suspend fun getUserInfo(tokenResponse: TokenResponse): ThirdPartyUserInfo {
         val response = superTokens.client.get(USER_URL) {
-            bearerAuth(accessToken)
+            bearerAuth(tokenResponse.accessToken)
         }
 
         if (response.status != HttpStatusCode.OK) {
@@ -54,7 +55,7 @@ class BitbucketProvider(
 
         return ThirdPartyUserInfo(
             id = body.uuid,
-            email = getEmail(accessToken)?.let {
+            email = getEmail(tokenResponse.accessToken)?.let {
                 ThirdPartyEmail(
                     id = it.email,
                     isVerified = it.is_confirmed

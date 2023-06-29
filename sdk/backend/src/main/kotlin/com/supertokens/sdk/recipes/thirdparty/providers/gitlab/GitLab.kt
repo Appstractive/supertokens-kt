@@ -8,6 +8,7 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
+import com.supertokens.sdk.recipes.thirdparty.providers.TokenResponse
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -21,9 +22,9 @@ class GitLabConfig: OAuthProviderConfig() {
 }
 
 class GitLabProvider(
-    private val superTokens: SuperTokens,
+    superTokens: SuperTokens,
     config: GitLabConfig,
-): OAuthProvider<GitLabConfig>(config) {
+): OAuthProvider<GitLabConfig>(superTokens, config) {
 
     override val id = ID
     override val authUrl = "${config.baseUrl}$AUTH_PATH"
@@ -42,9 +43,9 @@ class GitLabProvider(
         )
     }
 
-    override suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo {
+    override suspend fun getUserInfo(tokenResponse: TokenResponse): ThirdPartyUserInfo {
         val response = superTokens.client.get("${config.baseUrl}$USER_PATH") {
-            bearerAuth(accessToken)
+            bearerAuth(tokenResponse.accessToken)
         }
 
         if (response.status != HttpStatusCode.OK) {

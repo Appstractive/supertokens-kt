@@ -8,6 +8,7 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
+import com.supertokens.sdk.recipes.thirdparty.providers.TokenResponse
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -17,9 +18,9 @@ import io.ktor.http.HttpStatusCode
 class GoogleConfig: OAuthProviderConfig()
 
 class GoogleProvider(
-    private val superTokens: SuperTokens,
+    superTokens: SuperTokens,
     config: GoogleConfig,
-): OAuthProvider<GoogleConfig>(config) {
+): OAuthProvider<GoogleConfig>(superTokens, config) {
 
     override val id = ID
     override val authUrl = AUTH_URL
@@ -40,9 +41,9 @@ class GoogleProvider(
         )
     }
 
-    override suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo {
+    override suspend fun getUserInfo(tokenResponse: TokenResponse): ThirdPartyUserInfo {
         val response = superTokens.client.get(USER_URL) {
-            bearerAuth(accessToken)
+            bearerAuth(tokenResponse.accessToken)
         }
 
         if (response.status != HttpStatusCode.OK) {
@@ -67,7 +68,7 @@ class GoogleProvider(
 
         const val AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
         const val TOKEN_URL = "https://oauth2.googleapis.com/token"
-        const val USER_URL = "https://www.googleapis.com/oauth2/v1/userinfo"
+        const val USER_URL = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json"
     }
 }
 

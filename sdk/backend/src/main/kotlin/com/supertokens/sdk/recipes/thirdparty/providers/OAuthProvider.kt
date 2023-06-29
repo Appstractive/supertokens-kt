@@ -1,5 +1,13 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
+import com.supertokens.sdk.SuperTokens
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
+
 abstract class OAuthProviderConfig: ProviderConfig {
     override var isDefault = false
     var scopes: List<String>? = null
@@ -8,6 +16,7 @@ abstract class OAuthProviderConfig: ProviderConfig {
 }
 
 abstract class OAuthProvider<out C: OAuthProviderConfig>(
+    internal val superTokens: SuperTokens,
     internal val config: C
 ): Provider<C>() {
 
@@ -53,5 +62,21 @@ abstract class OAuthProvider<out C: OAuthProviderConfig>(
             authParams?.forEach { (key, value) -> set(key, value) }
         }
     )
+
+    open suspend fun convertTokenResponse(jsonObject: JsonObject): TokenResponse = TokenResponse(
+        accessToken = jsonObject["access_token"]?.jsonPrimitive?.content ?: throw ThirdPartyProviderException("'access_token' not in response")
+    )
+
+    override suspend fun getTokens(authCode: String, redirectUrl: String?): TokenResponse {
+        val response = superTokens.client.get(getAccessTokenEndpoint(authCode, redirectUrl).fullUrl)
+
+        if (response.status != HttpStatusCode.OK) {
+            throw ThirdPartyProviderException(response.bodyAsText())
+        }
+
+        val body = response.body<JsonObject>()
+
+        return convertTokenResponse(body)
+    }
 
 }
