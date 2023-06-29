@@ -24,6 +24,8 @@ dependencies {
     implementation(libs.ktor.client.json)
     implementation(libs.ktor.client.logging)
 
+    implementation(libs.javax.mail)
+
     implementation(libs.slf4j)
     implementation(libs.jwt)
 

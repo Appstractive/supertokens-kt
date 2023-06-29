@@ -3,6 +3,7 @@ package com.supertokens.sdk.recipes.emailpassword
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokensStatus
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
@@ -60,6 +61,8 @@ class EmailPasswordConfig: RecipeConfig {
             validate = FormField.DEFAULT_PASSWORD_VALIDATOR,
         ),
     )
+
+    var emailService: EmailService? = null
 }
 
 class EmailPasswordRecipe(
@@ -68,6 +71,7 @@ class EmailPasswordRecipe(
 ) : Recipe<EmailPasswordConfig> {
 
     val formFields: List<FormField> = config.formFields.toList()
+    val emailService: EmailService? = config.emailService
 
     suspend fun signUp(email: String, password: String): User {
         val response = superTokens.client.post(PATH_SIGNUP) {
