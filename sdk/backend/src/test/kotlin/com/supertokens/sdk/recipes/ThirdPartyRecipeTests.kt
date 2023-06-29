@@ -10,6 +10,7 @@ import com.supertokens.sdk.recipes.thirdparty.providers.bitbucket.Bitbucket
 import com.supertokens.sdk.recipes.thirdparty.providers.facebook.Facebook
 import com.supertokens.sdk.recipes.thirdparty.providers.github.Github
 import com.supertokens.sdk.recipes.thirdparty.providers.github.GithubProvider
+import com.supertokens.sdk.recipes.thirdparty.providers.gitlab.GitLab
 import com.supertokens.sdk.recipes.thirdparty.thirdPartySignInUp
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
@@ -41,6 +42,11 @@ class ThirdPartyRecipeTests {
             }
 
             provider(Bitbucket) {
+                clientId = "123456"
+                clientSecret = "abcdef"
+            }
+
+            provider(GitLab) {
                 clientId = "123456"
                 clientSecret = "abcdef"
             }
