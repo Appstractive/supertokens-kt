@@ -12,7 +12,7 @@ abstract class OAuthProviderConfig: ProviderConfig {
     override var isDefault = false
     var scopes: List<String>? = null
     var clientId: String? = null
-    var clientSecret: String? = null
+    open val clientSecret: String? = null
 }
 
 abstract class OAuthProvider<out C: OAuthProviderConfig>(
@@ -29,7 +29,8 @@ abstract class OAuthProvider<out C: OAuthProviderConfig>(
     }
 
     val clientId: String = config.clientId ?: throw RuntimeException("clientId not configured for provider ${this::class.simpleName}")
-    val clientSecret: String = config.clientSecret ?: throw RuntimeException("clientSecret not configured for provider ${this::class.simpleName}")
+    val clientSecret: String
+        get() = config.clientSecret ?: throw RuntimeException("clientSecret not configured for provider ${this::class.simpleName}")
 
     abstract val authUrl: String
     abstract val tokenUrl: String
@@ -64,7 +65,8 @@ abstract class OAuthProvider<out C: OAuthProviderConfig>(
     )
 
     open suspend fun convertTokenResponse(jsonObject: JsonObject): TokenResponse = TokenResponse(
-        accessToken = jsonObject["access_token"]?.jsonPrimitive?.content ?: throw ThirdPartyProviderException("'access_token' not in response")
+        accessToken = jsonObject["access_token"]?.jsonPrimitive?.content ?: throw ThirdPartyProviderException("'access_token' not in response for ${this::class.simpleName}"),
+        idToken = jsonObject["id_token"]?.jsonPrimitive?.content,
     )
 
     override suspend fun getTokens(authCode: String, redirectUrl: String?): TokenResponse {

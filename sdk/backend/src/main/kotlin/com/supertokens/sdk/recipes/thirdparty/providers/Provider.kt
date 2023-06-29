@@ -2,6 +2,7 @@ package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
+import java.net.URLEncoder
 
 data class ThirdPartyEmail(
     val id: String,
@@ -24,7 +25,7 @@ data class ProviderEndpoint(
 ) {
 
     val fullUrl: String
-        get() = if(params.isEmpty()) url else "$url?${params.map { "${it.key}=${it.value}" }.joinToString("&")}"
+        get() = if(params.isEmpty()) url else "$url?${params.map { "${it.key}=${URLEncoder.encode(it.value, "UTF-8")}" }.joinToString("&")}"
 
 }
 

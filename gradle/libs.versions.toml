@@ -12,6 +12,8 @@ kotlin-datetime = "0.4.0"
 kotlin-serialization = "1.5.1"
 kotlin-coroutines = "1.6.4"
 
+jwt = "5.2.4"
+
 slf4j = "1.6.1"
 
 [libraries]
@@ -32,6 +34,8 @@ ktor-client-logging = {module = "io.ktor:ktor-client-logging", version.ref = "kt
 ktor-client-serialization = {module = "io.ktor:ktor-client-serialization", version.ref = "ktor_version"}
 ktor-client-json = {module = "io.ktor:ktor-client-json", version.ref = "ktor_version"}
 ktor-client-contentnegotiation = {module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor_version"}
+
+jwt = {module = "io.fusionauth:fusionauth-jwt", version.ref = "jwt"}
 
 slf4j = {module = "org.slf4j:slf4j-simple", version.ref = "slf4j"}
 

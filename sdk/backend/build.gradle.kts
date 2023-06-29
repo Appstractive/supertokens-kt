@@ -25,6 +25,7 @@ dependencies {
     implementation(libs.ktor.client.logging)
 
     implementation(libs.slf4j)
+    implementation(libs.jwt)
 
     testImplementation(libs.test.kotlin)
 }

@@ -17,7 +17,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 
-class GithubConfig : OAuthProviderConfig()
+class GithubConfig : OAuthProviderConfig() {
+    override var clientSecret: String? = null
+}
 
 class GithubProvider(
     superTokens: SuperTokens,

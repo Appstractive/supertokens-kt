@@ -18,6 +18,7 @@ import io.ktor.http.HttpStatusCode
 class GitLabConfig: OAuthProviderConfig() {
 
     var baseUrl = "https://gitlab.com"
+    override var clientSecret: String? = null
 
 }
 

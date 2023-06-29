@@ -14,7 +14,9 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 
-class FacebookConfig : OAuthProviderConfig()
+class FacebookConfig : OAuthProviderConfig() {
+    override var clientSecret: String? = null
+}
 
 class FacebookProvider(
     superTokens: SuperTokens,

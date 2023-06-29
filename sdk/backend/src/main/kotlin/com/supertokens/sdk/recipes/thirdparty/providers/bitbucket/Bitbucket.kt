@@ -15,7 +15,9 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 
-class BitbucketConfig: OAuthProviderConfig()
+class BitbucketConfig: OAuthProviderConfig() {
+    override var clientSecret: String? = null
+}
 
 class BitbucketProvider(
     superTokens: SuperTokens,

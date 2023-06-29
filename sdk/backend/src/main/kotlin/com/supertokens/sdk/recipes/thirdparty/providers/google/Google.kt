@@ -15,7 +15,9 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 
-class GoogleConfig: OAuthProviderConfig()
+class GoogleConfig: OAuthProviderConfig() {
+    override var clientSecret: String? = null
+}
 
 class GoogleProvider(
     superTokens: SuperTokens,
