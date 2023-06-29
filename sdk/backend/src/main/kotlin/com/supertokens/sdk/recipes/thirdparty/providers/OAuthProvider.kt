@@ -3,7 +3,6 @@ package com.supertokens.sdk.recipes.thirdparty.providers
 abstract class OAuthProviderConfig: ProviderConfig {
     override var isDefault = false
     var scopes: List<String>? = null
-    var authParams: Map<String, String>? = null
     var clientId: String? = null
     var clientSecret: String? = null
 }
@@ -26,12 +25,15 @@ abstract class OAuthProvider<out C: OAuthProviderConfig>(
     abstract val authUrl: String
     abstract val tokenUrl: String
     abstract val defaultScopes: List<String>
+    open val authParams: Map<String, String>? = null
+    open val tokenParams: Map<String, String>? = null
 
     override fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?) = ProviderEndpoint(
         url = tokenUrl,
         params = buildMap {
             set("client_id", clientId)
             set("client_secret", clientSecret)
+            tokenParams?.forEach { (key, value) -> set(key, value) }
 
             authCode?.let {
                 set("code", it)
@@ -48,7 +50,7 @@ abstract class OAuthProvider<out C: OAuthProviderConfig>(
         params = buildMap {
             set("scope", scopes.joinToString(" "))
             set("client_id", clientId)
-            config.authParams?.forEach { (key, value) -> set(key, value) }
+            authParams?.forEach { (key, value) -> set(key, value) }
         }
     )
 

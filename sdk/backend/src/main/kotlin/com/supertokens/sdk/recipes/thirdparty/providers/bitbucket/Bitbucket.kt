@@ -1,4 +1,4 @@
-package com.supertokens.sdk.recipes.thirdparty.providers.github
+package com.supertokens.sdk.recipes.thirdparty.providers.bitbucket
 
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
@@ -12,83 +12,89 @@ import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 
-class GithubConfig : OAuthProviderConfig()
+class BitbucketConfig: OAuthProviderConfig()
 
-class GithubProvider(
+class BitbucketProvider(
     private val superTokens: SuperTokens,
-    config: GithubConfig,
-) : OAuthProvider<GithubConfig>(config) {
+    config: BitbucketConfig,
+): OAuthProvider<BitbucketConfig>(config) {
 
     override val id = ID
+
     override val authUrl = AUTH_URL
     override val tokenUrl = TOKEN_URL
     override val defaultScopes = listOf(
-        "read:user",
-        "user:email",
+        "account",
+        "email",
     )
+    override val authParams by lazy {
+        mapOf(
+            "access_type" to "offline",
+            "response_type" to "code",
+        )
+    }
+    override val tokenParams by lazy {
+        mapOf(
+            "grant_type" to "authorization_code",
+        )
+    }
 
     override suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo {
         val response = superTokens.client.get(USER_URL) {
             bearerAuth(accessToken)
-            contentType(HEADER_CONTENT_TYPE)
         }
 
         if (response.status != HttpStatusCode.OK) {
             throw ThirdPartyProviderException(response.bodyAsText())
         }
 
-        val body = response.body<GithubGetUserResponse>()
+        val body = response.body<BitbucketGetUserResponse>()
 
         return ThirdPartyUserInfo(
-            id = body.id.toString(),
+            id = body.uuid,
             email = getEmail(accessToken)?.let {
                 ThirdPartyEmail(
                     id = it.email,
-                    isVerified = it.verified
+                    isVerified = it.is_confirmed
                 )
             }
         )
     }
 
-    private suspend fun getEmail(accessToken: String): GithubGetEmailsResponse? {
+    private suspend fun getEmail(accessToken: String): BitbucketGetEmailsResponse? {
         val response = superTokens.client.get(EMAIL_URL) {
             bearerAuth(accessToken)
-            contentType(HEADER_CONTENT_TYPE)
         }
 
         if (response.status != HttpStatusCode.OK) {
             return null
         }
 
-        val body = response.body<List<GithubGetEmailsResponse>>()
+        val body = response.body<List<BitbucketGetEmailsResponse>>()
 
-        return (body.firstOrNull { it.primary } ?: body.firstOrNull())
+        return (body.firstOrNull { it.is_primary } ?: body.firstOrNull())
     }
 
     companion object {
-        const val ID = "github"
+        const val ID = "bitbucket"
 
-        const val AUTH_URL = "https://github.com/login/oauth/authorize"
-        const val TOKEN_URL = "https://github.com/login/oauth/access_token"
-        const val USER_URL = "https://api.github.com/user"
-        const val EMAIL_URL = "https://api.github.com/user/emails"
-
-        val HEADER_CONTENT_TYPE = ContentType("application", "vnd.github.v3+json")
+        const val AUTH_URL = "https://bitbucket.org/site/oauth2/authorize"
+        const val TOKEN_URL = "https://bitbucket.org/site/oauth2/access_token"
+        const val USER_URL = "https://api.bitbucket.org/2.0/user"
+        const val EMAIL_URL = "https://api.bitbucket.org/2.0/user/emails"
     }
 
 }
 
-val Github = object : ProviderBuilder<GithubConfig, GithubProvider>() {
+val Bitbucket = object : ProviderBuilder<BitbucketConfig, BitbucketProvider>() {
 
-    override fun install(configure: GithubConfig.() -> Unit): (SuperTokens, ThirdPartyRecipe) -> GithubProvider {
-        val config = GithubConfig().apply(configure)
+    override fun install(configure: BitbucketConfig.() -> Unit): (SuperTokens, ThirdPartyRecipe) -> BitbucketProvider {
+        val config = BitbucketConfig().apply(configure)
 
         return { superTokens, _ ->
-            GithubProvider(
+            BitbucketProvider(
                 superTokens, config,
             )
         }

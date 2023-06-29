@@ -6,6 +6,8 @@ import com.supertokens.sdk.recipes.thirdparty.ThirdParty
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.getUsersByEmail
 import com.supertokens.sdk.recipes.thirdparty.provider
+import com.supertokens.sdk.recipes.thirdparty.providers.bitbucket.Bitbucket
+import com.supertokens.sdk.recipes.thirdparty.providers.facebook.Facebook
 import com.supertokens.sdk.recipes.thirdparty.providers.github.Github
 import com.supertokens.sdk.recipes.thirdparty.providers.github.GithubProvider
 import com.supertokens.sdk.recipes.thirdparty.thirdPartySignInUp
@@ -33,6 +35,15 @@ class ThirdPartyRecipeTests {
                 clientSecret = "abcdef"
             }
 
+            provider(Facebook) {
+                clientId = "123456"
+                clientSecret = "abcdef"
+            }
+
+            provider(Bitbucket) {
+                clientId = "123456"
+                clientSecret = "abcdef"
+            }
         }
     }
 
