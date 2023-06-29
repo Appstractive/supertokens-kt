@@ -12,8 +12,6 @@ kotlin-datetime = "0.4.0"
 kotlin-serialization = "1.5.1"
 kotlin-coroutines = "1.6.4"
 
-kotlin-util = "1.8.0"
-
 slf4j = "1.6.1"
 
 [libraries]
@@ -25,8 +23,6 @@ kotlin-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serializati
 kotlin-datetime = {module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime"}
 kotlin-coroutines = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines"}
 kotlin-reflect = {module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin"}
-
-kotlin-util = {module = "it.czerwinski:kotlin-util", version.ref = "kotlin-util"}
 
 ktor-serialization = {module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor_version"}
 

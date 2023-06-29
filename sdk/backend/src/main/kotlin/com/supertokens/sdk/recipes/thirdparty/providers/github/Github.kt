@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers.github
 
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.SuperTokensStatus
+import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.Provider
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
@@ -9,6 +9,7 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderEndpoint
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
+import com.supertokens.sdk.toStatus
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -16,16 +17,14 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import it.czerwinski.kotlin.util.Either
-import it.czerwinski.kotlin.util.Left
-import it.czerwinski.kotlin.util.Right
 
-class GithubConfig : ProviderConfig {
+class GithubConfig() : ProviderConfig {
 
     var scopes: List<String>? = null
     var authParams: Map<String, String>? = null
     var clientId: String? = null
     var clientSecret: String? = null
+    override var isDefault = false
 
 }
 
@@ -35,6 +34,7 @@ class GithubProvider(
 ) : Provider<GithubConfig>() {
 
     override val id = ID
+    override val isDefault = config.isDefault
 
     val scopes = buildList {
         addAll(DEFAULT_SCOPES)
@@ -69,28 +69,26 @@ class GithubProvider(
         }
     )
 
-    override suspend fun getUserInfo(accessToken: String): Either<SuperTokensStatus, ThirdPartyUserInfo> {
+    override suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo {
         val response = superTokens.client.get(USER_URL) {
             bearerAuth(accessToken)
             contentType(HEADER_CONTENT_TYPE)
         }
 
         if (response.status != HttpStatusCode.OK) {
-            return Left(SuperTokensStatus.ThirdPartyProviderError(response.bodyAsText()))
+            throw SuperTokensStatusException(response.bodyAsText().toStatus())
         }
 
         val body = response.body<GithubGetUserResponse>()
 
-        return Right(
-            ThirdPartyUserInfo(
-                id = body.id.toString(),
-                email = getEmail(accessToken)?.let {
-                    ThirdPartyEmail(
-                        id = it.email,
-                        isVerified = it.verified
-                    )
-                }
-            )
+        return ThirdPartyUserInfo(
+            id = body.id.toString(),
+            email = getEmail(accessToken)?.let {
+                ThirdPartyEmail(
+                    id = it.email,
+                    isVerified = it.verified
+                )
+            }
         )
     }
 

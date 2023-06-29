@@ -23,7 +23,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -48,135 +47,89 @@ class SessionRecipeTests {
 
     @Test
     fun testCreateSession() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
-
-        assertTrue(response.isRight)
-        val user = response.get()
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
         val session = superTokens.createSession(userId = user.id, userDataInJWT = jwtData, userDataInDatabase = dbData)
-        assertTrue(session.isRight)
+        assertEquals(user.id, session.session.userId)
     }
 
     @Test
     fun testGetSession() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
-        assertTrue(response.isRight)
-        val user = response.get()
-
-        val sessionResponse = superTokens.createSession(userId = user.id, userDataInJWT = jwtData, userDataInDatabase = dbData)
-        assertTrue(sessionResponse.isRight)
-        val session = sessionResponse.get()
+        val session = superTokens.createSession(userId = user.id, userDataInJWT = jwtData, userDataInDatabase = dbData)
 
         val getResponse = superTokens.getSession(session.session.handle)
-        assertTrue(getResponse.isRight)
-
-        assertEquals(session.session.handle, getResponse.get().sessionHandle)
+        assertEquals(session.session.handle, getResponse.sessionHandle)
     }
 
     @Test
     fun testGetSessions() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
-        assertTrue(response.isRight)
-        val user = response.get()
+        val session = superTokens.createSession(user.id)
 
-        val sessionResponse = superTokens.createSession(user.id)
-        assertTrue(sessionResponse.isRight)
-        val session = sessionResponse.get()
-
-        val getSessionsResponse = superTokens.getSessions(user.id)
-        assertTrue(getSessionsResponse.isRight)
-        val sessions = getSessionsResponse.get()
+        val sessions = superTokens.getSessions(user.id)
 
         assertTrue(sessions.contains(session.session.handle))
     }
 
     @Test
     fun testRemoveSessions() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
-        assertTrue(response.isRight)
-        val user = response.get()
+        val session = superTokens.createSession(user.id)
 
-        val sessionResponse = superTokens.createSession(user.id)
-        assertTrue(sessionResponse.isRight)
-        val session = sessionResponse.get()
-
-        val getSessionsResponse = superTokens.removeSessions(listOf(session.session.handle))
-        assertTrue(getSessionsResponse.isRight)
-        val sessions = getSessionsResponse.get()
+        val sessions = superTokens.removeSessions(listOf(session.session.handle))
 
         assertTrue(sessions.contains(session.session.handle))
     }
 
     @Test
     fun testVerifySession() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
-        assertTrue(response.isRight)
-        val user = response.get()
-
-        val sessionResponse = superTokens.createSession(user.id)
-        assertTrue(sessionResponse.isRight)
-        val session = sessionResponse.get()
+        val session = superTokens.createSession(user.id)
 
         val verifySessionsResponse = superTokens.verifySession(
             session.accessToken.token,
         )
-        assertTrue(verifySessionsResponse.isRight)
+        assertEquals(session.session.handle, verifySessionsResponse.session.handle)
     }
 
     @Test
     fun testRefreshSession() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
-        assertTrue(response.isRight)
-        val user = response.get()
-
-        val sessionResponse = superTokens.createSession(user.id)
-        assertTrue(sessionResponse.isRight)
-        val session = sessionResponse.get()
+        val session = superTokens.createSession(user.id)
 
         val refreshSessionsResponse = superTokens.refreshSession(
             session.refreshToken.token,
         )
-        assertTrue(refreshSessionsResponse.isRight)
 
-        assertEquals(session.session.handle, refreshSessionsResponse.get().session.handle)
+        assertEquals(session.session.handle, refreshSessionsResponse.session.handle)
     }
 
     @Test
     fun testRegenerateSession() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
-        assertTrue(response.isRight)
-        val user = response.get()
-
-        val sessionResponse = superTokens.createSession(user.id)
-        assertTrue(sessionResponse.isRight)
-        val session = sessionResponse.get()
+        val session = superTokens.createSession(user.id)
 
         val regenerateSessionsResponse = superTokens.regenerateSession(
             session.accessToken.token,
             jwtData,
         )
-        assertTrue(regenerateSessionsResponse.isRight)
 
-        assertNotNull(regenerateSessionsResponse.get().session.userDataInJWT)
-        assertEquals(session.session.handle, regenerateSessionsResponse.get().session.handle)
+        assertNotNull(regenerateSessionsResponse.session.userDataInJWT)
+        assertEquals(session.session.handle, regenerateSessionsResponse.session.handle)
     }
 
     @Test
     fun testUpdateSessionData() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
-        assertTrue(response.isRight)
-        val user = response.get()
-
-        val sessionResponse = superTokens.createSession(user.id)
-        assertTrue(sessionResponse.isRight)
-        val session = sessionResponse.get()
+        val session = superTokens.createSession(user.id)
 
         val updateResponse = superTokens.updateSessionData(
             session.session.handle,
@@ -187,14 +140,9 @@ class SessionRecipeTests {
 
     @Test
     fun testUpdateJwtData() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
-        assertTrue(response.isRight)
-        val user = response.get()
-
-        val sessionResponse = superTokens.createSession(user.id)
-        assertTrue(sessionResponse.isRight)
-        val session = sessionResponse.get()
+        val session = superTokens.createSession(user.id)
 
         val updateResponse = superTokens.updateJwtData(
             session.session.handle,

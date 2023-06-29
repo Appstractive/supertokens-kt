@@ -31,8 +31,6 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
-import it.czerwinski.kotlin.util.Either
-import it.czerwinski.kotlin.util.Right
 
 class SessionConfig: RecipeConfig
 
@@ -47,7 +45,7 @@ class SessionRecipe(
         userDataInDatabase: Map<String, Any?>? = null,
         enableAntiCsrf: Boolean = false,
         useDynamicSigningKey: Boolean = false,
-    ): Either<SuperTokensStatus, CreateSessionData> {
+    ): CreateSessionData {
         val response = superTokens.client.post(PATH_SESSION) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -73,7 +71,7 @@ class SessionRecipe(
         }
     }
 
-    suspend fun getSession(sessionHandle: String): Either<SuperTokensStatus, GetSessionData> {
+    suspend fun getSession(sessionHandle: String): GetSessionData {
         val response = superTokens.client.get("$PATH_SESSION?sessionHandle=$sessionHandle") {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -95,7 +93,7 @@ class SessionRecipe(
         }
     }
 
-    suspend fun getSessions(userId: String): Either<SuperTokensStatus, List<String>> {
+    suspend fun getSessions(userId: String): List<String> {
         val response = superTokens.client.get("$PATH_SESSIONS?userId=$userId") {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -106,9 +104,9 @@ class SessionRecipe(
         }
     }
 
-    suspend fun removeSessions(sessionHandles: List<String>): Either<SuperTokensStatus, List<String>> {
+    suspend fun removeSessions(sessionHandles: List<String>): List<String> {
         if (sessionHandles.isEmpty()) {
-            return Right(emptyList())
+            return emptyList()
         }
 
         val response = superTokens.client.post(PATH_SESSION_REMOVE) {
@@ -133,7 +131,7 @@ class SessionRecipe(
         doAntiCsrfCheck: Boolean = false,
         checkDatabase: Boolean = false,
         antiCsrfToken: String? = null,
-    ): Either<SuperTokensStatus, VerifySessionData> {
+    ): VerifySessionData {
 
         val response = superTokens.client.post(PATH_SESSION_VERIFY) {
 
@@ -162,7 +160,7 @@ class SessionRecipe(
         refreshToken: String,
         enableAntiCsrf: Boolean = false,
         antiCsrfToken: String? = null,
-    ): Either<SuperTokensStatus, CreateSessionData> {
+    ): CreateSessionData {
         val response = superTokens.client.post(PATH_SESSION_REFRESH) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -189,7 +187,7 @@ class SessionRecipe(
     suspend fun regenerateSession(
         accessToken: String,
         userDataInJWT: Map<String, Any?>? = null,
-    ): Either<SuperTokensStatus, RegenerateSessionData> {
+    ): RegenerateSessionData {
 
         val response = superTokens.client.post(PATH_SESSION_REGENERATE) {
 

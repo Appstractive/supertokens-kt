@@ -14,7 +14,6 @@ dependencies {
 
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.coroutines)
-    implementation(libs.kotlin.util)
 
     implementation(libs.ktor.serialization)
 

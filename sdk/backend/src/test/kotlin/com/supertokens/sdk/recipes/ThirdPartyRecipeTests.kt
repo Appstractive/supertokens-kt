@@ -56,16 +56,14 @@ class ThirdPartyRecipeTests {
     fun testSignInUp() = runBlocking {
         val response = superTokens.thirdPartySignInUp("google", "12345678", "test@test.de")
 
-        assertTrue(response.isRight)
-        val user = response.get()
+        val thirdParty = assertNotNull(response.user.thirdParty)
     }
 
     @Test
     fun testGetUsersByMail() = runBlocking {
         val response = superTokens.getUsersByEmail("test@test.de")
 
-        assertTrue(response.isRight)
-        val users = response.get()
+        assertTrue(response.isNotEmpty())
     }
 
 }

@@ -2,7 +2,6 @@ package com.supertokens.sdk.recipes.thirdparty
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.SuperTokensStatus
 import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
@@ -21,7 +20,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import it.czerwinski.kotlin.util.Either
 
 fun <C: ProviderConfig, R: Provider<C>> ThirdPartyConfig.provider(builder: ProviderBuilder<C, R>, configure: C.() -> Unit = {}) {
     +builder.install(configure)
@@ -49,7 +47,7 @@ class ThirdPartyRecipe(
         thirdPartyId: String,
         thirdPartyUserId: String,
         email: String
-    ): Either<SuperTokensStatus, ThirdPartySignInUpData> {
+    ): ThirdPartySignInUpData {
         val response = superTokens.client.post(PATH_SIGN_IN_UP) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -73,7 +71,7 @@ class ThirdPartyRecipe(
         }
     }
 
-    suspend fun getUsersByEmail(email: String): Either<SuperTokensStatus, List<User>> {
+    suspend fun getUsersByEmail(email: String): List<User> {
         val response = superTokens.client.get("$PATH_USERS_BY_EMAIL?email=$email") {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -84,7 +82,11 @@ class ThirdPartyRecipe(
         }
     }
 
-    fun getProvider(id: String) = providers.firstOrNull { it.id == id }
+    fun getProvider(id: String): Provider<*>? = providers.filter { it.id == id }.let {
+        it.firstOrNull { provider ->
+            provider.isDefault
+        } ?: it.firstOrNull()
+    }
 
     companion object {
         const val ID = "thirdparty"

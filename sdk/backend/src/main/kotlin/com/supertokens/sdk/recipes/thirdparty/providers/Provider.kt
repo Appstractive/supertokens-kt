@@ -1,9 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.SuperTokensStatus
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
-import it.czerwinski.kotlin.util.Either
 
 data class ThirdPartyEmail(
     val id: String,
@@ -25,15 +23,18 @@ data class ProviderEndpoint(
 
 }
 
-interface ProviderConfig
+interface ProviderConfig {
+    val isDefault: Boolean
+}
 
 abstract class Provider<C: ProviderConfig> {
 
     abstract val id: String
+    abstract val isDefault: Boolean
 
     abstract fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?): ProviderEndpoint
     abstract fun getAuthorizationEndpoint(): ProviderEndpoint
-    abstract suspend fun getUserInfo(accessToken: String): Either<SuperTokensStatus, ThirdPartyUserInfo>
+    abstract suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo
 
 }
 

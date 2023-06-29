@@ -7,7 +7,6 @@ import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
-import com.supertokens.sdk.recipes.common.parseUserResponse
 import com.supertokens.sdk.recipes.emailpassword.requests.CreateResetPasswordTokenRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignInRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignUpRequest
@@ -15,19 +14,13 @@ import com.supertokens.sdk.recipes.emailpassword.requests.ResetPasswordWithToken
 import com.supertokens.sdk.recipes.emailpassword.requests.UpdateUserRequest
 import com.supertokens.sdk.recipes.emailpassword.responses.CreateResetPasswordTokenResponse
 import com.supertokens.sdk.recipes.emailpassword.responses.ResetPasswordWithTokenResponse
-import com.supertokens.sdk.toStatus
 import com.supertokens.sdk.utils.parse
-import io.ktor.client.call.body
+import com.supertokens.sdk.utils.parseUser
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpStatusCode
-import it.czerwinski.kotlin.util.Either
-import it.czerwinski.kotlin.util.Left
-import it.czerwinski.kotlin.util.Right
 
 typealias Validate = (value: String) -> Boolean
 
@@ -74,7 +67,7 @@ class EmailPasswordRecipe(
         ),
     )
 
-    suspend fun signUp(email: String, password: String): Either<SuperTokensStatus, User> {
+    suspend fun signUp(email: String, password: String): User {
         val response = superTokens.client.post(PATH_SIGNUP) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -87,10 +80,10 @@ class EmailPasswordRecipe(
             )
         }
 
-        return response.parseUserResponse()
+        return response.parseUser()
     }
 
-    suspend fun signIn(email: String, password: String): Either<SuperTokensStatus, User> {
+    suspend fun signIn(email: String, password: String): User {
         val response = superTokens.client.post(PATH_SIGNIN) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -103,28 +96,28 @@ class EmailPasswordRecipe(
             )
         }
 
-        return response.parseUserResponse()
+        return response.parseUser()
     }
 
-    suspend fun getUserById(userId: String): Either<SuperTokensStatus, User> {
+    suspend fun getUserById(userId: String): User {
 
         val response = superTokens.client.get("$PATH_GET_USER?userId=$userId") {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parseUserResponse()
+        return response.parseUser()
     }
 
-    suspend fun getUserByEMail(email: String): Either<SuperTokensStatus, User> {
+    suspend fun getUserByEMail(email: String): User {
 
         val response = superTokens.client.get("$PATH_GET_USER?email=$email") {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parseUserResponse()
+        return response.parseUser()
     }
 
-    suspend fun createResetPasswordToken(userId: String): Either<SuperTokensStatus, String> {
+    suspend fun createResetPasswordToken(userId: String): String {
         val response = superTokens.client.post(PATH_PASSWORD_RESET_TOKEN) {
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -135,19 +128,12 @@ class EmailPasswordRecipe(
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return Left(response.bodyAsText().toStatus())
-        }
-
-        val body = response.body<CreateResetPasswordTokenResponse>()
-
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> Right(body.token)
-            else -> Left(status)
+        return response.parse<CreateResetPasswordTokenResponse, String> {
+            token
         }
     }
 
-    suspend fun resetPasswordWithToken(token: String, newPassword: String): Either<SuperTokensStatus, String> {
+    suspend fun resetPasswordWithToken(token: String, newPassword: String): String {
         val response = superTokens.client.post(PATH_PASSWORD_RESET) {
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -159,15 +145,8 @@ class EmailPasswordRecipe(
             )
         }
 
-        if (response.status != HttpStatusCode.OK) {
-            return Left(response.bodyAsText().toStatus())
-        }
-
-        val body = response.body<ResetPasswordWithTokenResponse>()
-
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> Right(body.userId)
-            else -> Left(status)
+        return response.parse<ResetPasswordWithTokenResponse, String> {
+            userId
         }
     }
 
@@ -235,34 +214,26 @@ val EmailPassword = object: RecipeBuilder<EmailPasswordConfig, EmailPasswordReci
 
 }
 
-suspend fun SuperTokens.emailPasswordSignUp(email: String, password: String): Either<SuperTokensStatus, User> {
-    return getRecipe<EmailPasswordRecipe>().signUp(email, password)
-}
+suspend fun SuperTokens.emailPasswordSignUp(email: String, password: String) =
+    getRecipe<EmailPasswordRecipe>().signUp(email, password)
 
-suspend fun SuperTokens.emailPasswordSignIn(email: String, password: String): Either<SuperTokensStatus, User> {
-    return getRecipe<EmailPasswordRecipe>().signIn(email, password)
-}
+suspend fun SuperTokens.emailPasswordSignIn(email: String, password: String) =
+    getRecipe<EmailPasswordRecipe>().signIn(email, password)
 
-suspend fun SuperTokens.emailPasswordGetUserById(userId: String): Either<SuperTokensStatus, User> {
-    return getRecipe<EmailPasswordRecipe>().getUserById(userId)
-}
+suspend fun SuperTokens.emailPasswordGetUserById(userId: String) =
+    getRecipe<EmailPasswordRecipe>().getUserById(userId)
 
-suspend fun SuperTokens.getUserByEmail(email: String): Either<SuperTokensStatus, User> {
-    return getRecipe<EmailPasswordRecipe>().getUserByEMail(email)
-}
+suspend fun SuperTokens.getUserByEmail(email: String) =
+    getRecipe<EmailPasswordRecipe>().getUserByEMail(email)
 
-suspend fun SuperTokens.createResetPasswordToken(userId: String): Either<SuperTokensStatus, String> {
-    return getRecipe<EmailPasswordRecipe>().createResetPasswordToken(userId)
-}
+suspend fun SuperTokens.createResetPasswordToken(userId: String) =
+    getRecipe<EmailPasswordRecipe>().createResetPasswordToken(userId)
 
-suspend fun SuperTokens.resetPasswordWithToken(token: String, newPassword: String): Either<SuperTokensStatus, String> {
-    return getRecipe<EmailPasswordRecipe>().resetPasswordWithToken(token, newPassword)
-}
+suspend fun SuperTokens.resetPasswordWithToken(token: String, newPassword: String) =
+    getRecipe<EmailPasswordRecipe>().resetPasswordWithToken(token, newPassword)
 
-suspend fun SuperTokens.updateEmail(userId: String, email: String): SuperTokensStatus {
-    return getRecipe<EmailPasswordRecipe>().updateEmail(userId, email)
-}
+suspend fun SuperTokens.updateEmail(userId: String, email: String) =
+    getRecipe<EmailPasswordRecipe>().updateEmail(userId, email)
 
-suspend fun SuperTokens.updatePassword(userId: String, password: String, applyPasswordPolicy: Boolean = true): SuperTokensStatus {
-    return getRecipe<EmailPasswordRecipe>().updatePassword(userId, password, applyPasswordPolicy)
-}
+suspend fun SuperTokens.updatePassword(userId: String, password: String, applyPasswordPolicy: Boolean = true) =
+    getRecipe<EmailPasswordRecipe>().updatePassword(userId, password, applyPasswordPolicy)

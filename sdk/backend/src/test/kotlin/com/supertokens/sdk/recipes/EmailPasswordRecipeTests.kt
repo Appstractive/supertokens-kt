@@ -18,7 +18,6 @@ import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class EmailPasswordRecipeTests {
 
@@ -43,59 +42,45 @@ class EmailPasswordRecipeTests {
 
     @Test
     fun testCreateUser() = runBlocking {
-        val response = superTokens.emailPasswordSignUp("test@test.de", "a1234567")
-
-        assertTrue(response.isRight)
+        val user = superTokens.emailPasswordSignUp("test@test.de", "a1234567")
+        assertEquals("test@test.de", user.email)
     }
 
     @Test
     fun testSignInUser() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
-
-        assertTrue(response.isRight)
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        assertEquals("test@test.de", user.email)
     }
 
     @Test
     fun testGetUserById() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
-
-        assertTrue(response.isRight)
-        val user = response.get()
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
         val getResponse = superTokens.emailPasswordGetUserById(user.id)
 
-        assertTrue(getResponse.isRight)
+        assertEquals(user.id, getResponse.id)
     }
 
     @Test
     fun testGetUserByMail() = runBlocking {
-        val response = superTokens.getUserByEmail("test@test.de")
+        val user = superTokens.getUserByEmail("test@test.de")
 
-        assertTrue(response.isRight)
+        assertEquals("test@test.de", user.email)
     }
 
     @Test
     fun testPasswordReset() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
-        assertTrue(response.isRight)
-        val user = response.get()
-
-        val resetTokenResponse = superTokens.createResetPasswordToken(user.id)
-        assertTrue(resetTokenResponse.isRight)
-        val token = resetTokenResponse.get()
+        val token = superTokens.createResetPasswordToken(user.id)
 
         val resetResponse = superTokens.resetPasswordWithToken(token, "a1234567")
-        assertTrue(resetResponse.isRight)
-        assertEquals(user.id, resetResponse.get())
+        assertEquals(user.id, resetResponse)
     }
 
     @Test
     fun testChangeEMail() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
-
-        assertTrue(response.isRight)
-        val user = response.get()
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
         assertEquals(SuperTokensStatus.OK, superTokens.updateEmail(user.id, "test2@test.de"))
         assertEquals(SuperTokensStatus.OK, superTokens.updateEmail(user.id, "test@test.de"))
@@ -103,10 +88,7 @@ class EmailPasswordRecipeTests {
 
     @Test
     fun testChangePassword() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
-
-        assertTrue(response.isRight)
-        val user = response.get()
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
         assertEquals(SuperTokensStatus.OK, superTokens.updatePassword(user.id, "1abcdefg"))
         assertEquals(SuperTokensStatus.OK, superTokens.updatePassword(user.id, "a1234567"))
@@ -114,10 +96,7 @@ class EmailPasswordRecipeTests {
 
     @Test
     fun testChangePasswordDefaultPolicyError() = runBlocking {
-        val response = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
-
-        assertTrue(response.isRight)
-        val user = response.get()
+        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
 
         assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.updatePassword(user.id, "abcdefgh"))
         assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.updatePassword(user.id, "12345678"))
