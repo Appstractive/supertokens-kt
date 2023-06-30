@@ -1,7 +1,9 @@
 package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
-import com.supertokens.sdk.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.ingredients.email.smtp.SmtpConfig
+import com.supertokens.sdk.ingredients.email.smtp.SmtpEmailService
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
@@ -29,7 +31,17 @@ class EmailPasswordRecipeTests {
             websiteDomain = "localhost",
         ),
     ) {
-        recipe(EmailPassword)
+        recipe(EmailPassword) {
+            emailService = SmtpEmailService(
+                SmtpConfig(
+                    host = "localhost",
+                    port = 1025,
+                    password = "",
+                    fromEmail = "test@example.com",
+                    fromName = "SuperTokens Test",
+                )
+            )
+        }
     }
 
     @Test

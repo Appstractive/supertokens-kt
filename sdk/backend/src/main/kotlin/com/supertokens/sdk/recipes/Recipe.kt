@@ -9,6 +9,6 @@ typealias BuildRecipe = (SuperTokens) -> Recipe<*>
 
 abstract class RecipeBuilder<C: RecipeConfig, R: Recipe<C>> {
 
-    abstract fun install(configure: C.() -> Unit): (SuperTokens) -> R
+    abstract fun install(configure: C.() -> Unit): BuildRecipe
 
 }

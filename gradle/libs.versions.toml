@@ -37,6 +37,10 @@ ktor-client-serialization = {module = "io.ktor:ktor-client-serialization", versi
 ktor-client-json = {module = "io.ktor:ktor-client-json", version.ref = "ktor_version"}
 ktor-client-contentnegotiation = {module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor_version"}
 
+ktor-server-core = {module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor_version"}
+ktor-server-contentnegotiation = {module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor_version"}
+ktor-server-statuspages = {module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor_version"}
+
 javax-mail = {module = "org.apache.commons:commons-email", version.ref = "mail"}
 
 jwt = {module = "io.fusionauth:fusionauth-jwt", version.ref = "jwt"}

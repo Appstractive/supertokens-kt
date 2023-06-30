@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.emailpassword
 
 import com.supertokens.sdk.Constants
-import com.supertokens.sdk.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.User
@@ -29,38 +29,10 @@ data class FormField(
     val id: String,
     val optional: Boolean = true,
     val validate: Validate? = null
-) {
-
-    companion object {
-        const val FORM_FIELD_EMAIL_ID = "email"
-        const val FORM_FIELD_PASSWORD_ID = "password"
-
-        private val DEFAULT_PASSWORD_REGEXP = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")
-        val DEFAULT_PASSWORD_VALIDATOR: Validate = {
-            DEFAULT_PASSWORD_REGEXP.matches(it)
-        }
-
-        private val DEFAULT_EMAIL_REGEXP = Regex("[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,6}")
-        val DEFAULT_EMAIL_VALIDATOR: Validate = {
-            DEFAULT_EMAIL_REGEXP.matches(it)
-        }
-    }
-
-}
+)
 
 class EmailPasswordConfig: RecipeConfig {
-    var formFields: List<FormField> = listOf(
-        FormField(
-            id = FormField.FORM_FIELD_EMAIL_ID,
-            optional = false,
-            validate = FormField.DEFAULT_EMAIL_VALIDATOR,
-        ),
-        FormField(
-            id = FormField.FORM_FIELD_PASSWORD_ID,
-            optional = false,
-            validate = FormField.DEFAULT_PASSWORD_VALIDATOR,
-        ),
-    )
+    var formFields: List<FormField> = EmailPasswordRecipe.DEFAULT_FORM_FIELDS
 
     var emailService: EmailService? = null
 }
@@ -174,7 +146,7 @@ class EmailPasswordRecipe(
     suspend fun updatePassword(userId: String, password: String, applyPasswordPolicy: Boolean = true): SuperTokensStatus {
 
         if(applyPasswordPolicy) {
-            formFields.firstOrNull {it.id == FormField.FORM_FIELD_PASSWORD_ID}?.validate?.let {
+            formFields.firstOrNull {it.id == FORM_FIELD_PASSWORD_ID}?.validate?.let {
                 if(!it.invoke(password)) {
                     return SuperTokensStatus.PasswordPolicyViolatedError
                 }
@@ -204,6 +176,32 @@ class EmailPasswordRecipe(
         const val PATH_UPDATE_USER = "recipe/user"
         const val PATH_PASSWORD_RESET_TOKEN = "recipe/user/password/reset/token"
         const val PATH_PASSWORD_RESET = "recipe/user/password/reset"
+
+        const val FORM_FIELD_EMAIL_ID = "email"
+        const val FORM_FIELD_PASSWORD_ID = "password"
+
+        private val DEFAULT_PASSWORD_REGEXP = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")
+        private val DEFAULT_PASSWORD_VALIDATOR: Validate = {
+            DEFAULT_PASSWORD_REGEXP.matches(it)
+        }
+
+        private val DEFAULT_EMAIL_REGEXP = Regex("[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,6}")
+        private val DEFAULT_EMAIL_VALIDATOR: Validate = {
+            DEFAULT_EMAIL_REGEXP.matches(it)
+        }
+
+        val DEFAULT_FORM_FIELDS = listOf(
+            FormField(
+                id = FORM_FIELD_EMAIL_ID,
+                optional = false,
+                validate = DEFAULT_EMAIL_VALIDATOR,
+            ),
+            FormField(
+                id = FORM_FIELD_PASSWORD_ID,
+                optional = false,
+                validate = DEFAULT_PASSWORD_VALIDATOR,
+            ),
+        )
     }
 
 }

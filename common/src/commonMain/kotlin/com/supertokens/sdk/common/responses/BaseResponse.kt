@@ -1,4 +1,4 @@
-package com.supertokens.sdk.recipes.common
+package com.supertokens.sdk.common.responses
 
 interface BaseResponse {
 

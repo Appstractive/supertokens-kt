@@ -18,11 +18,10 @@ import kotlinx.serialization.json.Json
 
 data class AppConfig(
     val name: String,
-    val websiteDomain: String,
-    val websiteBasePath: String? = null,
-    val apiDomain: String,
-    val apiBasePath: String? = null,
-    val apiGatewayPath: String? = null,
+    val websiteDomain: String = "localhost",
+    val websiteBasePath: String = "/auth",
+    val apiDomain: String = "localhost",
+    val apiBasePath: String = "/auth",
 )
 
 fun <C: RecipeConfig, R: Recipe<C>> SuperTokensConfig.recipe(builder: RecipeBuilder<C, R>, configure: C.() -> Unit = {}) {
@@ -81,6 +80,8 @@ class SuperTokens(
 
     inline fun <reified T : Recipe<*>> getRecipe(): T = recipes.filterIsInstance<T>().firstOrNull()
         ?: throw RuntimeException("Recipe ${T::class.java.simpleName} not configured")
+
+    inline fun <reified T : Recipe<*>> hasRecipe(): Boolean = recipes.filterIsInstance<T>().isNotEmpty()
 
 }
 

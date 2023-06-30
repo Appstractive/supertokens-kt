@@ -2,7 +2,7 @@ package com.supertokens.sdk.recipes.session
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.recipes.Recipe
@@ -32,12 +32,18 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
-class SessionConfig: RecipeConfig
+class SessionConfig: RecipeConfig {
+
+    var cookieDomain: String = "localhost"
+
+}
 
 class SessionRecipe(
     private val superTokens: SuperTokens,
-    private val sessionConfig: SessionConfig
+    private val config: SessionConfig
 ) : Recipe<SessionConfig> {
+
+    val cookieDomain = config.cookieDomain
 
     suspend fun createSession(
         userId: String,

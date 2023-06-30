@@ -1,5 +1,6 @@
 package com.supertokens.sdk.recipes.common
 
+import com.supertokens.sdk.common.responses.BaseResponse
 import com.supertokens.sdk.models.User
 import kotlinx.serialization.Serializable
 

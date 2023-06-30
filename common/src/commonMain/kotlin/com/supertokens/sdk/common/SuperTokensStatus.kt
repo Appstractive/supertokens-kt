@@ -1,4 +1,4 @@
-package com.supertokens.sdk
+package com.supertokens.sdk.common
 
 sealed class SuperTokensStatus(
     val value: String
@@ -16,8 +16,7 @@ sealed class SuperTokensStatus(
     object InvalidApiKeyError: SuperTokensStatus("Invalid API key")
     object UnauthorizedError: SuperTokensStatus("UNAUTHORISED")
     object TryRefreshTokenError: SuperTokensStatus("TRY_REFRESH_TOKEN")
-
-    class ThirdPartyProviderError(error: String): SuperTokensStatus(error)
+    object FormFieldError: SuperTokensStatus("FIELD_ERROR")
 
     data class UnknownError(val message: String): SuperTokensStatus(message)
 
@@ -36,6 +35,7 @@ fun String.toStatus(): SuperTokensStatus {
         SuperTokensStatus.InvalidApiKeyError.value -> SuperTokensStatus.InvalidApiKeyError
         SuperTokensStatus.UnauthorizedError.value -> SuperTokensStatus.UnauthorizedError
         SuperTokensStatus.TryRefreshTokenError.value -> SuperTokensStatus.TryRefreshTokenError
+        SuperTokensStatus.FormFieldError.value -> SuperTokensStatus.FormFieldError
         else -> SuperTokensStatus.UnknownError(this)
     }
 }

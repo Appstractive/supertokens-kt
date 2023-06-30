@@ -1,6 +1,6 @@
 package com.supertokens.sdk.recipes.emailpassword.responses
 
-import com.supertokens.sdk.recipes.common.BaseResponse
+import com.supertokens.sdk.common.responses.BaseResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
