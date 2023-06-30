@@ -1,6 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.SuperTokensProviderDslMarker
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import java.net.URLEncoder
 
@@ -29,6 +30,7 @@ data class ProviderEndpoint(
 
 }
 
+@SuperTokensProviderDslMarker
 interface ProviderConfig {
     val isDefault: Boolean
 }

@@ -4,7 +4,6 @@ import com.supertokens.ktor.routes.emailpassword.emailPasswordRoutes
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.ApplicationStarted
 import io.ktor.server.application.application

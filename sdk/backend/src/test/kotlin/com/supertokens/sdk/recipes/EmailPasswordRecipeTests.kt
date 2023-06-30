@@ -48,8 +48,8 @@ class EmailPasswordRecipeTests {
     fun testConfig() {
         val recipe = superTokens.getRecipe<EmailPasswordRecipe>()
         assertEquals(2, recipe.formFields.size)
-        assertEquals(FormField.FORM_FIELD_EMAIL_ID, recipe.formFields[0].id)
-        assertEquals(FormField.FORM_FIELD_PASSWORD_ID, recipe.formFields[1].id)
+        assertEquals(EmailPasswordRecipe.FORM_FIELD_EMAIL_ID, recipe.formFields[0].id)
+        assertEquals(EmailPasswordRecipe.FORM_FIELD_PASSWORD_ID, recipe.formFields[1].id)
     }
 
     @Test

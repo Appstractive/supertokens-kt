@@ -1,7 +1,9 @@
 package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.SuperTokensRecipeDslMarker
 
+@SuperTokensRecipeDslMarker
 interface RecipeConfig
 interface Recipe<C: RecipeConfig>
 
