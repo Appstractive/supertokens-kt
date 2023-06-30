@@ -1,7 +1,7 @@
-package com.supertokens.ktor.routes.emailpassword
+package com.supertokens.ktor.recipes.emailpassword
 
-import com.supertokens.ktor.routes.session.sessions
-import com.supertokens.ktor.routes.session.sessionsEnabled
+import com.supertokens.ktor.recipes.session.sessions
+import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.utils.addSessionToResponse
 import com.supertokens.sdk.common.requests.FormFieldRequest
 import com.supertokens.sdk.common.SuperTokensStatus
@@ -66,8 +66,8 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.validateFormFields(
 }
 
 fun Route.emailPasswordRoutes(
-    headerBasedSessions: Boolean = true,
-    cookieBasedSessions: Boolean = true,
+    headerBasedSessions: Boolean,
+    cookieBasedSessions: Boolean,
 ) {
 
     post("/signin") {

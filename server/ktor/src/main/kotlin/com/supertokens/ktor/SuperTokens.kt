@@ -1,8 +1,13 @@
 package com.supertokens.ktor
 
-import com.supertokens.ktor.routes.emailpassword.emailPasswordRoutes
+import com.supertokens.ktor.plugins.SuperTokensAuth
+import com.supertokens.ktor.plugins.TokenValidator
+import com.supertokens.ktor.plugins.TokenVerifier
+import com.supertokens.ktor.recipes.emailpassword.emailPasswordRoutes
+import com.supertokens.ktor.recipes.session.sessionRoutes
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
+import com.supertokens.sdk.recipes.session.SessionRecipe
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.ApplicationStarted
@@ -10,8 +15,11 @@ import io.ktor.server.application.application
 import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.application.hooks.MonitoringEvent
 import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.application
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
@@ -57,11 +65,23 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
                     cookieBasedSessions = config.cookieBasedSessions,
                 )
             }
+
+            if(superTokens.hasRecipe<SessionRecipe>()) {
+
+                application.install(Authentication) {
+                    jwt(name = SuperTokensAuth) {
+                        validate(TokenValidator)
+                        verifier(TokenVerifier)
+                    }
+                }
+
+                sessionRoutes(
+                    headerBasedSessions = config.headerBasedSessions,
+                    cookieBasedSessions = config.cookieBasedSessions,
+                )
+            }
         }
     }
-
-
-
 }
 
 val SuperTokensAttributeKey = AttributeKey<SuperTokens>("SuperTokens")

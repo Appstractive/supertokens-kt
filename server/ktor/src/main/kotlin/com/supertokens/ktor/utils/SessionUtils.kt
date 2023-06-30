@@ -72,3 +72,59 @@ fun PipelineContext<Unit, ApplicationCall>.addSessionToResponse(
     }
 
 }
+
+fun PipelineContext<Unit, ApplicationCall>.clearSessionInResponse(
+    fromHeaders: Boolean = true,
+    fromCookies: Boolean = false,
+) {
+    if(fromHeaders) {
+        call.response.headers.append(
+            "st-access-token",
+            "",
+        )
+
+        call.response.headers.append(
+            "st-refresh-token",
+            "",
+        )
+
+        call.response.headers.append(
+            "front-token",
+            "",
+        )
+
+        call.response.headers.append(
+            "Access-Control-Expose-Headers",
+            listOf(
+                "front-token",
+                "st-access-token",
+                "st-refresh-token",
+            ).joinToString(", "),
+        )
+    }
+
+    if(fromCookies) {
+        val sessionRecipe = superTokens.getRecipe<SessionRecipe>()
+
+        call.response.cookies.append(Cookie(
+            name = "sAccessToken",
+            value = "",
+            domain = sessionRecipe.cookieDomain,
+            httpOnly = true,
+            expires = GMTDate(0),
+            path = "/",
+            secure = true,
+        ))
+
+        val basePath = superTokens.appConfig.websiteBasePath
+        call.response.cookies.append(Cookie(
+            name = "sRefreshToken",
+            value = "",
+            domain = sessionRecipe.cookieDomain,
+            httpOnly = true,
+            expires = GMTDate(0),
+            path = "${basePath}/session/refresh",
+            secure = true,
+        ))
+    }
+}

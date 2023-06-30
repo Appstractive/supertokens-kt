@@ -1,4 +1,4 @@
-package com.supertokens.ktor.routes.emailpassword
+package com.supertokens.ktor.recipes.emailpassword
 
 import com.supertokens.ktor.SuperTokensAttributeKey
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe

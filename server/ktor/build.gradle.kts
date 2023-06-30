@@ -28,6 +28,8 @@ dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.contentnegotiation)
     implementation(libs.ktor.server.statuspages)
+    implementation(libs.ktor.server.auth)
+    implementation(libs.ktor.server.auth.jwt)
 
     implementation(libs.slf4j)
     implementation(libs.jwt)

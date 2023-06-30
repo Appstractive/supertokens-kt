@@ -5,6 +5,8 @@ import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.toJsonElement
+import com.supertokens.sdk.models.CreateSessionData
+import com.supertokens.sdk.models.RegenerateSessionData
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -15,17 +17,16 @@ import com.supertokens.sdk.recipes.session.requests.RemoveSessionsRequest
 import com.supertokens.sdk.recipes.session.requests.UpdateJwtDataRequest
 import com.supertokens.sdk.recipes.session.requests.UpdateSessionDataRequest
 import com.supertokens.sdk.recipes.session.requests.VerifySessionRequest
-import com.supertokens.sdk.recipes.session.responses.CreateSessionData
 import com.supertokens.sdk.recipes.session.responses.CreateSessionResponse
 import com.supertokens.sdk.recipes.session.responses.GetSessionData
 import com.supertokens.sdk.recipes.session.responses.GetSessionResponse
 import com.supertokens.sdk.recipes.session.responses.GetSessionsResponse
-import com.supertokens.sdk.recipes.session.responses.RegenerateSessionData
 import com.supertokens.sdk.recipes.session.responses.RegenerateSessionResponse
 import com.supertokens.sdk.recipes.session.responses.RemoveSessionsResponse
 import com.supertokens.sdk.recipes.session.responses.VerifySessionData
 import com.supertokens.sdk.recipes.session.responses.VerifySessionResponse
 import com.supertokens.sdk.utils.parse
+import com.supertokens.sdk.utils.toData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post

@@ -1,4 +1,4 @@
-package com.supertokens.ktor.routes.session
+package com.supertokens.ktor.recipes.session
 
 import com.supertokens.ktor.SuperTokensAttributeKey
 import com.supertokens.sdk.recipes.session.SessionRecipe
