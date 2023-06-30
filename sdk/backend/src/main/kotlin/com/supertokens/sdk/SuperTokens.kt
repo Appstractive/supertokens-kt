@@ -29,7 +29,7 @@ fun <C: RecipeConfig, R: Recipe<C>> SuperTokensConfig.recipe(builder: RecipeBuil
 }
 
 class SuperTokensConfig(
-    val connectionURI: String,
+    val connectionUrl: String,
     val appConfig: AppConfig,
 ) {
 
@@ -54,6 +54,8 @@ class SuperTokens(
 
     val appConfig: AppConfig = config.appConfig
 
+    val jwksUrl: String = "${config.connectionUrl}/.well-known/jwks.json"
+
     @OptIn(ExperimentalSerializationApi::class)
     val client = config.client ?: HttpClient(CIO) {
         install(ContentNegotiation) {
@@ -67,7 +69,7 @@ class SuperTokens(
         install(Logging)
 
         defaultRequest {
-            url(config.connectionURI)
+            url(config.connectionUrl)
 
             config.apiKey?.let {
                 header(Constants.HEADER_API_KEY, it)
@@ -87,7 +89,7 @@ class SuperTokens(
 
 fun superTokens(connectionURI: String, appConfig: AppConfig, init: SuperTokensConfig.() -> Unit): SuperTokens {
     val config = SuperTokensConfig(
-        connectionURI = connectionURI,
+        connectionUrl = connectionURI,
         appConfig = appConfig,
     ).apply(init)
     return SuperTokens(config)

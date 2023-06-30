@@ -1,8 +1,9 @@
 package com.supertokens.ktor
 
+import com.auth0.jwt.interfaces.JWTVerifier
 import com.supertokens.ktor.plugins.SuperTokensAuth
+import com.supertokens.ktor.plugins.SuperTokensJwtVerifier
 import com.supertokens.ktor.plugins.TokenValidator
-import com.supertokens.ktor.plugins.TokenVerifier
 import com.supertokens.ktor.recipes.emailpassword.emailPasswordRoutes
 import com.supertokens.ktor.recipes.session.sessionRoutes
 import com.supertokens.sdk.SuperTokens
@@ -16,6 +17,8 @@ import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.application.hooks.MonitoringEvent
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.Principal
+import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.Route
@@ -34,6 +37,10 @@ class SuperTokensConfig {
     var headerBasedSessions: Boolean = true
 
     var cookieBasedSessions: Boolean = true
+
+    var jwtValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = TokenValidator
+
+    var jwtVerifier: JWTVerifier? = null
 
 }
 
@@ -70,8 +77,8 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
 
                 application.install(Authentication) {
                     jwt(name = SuperTokensAuth) {
-                        validate(TokenValidator)
-                        verifier(TokenVerifier)
+                        validate(config.jwtValidator)
+                        verifier(config.jwtVerifier ?: SuperTokensJwtVerifier(superTokens))
                     }
                 }
 
