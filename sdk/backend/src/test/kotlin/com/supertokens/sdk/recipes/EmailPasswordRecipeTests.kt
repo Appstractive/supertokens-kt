@@ -7,7 +7,6 @@ import com.supertokens.sdk.ingredients.email.smtp.SmtpEmailService
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
-import com.supertokens.sdk.recipes.emailpassword.FormField
 import com.supertokens.sdk.recipes.emailpassword.createResetPasswordToken
 import com.supertokens.sdk.recipes.emailpassword.getUserByEmail
 import com.supertokens.sdk.recipes.emailpassword.emailPasswordGetUserById

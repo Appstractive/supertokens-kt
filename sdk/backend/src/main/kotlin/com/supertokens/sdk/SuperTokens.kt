@@ -35,6 +35,8 @@ class SuperTokensConfig(
 
     var client: HttpClient? = null
 
+    var enableRequestLogging: Boolean = false
+
     var apiKey: String? = null
 
     var recipes: List<BuildRecipe> = emptyList()
@@ -66,7 +68,9 @@ class SuperTokens(
             })
         }
 
-        install(Logging)
+        if(config.enableRequestLogging) {
+            install(Logging)
+        }
 
         defaultRequest {
             url(config.connectionUrl)

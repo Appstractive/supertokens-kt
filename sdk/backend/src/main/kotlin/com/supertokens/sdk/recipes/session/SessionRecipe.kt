@@ -7,6 +7,7 @@ import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.models.CreateSessionData
 import com.supertokens.sdk.models.RegenerateSessionData
+import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -33,9 +34,21 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
+typealias CustomJwtData = suspend (superTokens: SuperTokens, user: User) -> Map<String, String>
+
 class SessionConfig: RecipeConfig {
 
     var cookieDomain: String = "localhost"
+
+    var headerBasedSessions: Boolean = true
+
+    var cookieBasedSessions: Boolean = true
+
+    internal var customJwtData: CustomJwtData? = null
+
+    fun customJwtData(jwtData: CustomJwtData) {
+        customJwtData = jwtData
+    }
 
 }
 
@@ -45,11 +58,14 @@ class SessionRecipe(
 ) : Recipe<SessionConfig> {
 
     val cookieDomain = config.cookieDomain
+    val headerBasedSessions = config.headerBasedSessions
+    val cookieBasedSessions = config.cookieBasedSessions
+    val customJwtData: CustomJwtData? = config.customJwtData
 
     suspend fun createSession(
         userId: String,
-        userDataInJWT: Map<String, Any?>? = null,
-        userDataInDatabase: Map<String, Any?>? = null,
+        userDataInJWT: Map<String, Any?> = emptyMap(),
+        userDataInDatabase: Map<String, Any?> = emptyMap(),
         enableAntiCsrf: Boolean = false,
         useDynamicSigningKey: Boolean = false,
     ): CreateSessionData {
@@ -60,8 +76,8 @@ class SessionRecipe(
             setBody(
                 CreateSessionRequest(
                     userId = userId,
-                    userDataInJWT = userDataInJWT?.toJsonElement(),
-                    userDataInDatabase = userDataInDatabase?.toJsonElement(),
+                    userDataInJWT = userDataInJWT.toJsonElement(),
+                    userDataInDatabase = userDataInDatabase.toJsonElement(),
                     enableAntiCsrf = enableAntiCsrf,
                     useDynamicSigningKey = useDynamicSigningKey,
                 )
@@ -277,8 +293,8 @@ val Sessions = object: RecipeBuilder<SessionConfig, SessionRecipe>() {
 
 suspend fun SuperTokens.createSession(
     userId: String,
-    userDataInJWT: Map<String, Any?>? = emptyMap(),
-    userDataInDatabase: Map<String, Any?>? = emptyMap(),
+    userDataInJWT: Map<String, Any?> = emptyMap(),
+    userDataInDatabase: Map<String, Any?> = emptyMap(),
     enableAntiCsrf: Boolean = false,
     useDynamicSigningKey: Boolean = false,
 ) = getRecipe<SessionRecipe>().createSession(userId, userDataInJWT, userDataInDatabase, enableAntiCsrf, useDynamicSigningKey)

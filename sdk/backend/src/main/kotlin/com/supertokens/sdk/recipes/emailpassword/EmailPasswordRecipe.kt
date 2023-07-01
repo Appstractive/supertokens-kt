@@ -3,11 +3,14 @@ package com.supertokens.sdk.recipes.emailpassword
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
+import com.supertokens.sdk.recipes.common.FormField
+import com.supertokens.sdk.recipes.common.Validate
 import com.supertokens.sdk.recipes.emailpassword.requests.CreateResetPasswordTokenRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignInRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignUpRequest
@@ -23,23 +26,19 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
-typealias Validate = (value: String) -> Boolean
-
-data class FormField(
-    val id: String,
-    val optional: Boolean = true,
-    val validate: Validate? = null
-)
-
 class EmailPasswordConfig: RecipeConfig {
     var formFields: List<FormField> = EmailPasswordRecipe.DEFAULT_FORM_FIELDS
 
     var emailService: EmailService? = null
+
+    var validatePasswordOnUpdate: Boolean = true
+
+    var validatePasswordOnReset: Boolean = true
 }
 
 class EmailPasswordRecipe(
     private val superTokens: SuperTokens,
-    config: EmailPasswordConfig,
+    private val config: EmailPasswordConfig,
 ) : Recipe<EmailPasswordConfig> {
 
     val formFields: List<FormField> = config.formFields.toList()
@@ -112,6 +111,11 @@ class EmailPasswordRecipe(
     }
 
     suspend fun resetPasswordWithToken(token: String, newPassword: String): String {
+
+        if(config.validatePasswordOnReset && !validatePassword(newPassword)) {
+            throw SuperTokensStatusException(SuperTokensStatus.PasswordPolicyViolatedError)
+        }
+
         val response = superTokens.client.post(PATH_PASSWORD_RESET) {
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -143,14 +147,10 @@ class EmailPasswordRecipe(
         return response.parse()
     }
 
-    suspend fun updatePassword(userId: String, password: String, applyPasswordPolicy: Boolean = true): SuperTokensStatus {
+    suspend fun updatePassword(userId: String, password: String): SuperTokensStatus {
 
-        if(applyPasswordPolicy) {
-            formFields.firstOrNull {it.id == FORM_FIELD_PASSWORD_ID}?.validate?.let {
-                if(!it.invoke(password)) {
-                    return SuperTokensStatus.PasswordPolicyViolatedError
-                }
-            }
+        if(config.validatePasswordOnUpdate && !validatePassword(password)) {
+            return SuperTokensStatus.PasswordPolicyViolatedError
         }
 
         val response = superTokens.client.put(PATH_UPDATE_USER) {
@@ -165,6 +165,16 @@ class EmailPasswordRecipe(
         }
 
         return response.parse()
+    }
+
+    fun validatePassword(password: String): Boolean {
+        formFields.firstOrNull {it.id == FORM_FIELD_PASSWORD_ID}?.validate?.let {
+            if(!it.invoke(password)) {
+                return false
+            }
+        }
+
+        return true
     }
 
     companion object {
@@ -185,7 +195,7 @@ class EmailPasswordRecipe(
             DEFAULT_PASSWORD_REGEXP.matches(it)
         }
 
-        private val DEFAULT_EMAIL_REGEXP = Regex("[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,6}")
+        private val DEFAULT_EMAIL_REGEXP = Regex("^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")
         private val DEFAULT_EMAIL_VALIDATOR: Validate = {
             DEFAULT_EMAIL_REGEXP.matches(it)
         }
@@ -239,5 +249,5 @@ suspend fun SuperTokens.resetPasswordWithToken(token: String, newPassword: Strin
 suspend fun SuperTokens.updateEmail(userId: String, email: String) =
     getRecipe<EmailPasswordRecipe>().updateEmail(userId, email)
 
-suspend fun SuperTokens.updatePassword(userId: String, password: String, applyPasswordPolicy: Boolean = true) =
-    getRecipe<EmailPasswordRecipe>().updatePassword(userId, password, applyPasswordPolicy)
+suspend fun SuperTokens.updatePassword(userId: String, password: String) =
+    getRecipe<EmailPasswordRecipe>().updatePassword(userId, password)
