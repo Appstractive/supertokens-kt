@@ -2,6 +2,7 @@ package com.supertokens.sdk.recipes.emailverification
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.common.toStatus
@@ -12,7 +13,7 @@ import com.supertokens.sdk.recipes.emailverification.requests.EmailVerificationR
 import com.supertokens.sdk.common.requests.VerifyEmailTokenRequest
 import com.supertokens.sdk.recipes.emailverification.models.VerifyEmailTokenData
 import com.supertokens.sdk.recipes.emailverification.responses.CreateEmailVerificationTokenResponse
-import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailResponse
+import com.supertokens.sdk.common.responses.VerifyEmailResponse
 import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailTokenResponse
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
@@ -41,7 +42,7 @@ class EmailVerificationRecipe(
         }
 
         return response.parse<CreateEmailVerificationTokenResponse, String> {
-            it.token
+            it.token ?: throw SuperTokensStatusException(SuperTokensStatus.EmailAlreadyVerifiedError)
         }
     }
 

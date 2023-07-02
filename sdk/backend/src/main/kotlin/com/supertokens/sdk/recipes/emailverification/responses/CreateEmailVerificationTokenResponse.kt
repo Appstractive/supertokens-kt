@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateEmailVerificationTokenResponse(
     override val status: String = SuperTokensStatus.OK.value,
-    val token: String,
+    val token: String?,
 ): BaseResponse

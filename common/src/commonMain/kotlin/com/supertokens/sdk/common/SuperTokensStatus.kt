@@ -17,8 +17,9 @@ sealed class SuperTokensStatus(
     object UnauthorizedError: SuperTokensStatus("UNAUTHORISED")
     object TryRefreshTokenError: SuperTokensStatus("TRY_REFRESH_TOKEN")
     object FormFieldError: SuperTokensStatus("FIELD_ERROR")
+    object EmailAlreadyVerifiedError: SuperTokensStatus("EMAIL_ALREADY_VERIFIED_ERROR")
 
-    data class UnknownError(val message: String): SuperTokensStatus(message)
+    data class UnknownError(val message: String = "UNKNOWN_ERROR"): SuperTokensStatus(message)
 
 }
 
@@ -36,6 +37,7 @@ fun String.toStatus(): SuperTokensStatus {
         SuperTokensStatus.UnauthorizedError.value -> SuperTokensStatus.UnauthorizedError
         SuperTokensStatus.TryRefreshTokenError.value -> SuperTokensStatus.TryRefreshTokenError
         SuperTokensStatus.FormFieldError.value -> SuperTokensStatus.FormFieldError
+        SuperTokensStatus.EmailAlreadyVerifiedError.value -> SuperTokensStatus.EmailAlreadyVerifiedError
         else -> SuperTokensStatus.UnknownError(this)
     }
 }

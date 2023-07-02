@@ -11,7 +11,7 @@ data class ThirdParty(
 @Serializable
 data class User(
     val id: String,
-    val email: String? = null,
+    val email: String,
     val phoneNumber: String? = null,
     val timeJoined: Long,
     val thirdParty: ThirdParty?,
