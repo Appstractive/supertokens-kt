@@ -8,8 +8,15 @@ import com.supertokens.ktor.plugins.superTokens
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
-import com.supertokens.sdk.recipes.session.CustomJwtData
 import com.supertokens.sdk.recipes.session.Sessions
+import com.supertokens.sdk.recipes.thirdparty.ThirdParty
+import com.supertokens.sdk.recipes.thirdparty.provider
+import com.supertokens.sdk.recipes.thirdparty.providers.apple.Apple
+import com.supertokens.sdk.recipes.thirdparty.providers.bitbucket.Bitbucket
+import com.supertokens.sdk.recipes.thirdparty.providers.facebook.Facebook
+import com.supertokens.sdk.recipes.thirdparty.providers.github.Github
+import com.supertokens.sdk.recipes.thirdparty.providers.gitlab.GitLab
+import com.supertokens.sdk.recipes.thirdparty.providers.google.Google
 import com.supertokens.sdk.superTokens
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.*
@@ -42,13 +49,54 @@ fun Application.module() {
 
             }
             recipe(Sessions) {
-                customJwtData { _ , user ->
+                customJwtData { _, user ->
                     buildMap {
                         set("email", user.email)
                     }
                 }
             }
+
+            recipe(ThirdParty) {
+
+                provider(Github) {
+                    clientId = "123456"
+                    clientSecret = "abcdef"
+                }
+
+                provider(Facebook) {
+                    clientId = "123456"
+                    clientSecret = "abcdef"
+                }
+
+                provider(Bitbucket) {
+                    clientId = "123456"
+                    clientSecret = "abcdef"
+                }
+
+                provider(GitLab) {
+                    clientId = "123456"
+                    clientSecret = "abcdef"
+                }
+
+                provider(Google) {
+                    clientId = "123456"
+                    clientSecret = "abcdef"
+                }
+
+                provider(Apple) {
+                    clientId = "123456"
+                    keyId = "keyid"
+                    privateKey = "-----BEGIN EC PRIVATE KEY-----\n" +
+                            "MHcCAQEEIA15hjyZS/pWzMgI4SOlwKbbG4/c+3vQcFCfQaRhoFbzoAoGCCqGSM49\n" +
+                            "AwEHoUQDQgAEkrYPIhuxDLQg8QKQnnto8JUFb13yWpY+venFhEzjhBwMgFl3oueT\n" +
+                            "oQJf/l9sIYMIXc6gVnMg/lGEWv0ZANcYqg==\n" +
+                            "-----END EC PRIVATE KEY-----"
+                    teamId = "teamid"
+                }
+            }
         }
+
+        emailPasswordHandler = CustomEmailPasswordHandler()
 
         jwtVerification {
             withAudience("localhost")
@@ -74,11 +122,13 @@ fun Application.module() {
 
         authenticate(SuperTokensAuth) {
             get("/private") {
-                val user =  call.requirePrincipal<AuthenticatedUser>(SuperTokensAuth)
+                val user = call.requirePrincipal<AuthenticatedUser>()
 
-                call.respond(PrivateUserResponse(
-                    id = user.id,
-                ))
+                call.respond(
+                    PrivateUserResponse(
+                        id = user.id,
+                    )
+                )
             }
         }
     }

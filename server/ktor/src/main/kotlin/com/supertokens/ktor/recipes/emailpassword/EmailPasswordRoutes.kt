@@ -1,6 +1,5 @@
 package com.supertokens.ktor.recipes.emailpassword
 
-import io.ktor.server.application.call
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -8,23 +7,33 @@ import io.ktor.server.routing.post
 fun Route.emailPasswordRoutes(handler: EmailPasswordHandler) {
 
     post("/signin") {
-        handler.signIn(call)
+        with(handler) {
+            signIn()
+        }
     }
 
     post("/signup") {
-        handler.signUp(call)
+        with(handler) {
+            signUp()
+        }
     }
 
     get("/signup/email/exists") {
-        handler.emailExists(call)
+        with(handler) {
+            emailExists()
+        }
     }
 
     post("/user/password/reset/token") {
-        handler.passwordResetToken(call)
+        with(handler) {
+            passwordResetToken()
+        }
     }
 
     post("/user/password/reset") {
-        handler.resetPassword(call)
+        with(handler) {
+            resetPassword()
+        }
     }
 
 }

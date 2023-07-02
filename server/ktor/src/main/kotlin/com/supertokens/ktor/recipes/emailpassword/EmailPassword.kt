@@ -8,16 +8,22 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.application
 import io.ktor.util.pipeline.PipelineContext
 
-val ApplicationCall.emailPassword: EmailPasswordRecipe get() =
-    application.attributes[SuperTokensAttributeKey].getRecipe()
-val PipelineContext<Unit, ApplicationCall>.emailPassword: EmailPasswordRecipe get() =
-    application.attributes[SuperTokensAttributeKey].getRecipe()
-val Route.emailPassword: EmailPasswordRecipe get() =
-    application.attributes[SuperTokensAttributeKey].getRecipe()
+val ApplicationCall.emailPassword: EmailPasswordRecipe
+    get() =
+        application.attributes[SuperTokensAttributeKey].getRecipe()
+val PipelineContext<Unit, ApplicationCall>.emailPassword: EmailPasswordRecipe
+    get() =
+        application.attributes[SuperTokensAttributeKey].getRecipe()
+val Route.emailPassword: EmailPasswordRecipe
+    get() =
+        application.attributes[SuperTokensAttributeKey].getRecipe()
 
-val ApplicationCall.isEmailPasswordEnabled: Boolean get() =
-    application.attributes[SuperTokensAttributeKey].hasRecipe<EmailPasswordRecipe>()
-val PipelineContext<Unit, ApplicationCall>.isEmailPasswordEnabled: Boolean get() =
-    application.attributes[SuperTokensAttributeKey].hasRecipe<EmailPasswordRecipe>()
-val Route.isEmailPasswordEnabled: Boolean get() =
-    application.attributes[SuperTokensAttributeKey].hasRecipe<EmailPasswordRecipe>()
+val ApplicationCall.isEmailPasswordEnabled: Boolean
+    get() =
+        application.attributes[SuperTokensAttributeKey].hasRecipe<EmailPasswordRecipe>()
+val PipelineContext<Unit, ApplicationCall>.isEmailPasswordEnabled: Boolean
+    get() =
+        application.attributes[SuperTokensAttributeKey].hasRecipe<EmailPasswordRecipe>()
+val Route.isEmailPasswordEnabled: Boolean
+    get() =
+        application.attributes[SuperTokensAttributeKey].hasRecipe<EmailPasswordRecipe>()

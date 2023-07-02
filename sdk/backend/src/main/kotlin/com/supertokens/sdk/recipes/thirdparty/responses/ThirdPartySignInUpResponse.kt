@@ -10,8 +10,3 @@ data class ThirdPartySignInUpResponse(
     val createdNewUser: Boolean,
     val user: User,
 ): BaseResponse
-
-data class ThirdPartySignInUpData(
-    val createdNewUser: Boolean,
-    val user: User,
-)

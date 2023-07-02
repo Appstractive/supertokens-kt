@@ -24,7 +24,7 @@ fun createAppleToken(teamId: String, keyId: String, privateKey: String, clientId
         .setExpiration(ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(60))
         .setAudience("https://appleid.apple.com")
 
-    return JWT.getEncoder().encode(jwt, signer);
+    return JWT.getEncoder().encode(jwt, signer)
 }
 
 class AppleConfig : OAuthProviderConfig() {

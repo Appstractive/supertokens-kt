@@ -2,6 +2,7 @@ package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.SuperTokensProviderDslMarker
+import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import java.net.URLEncoder
 
@@ -13,11 +14,6 @@ data class ThirdPartyEmail(
 data class ThirdPartyUserInfo(
     val id: String,
     val email: ThirdPartyEmail?,
-)
-
-data class TokenResponse(
-    val accessToken: String,
-    val idToken: String? = null,
 )
 
 data class ProviderEndpoint(
@@ -42,8 +38,8 @@ abstract class Provider<out C: ProviderConfig> {
 
     abstract fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?): ProviderEndpoint
     abstract fun getAuthorizationEndpoint(): ProviderEndpoint
-    abstract suspend fun getTokens(authCode: String, redirectUrl: String?): TokenResponse
-    abstract suspend fun getUserInfo(tokenResponse: TokenResponse): ThirdPartyUserInfo
+    abstract suspend fun getTokens(authCode: String, redirectUrl: String?): ThirdPartyTokenResponse
+    abstract suspend fun getUserInfo(tokenResponse: ThirdPartyTokenResponse): ThirdPartyUserInfo
 
 }
 

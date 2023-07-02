@@ -62,6 +62,16 @@ class SessionRecipe(
     val cookieBasedSessions = config.cookieBasedSessions
     val customJwtData: CustomJwtData? = config.customJwtData
 
+    suspend fun getJwtData(user: User): Map<String, Any?> = buildMap {
+        set("iss", superTokens.appConfig.apiDomain)
+        set("aud", superTokens.appConfig.websiteDomain)
+        customJwtData?.let {
+            it.invoke(superTokens, user).forEach { entry ->
+                set(entry.key, entry.value)
+            }
+        }
+    }
+
     suspend fun createSession(
         userId: String,
         userDataInJWT: Map<String, Any?> = emptyMap(),
@@ -86,10 +96,10 @@ class SessionRecipe(
 
         return response.parse<CreateSessionResponse, CreateSessionData> {
             CreateSessionData(
-                session = session.toData(),
-                accessToken = accessToken,
-                refreshToken = refreshToken,
-                antiCsrfToken = antiCsrfToken,
+                session = it.session.toData(),
+                accessToken = it.accessToken,
+                refreshToken = it.refreshToken,
+                antiCsrfToken = it.antiCsrfToken,
             )
         }
     }
@@ -102,15 +112,15 @@ class SessionRecipe(
 
         return response.parse<GetSessionResponse, GetSessionData> {
             GetSessionData(
-                userId = userId,
-                expiry = expiry,
-                timeCreated = timeCreated,
+                userId = it.userId,
+                expiry = it.expiry,
+                timeCreated = it.timeCreated,
                 sessionHandle = sessionHandle,
-                userDataInDatabase = userDataInDatabase?.entries?.associate {
-                    it.key to it.value.extractedContent
+                userDataInDatabase = it.userDataInDatabase?.entries?.associate { entry ->
+                    entry.key to entry.value.extractedContent
                 },
-                userDataInJWT = userDataInJWT?.entries?.associate {
-                    it.key to it.value.extractedContent
+                userDataInJWT = it.userDataInJWT?.entries?.associate { entry ->
+                    entry.key to entry.value.extractedContent
                 },
             )
         }
@@ -123,7 +133,7 @@ class SessionRecipe(
         }
 
         return response.parse<GetSessionsResponse, List<String>> {
-            sessionHandles
+            it.sessionHandles
         }
     }
 
@@ -144,7 +154,7 @@ class SessionRecipe(
         }
 
         return response.parse<RemoveSessionsResponse, List<String>> {
-            sessionHandlesRevoked
+            it.sessionHandlesRevoked
         }
     }
 
@@ -173,8 +183,8 @@ class SessionRecipe(
 
         return response.parse<VerifySessionResponse, VerifySessionData> {
             VerifySessionData(
-                session = session?.toData() ?: throw RuntimeException("VerifySession returned OK but no session"),
-                accessToken = this.accessToken,
+                session = it.session?.toData() ?: throw RuntimeException("VerifySession returned OK but no session"),
+                accessToken = it.accessToken,
             )
         }
     }
@@ -199,10 +209,10 @@ class SessionRecipe(
 
         return response.parse<CreateSessionResponse, CreateSessionData> {
             CreateSessionData(
-                session = session.toData(),
-                accessToken = accessToken,
-                refreshToken = this.refreshToken,
-                antiCsrfToken = antiCsrfToken,
+                session = it.session.toData(),
+                accessToken = it.accessToken,
+                refreshToken = it.refreshToken,
+                antiCsrfToken = it.antiCsrfToken,
             )
         }
     }
@@ -226,8 +236,8 @@ class SessionRecipe(
 
         return response.parse<RegenerateSessionResponse, RegenerateSessionData> {
             RegenerateSessionData(
-                session = session?.toData() ?: throw RuntimeException("RegenerateSession returned OK but no session"),
-                accessToken = this.accessToken ?: throw RuntimeException("RegenerateSession returned OK but no accessToken"),
+                session = it.session?.toData() ?: throw RuntimeException("RegenerateSession returned OK but no session"),
+                accessToken = it.accessToken ?: throw RuntimeException("RegenerateSession returned OK but no accessToken"),
             )
         }
     }

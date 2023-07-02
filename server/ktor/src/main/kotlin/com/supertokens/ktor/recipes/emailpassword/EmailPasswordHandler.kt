@@ -2,12 +2,10 @@ package com.supertokens.ktor.recipes.emailpassword
 
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
-import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.getEmailFormField
 import com.supertokens.ktor.utils.getInvalidFormFields
 import com.supertokens.ktor.utils.getPasswordFormField
 import com.supertokens.ktor.utils.setSessionInResponse
-import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.FormField
 import com.supertokens.sdk.common.requests.FormFieldRequest
@@ -17,13 +15,13 @@ import com.supertokens.sdk.common.responses.FormFieldError
 import com.supertokens.sdk.common.responses.SignInResponse
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.common.responses.UserResponse
-import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
-import com.supertokens.sdk.recipes.session.SessionRecipe
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.util.pipeline.PipelineContext
 
 private suspend fun ApplicationCall.validateFormFields(
     fields: List<FormField>,
@@ -63,29 +61,19 @@ private suspend fun ApplicationCall.validateFormFields(
 
 open class EmailPasswordHandler {
 
-    private suspend fun SuperTokens.getJwtData(user: User): Map<String, Any?> = buildMap {
-        set("iss", appConfig.apiDomain)
-        set("aud", appConfig.websiteDomain)
-        getRecipe<SessionRecipe>().customJwtData?.let {
-            it.invoke(this@getJwtData, user).forEach { entry ->
-                set(entry.key, entry.value)
-            }
-        }
-    }
-
-    open suspend fun signIn(call: ApplicationCall) {
+    open suspend fun PipelineContext<Unit, ApplicationCall>.signIn() {
         val body = call.receive<FormFieldRequest>()
 
         call.validateFormFields(body.formFields) { email, password ->
-            val user = call.emailPassword.signIn(email, password)
+            val user = emailPassword.signIn(email, password)
 
-            if(call.sessionsEnabled) {
-                val session = call.sessions.createSession(
+            if (sessionsEnabled) {
+                val session = sessions.createSession(
                     userId = user.id,
-                    userDataInJWT = call.superTokens.getJwtData(user),
+                    userDataInJWT = sessions.getJwtData(user),
                 )
 
-                call.setSessionInResponse(
+                setSessionInResponse(
                     accessToken = session.accessToken,
                     refreshToken = session.refreshToken,
                     antiCsrfToken = session.antiCsrfToken,
@@ -104,19 +92,19 @@ open class EmailPasswordHandler {
         }
     }
 
-    open suspend fun signUp(call: ApplicationCall) {
+    open suspend fun PipelineContext<Unit, ApplicationCall>.signUp() {
         val body = call.receive<FormFieldRequest>()
 
         call.validateFormFields(body.formFields) { email, password ->
-            val user = call.emailPassword.signUp(email, password)
+            val user = emailPassword.signUp(email, password)
 
-            if(call.sessionsEnabled) {
-                val session = call.sessions.createSession(
+            if (sessionsEnabled) {
+                val session = sessions.createSession(
                     userId = user.id,
-                    userDataInJWT = call.superTokens.getJwtData(user),
+                    userDataInJWT = sessions.getJwtData(user),
                 )
 
-                call.setSessionInResponse(
+                setSessionInResponse(
                     accessToken = session.accessToken,
                     refreshToken = session.refreshToken,
                     antiCsrfToken = session.antiCsrfToken,
@@ -137,7 +125,7 @@ open class EmailPasswordHandler {
         }
     }
 
-    open suspend fun emailExists(call: ApplicationCall) {
+    open suspend fun PipelineContext<Unit, ApplicationCall>.emailExists() {
         val email = call.parameters["email"] ?: return call.respond(HttpStatusCode.NotFound)
 
         val response = runCatching {
@@ -151,15 +139,15 @@ open class EmailPasswordHandler {
         )
     }
 
-    open suspend fun passwordResetToken(call: ApplicationCall) {
+    open suspend fun PipelineContext<Unit, ApplicationCall>.passwordResetToken() {
         val body = call.receive<FormFieldRequest>()
 
         val email = body.formFields.firstOrNull { it.id == EmailPasswordRecipe.FORM_FIELD_EMAIL_ID }?.value
 
         email?.let {
             val result = runCatching {
-                val user = call.emailPassword.getUserByEMail(it)
-                val token = call.emailPassword.createResetPasswordToken(user.id)
+                val user = emailPassword.getUserByEMail(it)
+                val token = emailPassword.createResetPasswordToken(user.id)
 
                 // TODO send email
             }
@@ -170,14 +158,16 @@ open class EmailPasswordHandler {
         )
     }
 
-    open suspend fun resetPassword(call: ApplicationCall) {
+    open suspend fun PipelineContext<Unit, ApplicationCall>.resetPassword() {
         val body = call.receive<PasswordResetRequest>()
 
-        when(body.method) {
+        when (body.method) {
             "token" -> {
-                val token = body.token ?: return call.respond(StatusResponse(
-                    status = SuperTokensStatus.ResetPasswordInvalidTokenError.value,
-                ))
+                val token = body.token ?: return call.respond(
+                    StatusResponse(
+                        status = SuperTokensStatus.ResetPasswordInvalidTokenError.value,
+                    )
+                )
 
                 val password: String = body.formFields.firstOrNull { it.id == EmailPasswordRecipe.FORM_FIELD_PASSWORD_ID }?.value
                     ?: return call.respond(
@@ -192,10 +182,11 @@ open class EmailPasswordHandler {
                         )
                     )
 
-                call.emailPassword.resetPasswordWithToken(token, password)
+                emailPassword.resetPasswordWithToken(token, password)
 
                 call.respond(StatusResponse())
             }
+
             else -> call.respond(HttpStatusCode.BadRequest)
         }
     }

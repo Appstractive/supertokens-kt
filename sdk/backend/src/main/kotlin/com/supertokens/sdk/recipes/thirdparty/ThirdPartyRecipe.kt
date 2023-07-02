@@ -13,7 +13,6 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.recipes.thirdparty.responses.ThirdPartyGetUsersResponse
-import com.supertokens.sdk.recipes.thirdparty.responses.ThirdPartySignInUpData
 import com.supertokens.sdk.recipes.thirdparty.responses.ThirdPartySignInUpResponse
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
@@ -47,7 +46,7 @@ class ThirdPartyRecipe(
         thirdPartyId: String,
         thirdPartyUserId: String,
         email: String
-    ): ThirdPartySignInUpData {
+    ): ThirdPartySignInUpResponse {
         Result
         val response = superTokens.client.post(PATH_SIGN_IN_UP) {
 
@@ -64,11 +63,8 @@ class ThirdPartyRecipe(
             )
         }
 
-        return response.parse<ThirdPartySignInUpResponse, ThirdPartySignInUpData> {
-            ThirdPartySignInUpData(
-                createdNewUser = createdNewUser,
-                user = user,
-            )
+        return response.parse<ThirdPartySignInUpResponse, ThirdPartySignInUpResponse> {
+            it
         }
     }
 
@@ -79,7 +75,7 @@ class ThirdPartyRecipe(
         }
 
         return response.parse<ThirdPartyGetUsersResponse, List<User>> {
-            users
+            it.users
         }
     }
 

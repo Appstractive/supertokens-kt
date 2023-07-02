@@ -12,7 +12,7 @@ import io.ktor.server.auth.parseAuthorizationHeader
 data class AuthenticatedUser(
     val id: String,
     val sessionHandle: String,
-): Principal
+) : Principal
 
 const val SuperTokensAuth = "SuperTokens"
 
@@ -20,10 +20,9 @@ val TokenValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = {
     val sub = it.subject
     val sessionHandle = it["sessionHandle"]
 
-    if(sub != null && sessionHandle != null) {
+    if (sub != null && sessionHandle != null) {
         AuthenticatedUser(id = sub, sessionHandle = sessionHandle)
-    }
-    else {
+    } else {
         null
     }
 
