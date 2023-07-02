@@ -2,7 +2,7 @@ package com.supertokens.ktor.utils
 
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.common.requests.FormField as RequestFormField
-import com.supertokens.sdk.recipes.common.FormField as RecipeFormField
+import com.supertokens.sdk.recipes.common.models.FormField as RecipeFormField
 
 fun getInvalidFormFields(requestFormFields: List<RequestFormField>, recipeFormFields: List<RecipeFormField>): List<RequestFormField> {
     val invalidFormFields = mutableListOf<RequestFormField>()

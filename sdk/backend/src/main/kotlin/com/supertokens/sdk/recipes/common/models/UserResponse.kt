@@ -1,4 +1,4 @@
-package com.supertokens.sdk.recipes.common
+package com.supertokens.sdk.recipes.common.models
 
 import com.supertokens.sdk.common.responses.BaseResponse
 import com.supertokens.sdk.models.User

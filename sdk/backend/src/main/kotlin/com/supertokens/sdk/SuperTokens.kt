@@ -1,5 +1,6 @@
 package com.supertokens.sdk
 
+import com.supertokens.sdk.core.CoreHandler
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.BuildRecipe
 import com.supertokens.sdk.recipes.RecipeBuilder
@@ -28,6 +29,7 @@ fun <C: RecipeConfig, R: Recipe<C>> SuperTokensConfig.recipe(builder: RecipeBuil
     +builder.install(configure)
 }
 
+@SuperTokensDslMarker
 class SuperTokensConfig(
     val connectionUrl: String,
     val appConfig: AppConfig,
@@ -57,6 +59,8 @@ class SuperTokens(
     val appConfig: AppConfig = config.appConfig
 
     val jwksUrl: String = "${config.connectionUrl}/.well-known/jwks.json"
+
+    val core: CoreHandler = CoreHandler()
 
     @OptIn(ExperimentalSerializationApi::class)
     val client = config.client ?: HttpClient(CIO) {

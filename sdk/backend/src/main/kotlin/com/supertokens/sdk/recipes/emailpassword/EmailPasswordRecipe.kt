@@ -9,8 +9,8 @@ import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
-import com.supertokens.sdk.recipes.common.FormField
-import com.supertokens.sdk.recipes.common.Validate
+import com.supertokens.sdk.recipes.common.models.FormField
+import com.supertokens.sdk.recipes.common.models.Validate
 import com.supertokens.sdk.recipes.emailpassword.requests.CreateResetPasswordTokenRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignInRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignUpRequest

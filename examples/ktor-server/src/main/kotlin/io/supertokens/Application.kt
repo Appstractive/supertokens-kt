@@ -51,7 +51,12 @@ fun Application.module() {
             recipe(Sessions) {
                 customJwtData { _, user ->
                     buildMap {
-                        set("email", user.email)
+                        user.email?.let {
+                            set("email", it)
+                        }
+                        user.phoneNumber?.let {
+                            set("phoneNumber", it)
+                        }
                     }
                 }
             }

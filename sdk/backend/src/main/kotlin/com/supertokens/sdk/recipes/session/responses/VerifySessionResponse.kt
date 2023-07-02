@@ -11,8 +11,3 @@ data class VerifySessionResponse(
     val session: SessionResponse?,
     val accessToken: Token?,
 ): BaseResponse
-
-data class VerifySessionData(
-    val session: SessionData,
-    val accessToken: Token?,
-)

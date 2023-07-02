@@ -1,4 +1,4 @@
-package com.supertokens.sdk.recipes.common
+package com.supertokens.sdk.recipes.common.models
 
 typealias Validate = (value: String) -> Boolean
 

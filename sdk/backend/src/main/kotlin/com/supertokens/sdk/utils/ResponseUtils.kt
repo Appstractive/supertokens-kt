@@ -6,7 +6,7 @@ import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.models.User
 import com.supertokens.sdk.common.responses.BaseResponse
 import com.supertokens.sdk.common.responses.StatusResponse
-import com.supertokens.sdk.recipes.common.UserResponse
+import com.supertokens.sdk.recipes.common.models.UserResponse
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.models.SessionData
 import com.supertokens.sdk.recipes.session.responses.SessionResponse
