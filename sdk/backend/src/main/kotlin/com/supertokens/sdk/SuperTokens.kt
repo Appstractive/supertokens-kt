@@ -65,6 +65,7 @@ class SuperTokens(
                 isLenient = true
                 explicitNulls = false
                 encodeDefaults = true
+                ignoreUnknownKeys = true
             })
         }
 

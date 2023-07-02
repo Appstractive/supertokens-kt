@@ -51,7 +51,9 @@ open class ThirdPartyHandler {
             )
         }
 
-        call.respond(response)
+        body.redirectURI?.let {
+            call.respondRedirect(it)
+        } ?: call.respond(response)
     }
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.getAuthorizationUrl() {

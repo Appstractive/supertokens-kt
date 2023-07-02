@@ -1,13 +1,13 @@
 package com.supertokens.sdk.recipes.thirdparty.providers.apple
 
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
-import com.supertokens.sdk.recipes.thirdparty.providers.TokenResponse
 import io.fusionauth.jwt.Verifier
 import io.fusionauth.jwt.domain.Algorithm
 import io.fusionauth.jwt.domain.JWT
@@ -63,7 +63,7 @@ class AppleProvider(
         )
     }
 
-    override suspend fun getUserInfo(tokenResponse: TokenResponse): ThirdPartyUserInfo {
+    override suspend fun getUserInfo(tokenResponse: ThirdPartyTokenResponse): ThirdPartyUserInfo {
         val idToken = tokenResponse.idToken ?: throw RuntimeException("No IdToken in TokenResponse")
 
         // TODO actual verifier

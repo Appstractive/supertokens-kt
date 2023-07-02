@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ThirdPartySignInUpRequest(
-    val redirectURI: String,
+    val redirectURI: String? = null,
     val thirdPartyId: String,
-    val code: String?,
-    val authCodeResponse: ThirdPartyTokenResponse?,
-    val clientId: String?
+    val code: String? = null,
+    val authCodeResponse: ThirdPartyTokenResponse? = null,
+    val clientId: String? = null,
 )
