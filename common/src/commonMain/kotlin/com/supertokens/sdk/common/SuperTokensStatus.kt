@@ -18,6 +18,10 @@ sealed class SuperTokensStatus(
     object TryRefreshTokenError: SuperTokensStatus("TRY_REFRESH_TOKEN")
     object FormFieldError: SuperTokensStatus("FIELD_ERROR")
     object EmailAlreadyVerifiedError: SuperTokensStatus("EMAIL_ALREADY_VERIFIED_ERROR")
+    object PasswordlessRestartFlowError: SuperTokensStatus("RESTART_FLOW_ERROR")
+    object PasswordlessCodeAlreadyUsedError: SuperTokensStatus("USER_INPUT_CODE_ALREADY_USED_ERROR")
+    object PasswordlessIncorrectCodeError: SuperTokensStatus("INCORRECT_USER_INPUT_CODE_ERROR")
+    object PasswordlessExpiredCodeError: SuperTokensStatus("EXPIRED_USER_INPUT_CODE_ERROR")
 
     data class UnknownError(val message: String = "UNKNOWN_ERROR"): SuperTokensStatus(message)
 
@@ -38,6 +42,10 @@ fun String.toStatus(): SuperTokensStatus {
         SuperTokensStatus.TryRefreshTokenError.value -> SuperTokensStatus.TryRefreshTokenError
         SuperTokensStatus.FormFieldError.value -> SuperTokensStatus.FormFieldError
         SuperTokensStatus.EmailAlreadyVerifiedError.value -> SuperTokensStatus.EmailAlreadyVerifiedError
+        SuperTokensStatus.PasswordlessRestartFlowError.value -> SuperTokensStatus.PasswordlessRestartFlowError
+        SuperTokensStatus.PasswordlessCodeAlreadyUsedError.value -> SuperTokensStatus.PasswordlessCodeAlreadyUsedError
+        SuperTokensStatus.PasswordlessIncorrectCodeError.value -> SuperTokensStatus.PasswordlessIncorrectCodeError
+        SuperTokensStatus.PasswordlessExpiredCodeError.value -> SuperTokensStatus.PasswordlessExpiredCodeError
         else -> SuperTokensStatus.UnknownError(this)
     }
 }

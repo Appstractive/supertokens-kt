@@ -1,11 +1,11 @@
-package com.supertokens.sdk.recipes.thirdparty.responses
+package com.supertokens.sdk.recipes.common.responses
 
 import com.supertokens.sdk.models.User
 import com.supertokens.sdk.common.responses.BaseResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ThirdPartySignInUpResponse(
+data class SignInUpResponse(
     override val status: String,
     val createdNewUser: Boolean,
     val user: User,

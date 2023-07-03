@@ -6,6 +6,7 @@ import com.supertokens.sdk.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
+import com.supertokens.sdk.recipes.common.models.SignInUpData
 import com.supertokens.sdk.recipes.thirdparty.providers.BuildProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.Provider
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
@@ -13,7 +14,7 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.recipes.thirdparty.responses.ThirdPartyGetUsersResponse
-import com.supertokens.sdk.recipes.thirdparty.responses.ThirdPartySignInUpResponse
+import com.supertokens.sdk.recipes.common.responses.SignInUpResponse
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -46,7 +47,7 @@ class ThirdPartyRecipe(
         thirdPartyId: String,
         thirdPartyUserId: String,
         email: String
-    ): ThirdPartySignInUpResponse {
+    ): SignInUpData {
         Result
         val response = superTokens.client.post(PATH_SIGN_IN_UP) {
 
@@ -63,8 +64,11 @@ class ThirdPartyRecipe(
             )
         }
 
-        return response.parse<ThirdPartySignInUpResponse, ThirdPartySignInUpResponse> {
-            it
+        return response.parse<SignInUpResponse, SignInUpData> {
+            SignInUpData(
+                user = it.user,
+                createdNewUser = it.createdNewUser
+            )
         }
     }
 
