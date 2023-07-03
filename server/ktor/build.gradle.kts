@@ -10,7 +10,7 @@ version = "1.0.0"
 group = "com.supertokens.backend"
 
 dependencies {
-    implementation(projects.common)
+    implementation(projects.supertokensSdkCommon)
     implementation(projects.sdk.backend)
 
     implementation(libs.kotlin.serialization)

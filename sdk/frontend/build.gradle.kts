@@ -5,7 +5,7 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-group = "com.supertokens.sdk"
+group = "com.appstractive"
 version = "1.0"
 
 kotlin {

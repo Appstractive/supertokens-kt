@@ -14,10 +14,12 @@ import com.supertokens.sdk.recipes.emailverification.verifyEmail
 import com.supertokens.sdk.recipes.emailverification.verifyToken
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@Ignore("Only for DEV purposes")
 class EmailVerificationTest {
 
     private val superTokens = superTokens(

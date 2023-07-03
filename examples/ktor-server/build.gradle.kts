@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("kotlin-platform-jvm")
     application
@@ -8,7 +6,7 @@ plugins {
 }
 
 version = "1.0.0"
-group = "com.supertokens"
+group = "com.appstractive"
 
 dependencies {
     implementation(projects.sdk.backend)

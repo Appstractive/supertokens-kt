@@ -3,7 +3,6 @@ allprojects {
         google()
         mavenCentral()
         maven("https://jitpack.io")
-        jcenter()
     }
 }
 
@@ -12,7 +11,6 @@ buildscript {
         google()
         mavenCentral()
         maven("https://jitpack.io")
-        jcenter()
     }
     dependencies {
         classpath(libs.androidGradle)

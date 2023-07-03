@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="backend-jvm">
+    <output-path>$PROJECT_DIR$/sdk/backend/build/libs</output-path>
+    <root id="archive" name="backend-jvm.jar">
+      <element id="module-output" name="supertokens_kotlin.sdk.backend.jvmMain" />
+    </root>
+  </artifact>
+</component>

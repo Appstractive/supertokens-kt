@@ -1,16 +1,10 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("kotlin-platform-jvm")
-    id("io.ktor.plugin") version libs.versions.ktor.version
     kotlin("plugin.serialization")
+    `maven-publish`
 }
-
-version = "1.0.0"
-group = "com.supertokens.sdk"
-
 dependencies {
-    implementation(projects.common)
+    implementation(projects.supertokensSdkCommon)
 
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.coroutines)
@@ -32,6 +26,35 @@ dependencies {
     testImplementation(libs.test.kotlin)
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+/*tasks.withType<Jar>() {
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from(configurations.runtimeClasspath.get()
+        .filter {
+            it.canonicalPath.contains("common-jvm-.*\\.jar".toRegex())
+        }.map {
+            zipTree(it)
+        })
+}*/
+
+publishing {
+    publications {
+        create<MavenPublication>("backendSDK") {
+            groupId = "com.appstractive"
+            artifactId = "supertokens-sdk-backend"
+            version = "1.0.0"
+
+            setOf("runtimeElements")
+                .flatMap { configName -> configurations[configName].hierarchy }
+                .forEach { configuration ->
+                    configuration.dependencies.removeIf { dependency ->
+                        println(dependency.name)
+                        dependency.name == "common-jvm"
+                    }
+                }
+
+            from(components["java"])
+        }
+    }
 }

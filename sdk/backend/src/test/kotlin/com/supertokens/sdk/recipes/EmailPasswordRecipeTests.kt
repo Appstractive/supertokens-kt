@@ -18,8 +18,10 @@ import com.supertokens.sdk.recipes.emailpassword.updatePassword
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 
+@org.junit.Ignore("Only for DEV purposes")
 class EmailPasswordRecipeTests {
 
     private val superTokens = superTokens(

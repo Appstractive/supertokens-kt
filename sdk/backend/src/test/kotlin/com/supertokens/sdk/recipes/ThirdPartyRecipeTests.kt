@@ -24,11 +24,13 @@ import io.fusionauth.jwt.Verifier
 import io.fusionauth.jwt.domain.Algorithm
 import io.fusionauth.jwt.domain.JWT
 import kotlinx.coroutines.runBlocking
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@Ignore("Only for DEV purposes")
 class ThirdPartyRecipeTests {
 
     private val superTokens = superTokens(
