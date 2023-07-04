@@ -11,13 +11,12 @@ import io.ktor.util.pipeline.PipelineContext
 
 fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
     accessToken: Token,
-    refreshToken: Token,
+    refreshToken: Token? = null,
     antiCsrfToken: String? = null,
 ) {
     if (sessions.headerBasedSessions) {
         val exposeHeaders = mutableListOf(
             "st-access-token",
-            "st-refresh-token",
         )
 
         call.response.headers.append(
@@ -25,10 +24,13 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
             accessToken.token,
         )
 
-        call.response.headers.append(
-            "st-refresh-token",
-            refreshToken.token,
-        )
+        refreshToken?.let {
+            call.response.headers.append(
+                "st-refresh-token",
+                it.token,
+            )
+            exposeHeaders.add("st-refresh-token")
+        }
 
         antiCsrfToken?.let {
             call.response.headers.append(
@@ -56,17 +58,19 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
             )
         )
 
-        val basePath = superTokens.appConfig.websiteBasePath
-        call.response.cookies.append(
-            Cookie(
-                name = "sRefreshToken",
-                value = refreshToken.token,
-                domain = sessions.cookieDomain,
-                httpOnly = true,
-                expires = GMTDate(refreshToken.expiry),
-                path = "${basePath}/session/refresh",
+        refreshToken?.let {
+            val basePath = superTokens.appConfig.websiteBasePath
+            call.response.cookies.append(
+                Cookie(
+                    name = "sRefreshToken",
+                    value = it.token,
+                    domain = sessions.cookieDomain,
+                    httpOnly = true,
+                    expires = GMTDate(it.expiry),
+                    path = "${basePath}/session/refresh",
+                )
             )
-        )
+        }
     }
 
 }

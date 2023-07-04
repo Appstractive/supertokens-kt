@@ -2,6 +2,7 @@ package com.supertokens.ktor.recipes.emailpassword
 
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
+import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.getEmailFormField
 import com.supertokens.ktor.utils.getInvalidFormFields
 import com.supertokens.ktor.utils.getPasswordFormField
@@ -10,11 +11,11 @@ import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.FormField
 import com.supertokens.sdk.common.requests.FormFieldRequest
 import com.supertokens.sdk.common.requests.PasswordResetRequest
-import com.supertokens.sdk.common.responses.EmailExistsResponse
 import com.supertokens.sdk.common.responses.FormFieldError
 import com.supertokens.sdk.common.responses.SignInResponse
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.common.responses.UserResponse
+import com.supertokens.sdk.core.getUserByEMail
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -125,20 +126,6 @@ open class EmailPasswordHandler {
         }
     }
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.emailExists() {
-        val email = call.parameters["email"] ?: return call.respond(HttpStatusCode.NotFound)
-
-        val response = runCatching {
-            call.emailPassword.getUserByEMail(email)
-        }
-
-        call.respond(
-            EmailExistsResponse(
-                exists = response.isSuccess,
-            )
-        )
-    }
-
     open suspend fun PipelineContext<Unit, ApplicationCall>.passwordResetToken() {
         val body = call.receive<FormFieldRequest>()
 
@@ -146,7 +133,7 @@ open class EmailPasswordHandler {
 
         email?.let {
             val result = runCatching {
-                val user = emailPassword.getUserByEMail(it)
+                val user = superTokens.getUserByEMail(it)
                 val token = emailPassword.createResetPasswordToken(user.id)
 
                 // TODO send email

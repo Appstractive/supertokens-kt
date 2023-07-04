@@ -6,8 +6,11 @@ import com.supertokens.ktor.plugins.SuperTokensAuth
 import com.supertokens.ktor.plugins.requirePrincipal
 import com.supertokens.ktor.plugins.superTokens
 import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
+import com.supertokens.sdk.recipes.emailverification.EmailVerification
+import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.session.Sessions
 import com.supertokens.sdk.recipes.thirdparty.ThirdParty
 import com.supertokens.sdk.recipes.thirdparty.provider
@@ -49,14 +52,6 @@ fun Application.module() {
 
             }
             recipe(Sessions) {
-                customJwtData { _, user ->
-                    buildMap {
-                        set("email", user.email)
-                        user.phoneNumber?.let {
-                            set("phoneNumber", it)
-                        }
-                    }
-                }
             }
 
             recipe(ThirdParty) {
@@ -96,6 +91,14 @@ fun Application.module() {
                             "-----END EC PRIVATE KEY-----"
                     teamId = "teamid"
                 }
+            }
+
+            recipe(EmailVerification) {
+
+            }
+
+            recipe(Passwordless) {
+                mode = PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK
             }
         }
 

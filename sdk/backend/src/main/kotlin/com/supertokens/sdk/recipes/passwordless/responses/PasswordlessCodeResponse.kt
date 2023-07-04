@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PasswordlessCodeResponse(
     override val status: String,
-    val preAuthSessionId: String,
-    val codeId: String,
-    val deviceId: String,
-    val userInputCode: String,
-    val linkCode: String,
-    val timeCreated: Long,
-    val codeLifetime: Long,
+    val preAuthSessionId: String? = null,
+    val codeId: String? = null,
+    val deviceId: String? = null,
+    val userInputCode: String? = null,
+    val linkCode: String? = null,
+    val timeCreated: Long? = null,
+    val codeLifetime: Long? = null,
 ): BaseResponse

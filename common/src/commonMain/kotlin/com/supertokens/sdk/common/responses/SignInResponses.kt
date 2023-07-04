@@ -11,8 +11,8 @@ data class FormFieldError(
 
 @Serializable
 data class SignInResponse(
-    val status: String = SuperTokensStatus.OK.value,
+    override val status: String = SuperTokensStatus.OK.value,
     val user: UserResponse? = null,
     val formFields: List<FormFieldError>? = null,
     val message: String? = null,
-)
+): BaseResponse

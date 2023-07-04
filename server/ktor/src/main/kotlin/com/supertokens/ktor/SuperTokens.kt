@@ -9,6 +9,8 @@ import com.supertokens.ktor.recipes.emailpassword.EmailPasswordHandler
 import com.supertokens.ktor.recipes.emailpassword.emailPasswordRoutes
 import com.supertokens.ktor.recipes.emailverification.EmailVerificationHandler
 import com.supertokens.ktor.recipes.emailverification.emailVerificationRoutes
+import com.supertokens.ktor.recipes.passwordless.PasswordlessHandler
+import com.supertokens.ktor.recipes.passwordless.passwordlessRoutes
 import com.supertokens.ktor.recipes.session.SessionHandler
 import com.supertokens.ktor.recipes.session.sessionRoutes
 import com.supertokens.ktor.recipes.thirdparty.ThirdPartyHandler
@@ -16,6 +18,7 @@ import com.supertokens.ktor.recipes.thirdparty.thirdPartyRoutes
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.emailverification.EmailVerificationRecipe
+import com.supertokens.sdk.recipes.passwordless.PasswordlessRecipe
 import com.supertokens.sdk.recipes.session.SessionRecipe
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import io.ktor.serialization.kotlinx.json.json
@@ -43,6 +46,8 @@ class SuperTokensConfig {
 
     var superTokens: SuperTokens? = null
 
+    var coreHandler: CoreHandler = CoreHandler()
+
     var emailPasswordHandler: EmailPasswordHandler = EmailPasswordHandler()
 
     var sessionHandler: SessionHandler = SessionHandler()
@@ -50,6 +55,8 @@ class SuperTokensConfig {
     var thirdPartyHandler: ThirdPartyHandler = ThirdPartyHandler()
 
     var emailVerificationHandler: EmailVerificationHandler = EmailVerificationHandler()
+
+    var passwordlessHandler: PasswordlessHandler = PasswordlessHandler()
 
     var jwtValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = TokenValidator
 
@@ -79,6 +86,8 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
                 })
             }
 
+            coreRoutes(config.coreHandler)
+
             if (superTokens.hasRecipe<EmailPasswordRecipe>()) {
                 emailPasswordRoutes(config.emailPasswordHandler)
             }
@@ -106,6 +115,10 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
 
             if(superTokens.hasRecipe<EmailVerificationRecipe>()) {
                 emailVerificationRoutes(config.emailVerificationHandler)
+            }
+
+            if(superTokens.hasRecipe<PasswordlessRecipe>()) {
+                passwordlessRoutes(config.passwordlessHandler)
             }
         }
     }

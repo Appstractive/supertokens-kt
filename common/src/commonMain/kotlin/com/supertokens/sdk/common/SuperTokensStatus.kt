@@ -10,6 +10,7 @@ sealed class SuperTokensStatus(
     object WrongCredentialsError: SuperTokensStatus("WRONG_CREDENTIALS_ERROR")
     object UnknownUserIdError: SuperTokensStatus("UNKNOWN_USER_ID_ERROR")
     object UnknownEMailError: SuperTokensStatus("UNKNOWN_EMAIL_ERROR")
+    object UnknownPhoneNumberError: SuperTokensStatus("UNKNOWN_PHONE_NUMBER_ERROR")
     object ResetPasswordInvalidTokenError: SuperTokensStatus("RESET_PASSWORD_INVALID_TOKEN_ERROR")
     object PasswordPolicyViolatedError: SuperTokensStatus("PASSWORD_POLICY_VIOLATED_ERROR")
     object NotFoundError: SuperTokensStatus("Not Found")
@@ -46,6 +47,7 @@ fun String.toStatus(): SuperTokensStatus {
         SuperTokensStatus.PasswordlessCodeAlreadyUsedError.value -> SuperTokensStatus.PasswordlessCodeAlreadyUsedError
         SuperTokensStatus.PasswordlessIncorrectCodeError.value -> SuperTokensStatus.PasswordlessIncorrectCodeError
         SuperTokensStatus.PasswordlessExpiredCodeError.value -> SuperTokensStatus.PasswordlessExpiredCodeError
+        SuperTokensStatus.UnknownPhoneNumberError.value -> SuperTokensStatus.UnknownPhoneNumberError
         else -> SuperTokensStatus.UnknownError(this)
     }
 }

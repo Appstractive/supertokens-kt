@@ -3,7 +3,7 @@ package com.supertokens.sdk.utils
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.common.extractedContent
-import com.supertokens.sdk.models.User
+import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.common.responses.BaseResponse
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.recipes.common.responses.UserResponse

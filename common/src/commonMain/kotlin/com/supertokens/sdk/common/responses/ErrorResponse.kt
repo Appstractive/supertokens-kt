@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ErrorResponse(
-    val status: String = "UNKNOWN_ERROR",
+    override val status: String = "UNKNOWN_ERROR",
     val message: String,
-)
+): BaseResponse

@@ -8,8 +8,6 @@ import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.emailpassword.createResetPasswordToken
-import com.supertokens.sdk.recipes.emailpassword.getUserByEmail
-import com.supertokens.sdk.recipes.emailpassword.emailPasswordGetUserById
 import com.supertokens.sdk.recipes.emailpassword.resetPasswordWithToken
 import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignIn
 import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignUp
@@ -62,22 +60,6 @@ class EmailPasswordRecipeTests {
     @Test
     fun testSignInUser() = runBlocking {
         val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
-        assertEquals("test@test.de", user.email)
-    }
-
-    @Test
-    fun testGetUserById() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
-
-        val getResponse = superTokens.emailPasswordGetUserById(user.id)
-
-        assertEquals(user.id, getResponse.id)
-    }
-
-    @Test
-    fun testGetUserByMail() = runBlocking {
-        val user = superTokens.getUserByEmail("test@test.de")
-
         assertEquals("test@test.de", user.email)
     }
 

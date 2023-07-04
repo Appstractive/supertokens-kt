@@ -1,4 +1,4 @@
-package com.supertokens.sdk.recipes.passwordless.requests
+package com.supertokens.sdk.common.requests
 
 import kotlinx.serialization.Serializable
 

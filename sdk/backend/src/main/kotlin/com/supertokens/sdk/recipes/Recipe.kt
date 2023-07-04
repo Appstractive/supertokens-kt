@@ -2,10 +2,17 @@ package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.SuperTokensRecipeDslMarker
+import com.supertokens.sdk.common.models.User
 
 @SuperTokensRecipeDslMarker
 interface RecipeConfig
-interface Recipe<C: RecipeConfig>
+interface Recipe<C: RecipeConfig> {
+
+    suspend fun getExtraJwtData(user: User): Map<String, Any?> = emptyMap()
+
+}
+
+typealias CustomJwtData = suspend (superTokens: SuperTokens, user: User) -> Map<String, Any?>
 
 typealias BuildRecipe = (SuperTokens) -> Recipe<*>
 

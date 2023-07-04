@@ -3,6 +3,7 @@ package com.supertokens.sdk.recipes.passwordless
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.recipes.Recipe
@@ -10,7 +11,7 @@ import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
 import com.supertokens.sdk.recipes.common.models.SignInUpData
 import com.supertokens.sdk.recipes.passwordless.models.PasswordlessCodeData
-import com.supertokens.sdk.recipes.passwordless.requests.ConsumePasswordlessCodeRequest
+import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequest
 import com.supertokens.sdk.recipes.passwordless.requests.CreatePasswordlessCodeRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokeAllPasswordlessCodesRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokePasswordlesCodeRequest
@@ -27,12 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URLEncoder
 
-enum class PasswordlessMode {
-    MAGIC_LINK,
-    OTP,
-    MAGIC_LINK_OTP,
-}
-
 class PasswordlessRecipeConfig : RecipeConfig {
 
     var mode: PasswordlessMode = PasswordlessMode.MAGIC_LINK
@@ -43,6 +38,8 @@ class PasswordlessRecipe(
     private val superTokens: SuperTokens,
     private val config: PasswordlessRecipeConfig
 ) : Recipe<PasswordlessRecipeConfig> {
+
+    val flowType: PasswordlessMode = config.mode
 
     suspend fun createEmailCode(email: String): PasswordlessCodeData {
         val response = superTokens.client.post(PATH_CREATE_CODE) {
@@ -58,13 +55,13 @@ class PasswordlessRecipe(
 
         return response.parse<PasswordlessCodeResponse, PasswordlessCodeData> {
             PasswordlessCodeData(
-                preAuthSessionId = it.preAuthSessionId,
-                codeId = it.codeId,
-                deviceId = it.deviceId,
-                userInputCode = it.userInputCode,
-                linkCode = it.linkCode,
-                timeCreated = it.timeCreated,
-                codeLifetime = it.codeLifetime,
+                preAuthSessionId = checkNotNull(it.preAuthSessionId),
+                codeId = checkNotNull(it.codeId),
+                deviceId = checkNotNull(it.deviceId),
+                userInputCode = checkNotNull(it.userInputCode),
+                linkCode = checkNotNull(it.linkCode),
+                timeCreated = checkNotNull(it.timeCreated),
+                codeLifetime = checkNotNull(it.codeLifetime),
             )
         }
     }
@@ -83,13 +80,13 @@ class PasswordlessRecipe(
 
         return response.parse<PasswordlessCodeResponse, PasswordlessCodeData> {
             PasswordlessCodeData(
-                preAuthSessionId = it.preAuthSessionId,
-                codeId = it.codeId,
-                deviceId = it.deviceId,
-                userInputCode = it.userInputCode,
-                linkCode = it.linkCode,
-                timeCreated = it.timeCreated,
-                codeLifetime = it.codeLifetime,
+                preAuthSessionId = checkNotNull(it.preAuthSessionId),
+                codeId = checkNotNull(it.codeId),
+                deviceId = checkNotNull(it.deviceId),
+                userInputCode = checkNotNull(it.userInputCode),
+                linkCode = checkNotNull(it.linkCode),
+                timeCreated = checkNotNull(it.timeCreated),
+                codeLifetime = checkNotNull(it.codeLifetime),
             )
         }
     }
@@ -108,13 +105,13 @@ class PasswordlessRecipe(
 
         return response.parse<PasswordlessCodeResponse, PasswordlessCodeData> {
             PasswordlessCodeData(
-                preAuthSessionId = it.preAuthSessionId,
-                codeId = it.codeId,
-                deviceId = it.deviceId,
-                userInputCode = it.userInputCode,
-                linkCode = it.linkCode,
-                timeCreated = it.timeCreated,
-                codeLifetime = it.codeLifetime,
+                preAuthSessionId = checkNotNull(it.preAuthSessionId),
+                codeId = checkNotNull(it.codeId),
+                deviceId = checkNotNull(it.deviceId),
+                userInputCode = checkNotNull(it.userInputCode),
+                linkCode = checkNotNull(it.linkCode),
+                timeCreated = checkNotNull(it.timeCreated),
+                codeLifetime = checkNotNull(it.codeLifetime),
             )
         }
     }

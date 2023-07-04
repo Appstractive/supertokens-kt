@@ -5,7 +5,7 @@ import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.ingredients.email.EmailService
-import com.supertokens.sdk.models.User
+import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -20,7 +20,6 @@ import com.supertokens.sdk.recipes.emailpassword.responses.CreateResetPasswordTo
 import com.supertokens.sdk.recipes.emailpassword.responses.ResetPasswordWithTokenResponse
 import com.supertokens.sdk.utils.parse
 import com.supertokens.sdk.utils.parseUser
-import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -71,24 +70,6 @@ class EmailPasswordRecipe(
                     password = password
                 )
             )
-        }
-
-        return response.parseUser()
-    }
-
-    suspend fun getUserById(userId: String): User {
-
-        val response = superTokens.client.get("$PATH_GET_USER?userId=$userId") {
-            header(Constants.HEADER_RECIPE_ID, ID)
-        }
-
-        return response.parseUser()
-    }
-
-    suspend fun getUserByEMail(email: String): User {
-
-        val response = superTokens.client.get("$PATH_GET_USER?email=$email") {
-            header(Constants.HEADER_RECIPE_ID, ID)
         }
 
         return response.parseUser()
@@ -233,12 +214,6 @@ suspend fun SuperTokens.emailPasswordSignUp(email: String, password: String) =
 
 suspend fun SuperTokens.emailPasswordSignIn(email: String, password: String) =
     getRecipe<EmailPasswordRecipe>().signIn(email, password)
-
-suspend fun SuperTokens.emailPasswordGetUserById(userId: String) =
-    getRecipe<EmailPasswordRecipe>().getUserById(userId)
-
-suspend fun SuperTokens.getUserByEmail(email: String) =
-    getRecipe<EmailPasswordRecipe>().getUserByEMail(email)
 
 suspend fun SuperTokens.createResetPasswordToken(userId: String) =
     getRecipe<EmailPasswordRecipe>().createResetPasswordToken(userId)

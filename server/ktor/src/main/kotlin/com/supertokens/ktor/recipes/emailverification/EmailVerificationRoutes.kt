@@ -1,5 +1,6 @@
 package com.supertokens.ktor.recipes.emailverification
 
+import com.supertokens.ktor.plugins.SuperTokensAuth
 import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -9,7 +10,7 @@ fun Route.emailVerificationRoutes(
     handler: EmailVerificationHandler,
 ) {
 
-    authenticate {
+    authenticate(SuperTokensAuth) {
         post("/user/email/verify/token") {
             with(handler) {
                 sendEmailVerification()

@@ -2,7 +2,7 @@ package com.supertokens.sdk.recipes.thirdparty
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.models.User
+import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -14,7 +14,7 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.recipes.thirdparty.responses.ThirdPartyGetUsersResponse
-import com.supertokens.sdk.recipes.common.responses.SignInUpResponse
+import com.supertokens.sdk.common.responses.SignInUpResponse
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
 import io.ktor.client.request.header

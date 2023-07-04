@@ -1,7 +1,6 @@
 package com.supertokens.ktor.recipes.emailpassword
 
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 
 fun Route.emailPasswordRoutes(handler: EmailPasswordHandler) {
@@ -15,12 +14,6 @@ fun Route.emailPasswordRoutes(handler: EmailPasswordHandler) {
     post("/signup") {
         with(handler) {
             signUp()
-        }
-    }
-
-    get("/signup/email/exists") {
-        with(handler) {
-            emailExists()
         }
     }
 

@@ -14,6 +14,7 @@ import com.supertokens.sdk.common.requests.VerifyEmailTokenRequest
 import com.supertokens.sdk.recipes.emailverification.models.VerifyEmailTokenData
 import com.supertokens.sdk.recipes.emailverification.responses.CreateEmailVerificationTokenResponse
 import com.supertokens.sdk.common.responses.VerifyEmailResponse
+import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailTokenResponse
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
@@ -27,6 +28,24 @@ class EmailVerificationRecipe(
     private val superTokens: SuperTokens,
     private val config: EmailVerificationRecipeConfig
 ): Recipe<EmailVerificationRecipeConfig> {
+
+    suspend fun isVerified(userId: String, email: String?): Boolean {
+        return email?.let {
+            val response  = runCatching {
+                verifyEmail(userId, it)
+            }
+            response.getOrElse {
+                true
+            }
+        // users without an email are verified (to have none)
+        } ?: true
+    }
+
+    override suspend fun getExtraJwtData(user: User): Map<String, Any?> {
+        return buildMap {
+            set("st-ev", isVerified(user.id, user.email))
+        }
+    }
 
     suspend fun createVerificationToken(userId: String, email: String): String {
         val response = superTokens.client.post(PATH_CREATE_TOKEN) {

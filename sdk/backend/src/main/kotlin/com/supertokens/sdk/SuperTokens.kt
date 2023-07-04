@@ -60,7 +60,7 @@ class SuperTokens(
 
     val jwksUrl: String = "${config.connectionUrl}/.well-known/jwks.json"
 
-    val core: CoreHandler = CoreHandler()
+    internal val core: CoreHandler = CoreHandler()
 
     @OptIn(ExperimentalSerializationApi::class)
     val client = config.client ?: HttpClient(CIO) {

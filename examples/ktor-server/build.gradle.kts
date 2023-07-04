@@ -9,7 +9,9 @@ version = "1.0.0"
 group = "com.appstractive"
 
 dependencies {
+    implementation(projects.supertokensSdkCommon)
     implementation(projects.sdk.backend)
+
     implementation(projects.server.ktor)
 
     implementation(libs.kotlin.serialization)

@@ -7,7 +7,8 @@ import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.models.CreateSessionData
 import com.supertokens.sdk.models.RegenerateSessionData
-import com.supertokens.sdk.models.User
+import com.supertokens.sdk.common.models.User
+import com.supertokens.sdk.recipes.CustomJwtData
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -34,7 +35,6 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
-typealias CustomJwtData = suspend (superTokens: SuperTokens, user: User) -> Map<String, String>
 
 class SessionConfig: RecipeConfig {
 
@@ -65,6 +65,21 @@ class SessionRecipe(
     suspend fun getJwtData(user: User): Map<String, Any?> = buildMap {
         set("iss", superTokens.appConfig.apiDomain)
         set("aud", superTokens.appConfig.websiteDomain)
+
+        buildMap {
+            user.email?.let {
+                set("email", it)
+            }
+            user.phoneNumber?.let {
+                set("phoneNumber", it)
+            }
+        }
+
+        superTokens.recipes.forEach {
+            it.getExtraJwtData(user).forEach { entry ->
+                set(entry.key, entry.value)
+            }
+        }
         customJwtData?.let {
             it.invoke(superTokens, user).forEach { entry ->
                 set(entry.key, entry.value)
