@@ -10,8 +10,7 @@ version = "1.0.0"
 group = "com.supertokens.backend"
 
 dependencies {
-    implementation(projects.supertokensSdkCommon)
-    implementation(projects.sdk.backend)
+    api(projects.sdk.backend)
 
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.coroutines)
@@ -25,11 +24,11 @@ dependencies {
     implementation(libs.ktor.client.json)
     implementation(libs.ktor.client.logging)
 
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.contentnegotiation)
-    implementation(libs.ktor.server.statuspages)
-    implementation(libs.ktor.server.auth)
-    implementation(libs.ktor.server.auth.jwt)
+    api(libs.ktor.server.core)
+    api(libs.ktor.server.contentnegotiation)
+    api(libs.ktor.server.statuspages)
+    api(libs.ktor.server.auth)
+    api(libs.ktor.server.auth.jwt)
 
     implementation(libs.slf4j)
     implementation(libs.jwt)

@@ -7,6 +7,8 @@ import com.supertokens.ktor.plugins.requirePrincipal
 import com.supertokens.ktor.plugins.superTokens
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.common.models.PasswordlessMode
+import com.supertokens.sdk.ingredients.email.smtp.SmtpConfig
+import com.supertokens.sdk.ingredients.email.smtp.SmtpEmailService
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailverification.EmailVerification
@@ -42,6 +44,17 @@ fun main() {
 fun Application.module() {
 
     install(SuperTokens) {
+
+        val mailService = SmtpEmailService(
+            SmtpConfig(
+                host = "localhost",
+                port = 1025,
+                password = "",
+                fromEmail = "test@example.com",
+                fromName = "SuperTokens Test",
+            )
+        )
+
         superTokens = superTokens(
             connectionURI = "https://try.supertokens.io",
             appConfig = AppConfig(
@@ -49,7 +62,7 @@ fun Application.module() {
             ),
         ) {
             recipe(EmailPassword) {
-
+                emailService = mailService
             }
             recipe(Sessions) {
             }
@@ -94,10 +107,11 @@ fun Application.module() {
             }
 
             recipe(EmailVerification) {
-
+                emailService = mailService
             }
 
             recipe(Passwordless) {
+                emailService = mailService
                 mode = PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK
             }
         }

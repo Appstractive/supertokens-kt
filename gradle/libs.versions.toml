@@ -17,6 +17,7 @@ jwt = "5.2.4"
 slf4j = "1.6.1"
 
 mail = "1.5"
+freemarker = "2.3.14"
 
 [libraries]
 androidGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -45,6 +46,7 @@ ktor-server-auth = {module = "io.ktor:ktor-server-auth", version.ref = "ktor_ver
 ktor-server-auth-jwt = {module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor_version"}
 
 javax-mail = {module = "org.apache.commons:commons-email", version.ref = "mail"}
+freemarker = {module = "org.freemarker:freemarker", version.ref = "freemarker"}
 
 jwt = {module = "io.fusionauth:fusionauth-jwt", version.ref = "jwt"}
 

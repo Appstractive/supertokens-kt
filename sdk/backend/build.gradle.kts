@@ -3,8 +3,9 @@ plugins {
     kotlin("plugin.serialization")
     `maven-publish`
 }
+
 dependencies {
-    implementation(projects.supertokensSdkCommon)
+    api(projects.supertokensSdkCommon)
 
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.coroutines)
@@ -19,6 +20,7 @@ dependencies {
     implementation(libs.ktor.client.logging)
 
     implementation(libs.javax.mail)
+    api(libs.freemarker)
 
     implementation(libs.slf4j)
     implementation(libs.jwt)

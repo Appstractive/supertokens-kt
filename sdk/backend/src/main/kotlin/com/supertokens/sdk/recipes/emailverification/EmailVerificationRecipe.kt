@@ -15,6 +15,7 @@ import com.supertokens.sdk.recipes.emailverification.models.VerifyEmailTokenData
 import com.supertokens.sdk.recipes.emailverification.responses.CreateEmailVerificationTokenResponse
 import com.supertokens.sdk.common.responses.VerifyEmailResponse
 import com.supertokens.sdk.common.models.User
+import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailTokenResponse
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
@@ -22,12 +23,23 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
-class EmailVerificationRecipeConfig: RecipeConfig
+class EmailVerificationRecipeConfig: RecipeConfig {
+
+    var emailService: EmailService? = null
+
+}
 
 class EmailVerificationRecipe(
     private val superTokens: SuperTokens,
     private val config: EmailVerificationRecipeConfig
 ): Recipe<EmailVerificationRecipeConfig> {
+
+    val emailService: EmailService? = config.emailService
+
+    suspend fun setVerified(userId: String, email: String) {
+        val token = createVerificationToken(userId, email)
+        verifyToken(token)
+    }
 
     suspend fun isVerified(userId: String, email: String?): Boolean {
         return email?.let {

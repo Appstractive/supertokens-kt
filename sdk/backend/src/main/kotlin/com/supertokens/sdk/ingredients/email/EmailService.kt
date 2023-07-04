@@ -1,5 +1,12 @@
 package com.supertokens.sdk.ingredients.email
 
+import com.supertokens.sdk.recipes.passwordless.models.TemplateProvider
+import freemarker.cache.TemplateLoader
+import freemarker.cache.URLTemplateLoader
+import freemarker.template.Configuration
+import java.io.StringWriter
+import java.net.URL
+
 data class EmailContent(
     val body: String,
     val isHtml: Boolean,
@@ -7,8 +14,42 @@ data class EmailContent(
     val toEmail: String,
 )
 
-interface EmailService {
+abstract class EmailService(
+    templateLoader: TemplateLoader = DEFAULT_EMAIL_TEMPLATE_LOADER,
+    val magicLinkLoginTemplateName: String = "magic-link-login.html",
+    val magicLinkOtpLoginTemplateName: String = "magic-link-otp-login.html",
+    val otpLoginTemplateName: String = "otp-login.html",
+    val passwordResetTemplateName: String = "password-reset.html",
+    val emailVerificationTemplateName: String = "email-verification.html",
+) {
 
-    suspend fun sendEmail(content: EmailContent)
+    private val cfg = Configuration().apply {
+        localizedLookup = false
+    }
 
+    init {
+        cfg.templateLoader = templateLoader
+    }
+
+    abstract suspend fun sendEmail(content: EmailContent)
+
+    open fun getTemplate(template: String) = cfg.getTemplate(template)
+
+    fun processTemplate(name: String, provider: TemplateProvider): String {
+        val template = getTemplate(name)
+        val out = StringWriter()
+        template.process(
+            provider.template,
+            out,
+        )
+        return out.toString()
+    }
+
+}
+
+val DEFAULT_EMAIL_TEMPLATE_LOADER = object : URLTemplateLoader() {
+
+    override fun getURL(name: String): URL {
+        return URL("https://raw.githubusercontent.com/supertokens/email-sms-templates/master/email-html/$name")
+    }
 }

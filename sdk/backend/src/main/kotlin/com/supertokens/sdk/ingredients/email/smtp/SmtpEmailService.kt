@@ -21,7 +21,7 @@ data class SmtpConfig(
 
 class SmtpEmailService(
     private val config: SmtpConfig,
-): EmailService {
+): EmailService() {
 
     private val transport: Transport by lazy {
         val props = Properties()
@@ -37,7 +37,7 @@ class SmtpEmailService(
 
         val m = HtmlEmail().apply {
             hostName = config.host
-            subject = "Wichteln Helfer Kontakt"
+            subject = content.subject
             if(content.isHtml) {
                 setHtmlMsg(content.body)
             }

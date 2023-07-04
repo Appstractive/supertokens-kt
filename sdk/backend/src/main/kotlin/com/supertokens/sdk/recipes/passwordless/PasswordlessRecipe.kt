@@ -12,6 +12,7 @@ import com.supertokens.sdk.recipes.RecipeConfig
 import com.supertokens.sdk.recipes.common.models.SignInUpData
 import com.supertokens.sdk.recipes.passwordless.models.PasswordlessCodeData
 import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequest
+import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.passwordless.requests.CreatePasswordlessCodeRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokeAllPasswordlessCodesRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokePasswordlesCodeRequest
@@ -32,6 +33,8 @@ class PasswordlessRecipeConfig : RecipeConfig {
 
     var mode: PasswordlessMode = PasswordlessMode.MAGIC_LINK
 
+    var emailService: EmailService? = null
+
 }
 
 class PasswordlessRecipe(
@@ -40,6 +43,8 @@ class PasswordlessRecipe(
 ) : Recipe<PasswordlessRecipeConfig> {
 
     val flowType: PasswordlessMode = config.mode
+
+    val emailService: EmailService? = config.emailService
 
     suspend fun createEmailCode(email: String): PasswordlessCodeData {
         val response = superTokens.client.post(PATH_CREATE_CODE) {

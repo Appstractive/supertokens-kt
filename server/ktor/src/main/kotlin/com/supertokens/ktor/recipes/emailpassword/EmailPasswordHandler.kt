@@ -16,13 +16,19 @@ import com.supertokens.sdk.common.responses.SignInResponse
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.common.responses.UserResponse
 import com.supertokens.sdk.core.getUserByEMail
+import com.supertokens.sdk.ingredients.email.EmailContent
+import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
+import com.supertokens.sdk.recipes.emailpassword.models.EmailResetTemplate
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private suspend fun ApplicationCall.validateFormFields(
     fields: List<FormField>,
@@ -112,8 +118,6 @@ open class EmailPasswordHandler {
                 )
             }
 
-            // TODO send verify email
-
             call.respond(
                 SignInResponse(
                     user = UserResponse(
@@ -126,18 +130,51 @@ open class EmailPasswordHandler {
         }
     }
 
+    open suspend fun PipelineContext<Unit, ApplicationCall>.createPasswordResetLink(token: String) =
+        "https://${superTokens.appConfig.websiteDomain}${superTokens.appConfig.websiteBasePath}/reset-password?token=$token"
+
+    /**
+     * Override this to send localized mails
+     */
+    open suspend fun PipelineContext<Unit, ApplicationCall>.getResetPasswordTemplateName(emailService: EmailService) =
+        emailService.passwordResetTemplateName
+
+    open suspend fun PipelineContext<Unit, ApplicationCall>.sendPasswordResetMail(email: String) {
+        emailPassword.emailService?.let {
+            CoroutineScope(Dispatchers.IO).launch {
+                runCatching {
+                    val user = superTokens.getUserByEMail(email)
+                    val token = emailPassword.createResetPasswordToken(user.id)
+
+                    val body = it.processTemplate(
+                        getResetPasswordTemplateName(it),
+                        EmailResetTemplate(
+                            appname = superTokens.appConfig.name,
+                            toEmail = email,
+                            resetLink = createPasswordResetLink(token),
+                        ),
+                    )
+
+                    it.sendEmail(
+                        EmailContent(
+                            body = body,
+                            isHtml = true,
+                            subject = superTokens.appConfig.name,
+                            toEmail = email,
+                        )
+                    )
+                }
+            }
+        }
+    }
+
     open suspend fun PipelineContext<Unit, ApplicationCall>.passwordResetToken() {
         val body = call.receive<FormFieldRequest>()
 
-        val email = body.formFields.firstOrNull { it.id == EmailPasswordRecipe.FORM_FIELD_EMAIL_ID }?.value
+        val emailField = body.formFields.firstOrNull { it.id == EmailPasswordRecipe.FORM_FIELD_EMAIL_ID }
 
-        email?.let {
-            val result = runCatching {
-                val user = superTokens.getUserByEMail(it)
-                val token = emailPassword.createResetPasswordToken(user.id)
-
-                // TODO send email
-            }
+        emailField?.value?.let { email ->
+            sendPasswordResetMail(email)
         }
 
         call.respond(
