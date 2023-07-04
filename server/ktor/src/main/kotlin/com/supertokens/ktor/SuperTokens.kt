@@ -21,6 +21,7 @@ import com.supertokens.sdk.recipes.emailverification.EmailVerificationRecipe
 import com.supertokens.sdk.recipes.passwordless.PasswordlessRecipe
 import com.supertokens.sdk.recipes.session.SessionRecipe
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
+import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.application

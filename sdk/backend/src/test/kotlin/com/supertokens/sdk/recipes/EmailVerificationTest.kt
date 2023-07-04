@@ -27,7 +27,6 @@ class EmailVerificationTest {
         appConfig = AppConfig(
             name = "TestApp",
             apiDomain = "localhost",
-            websiteDomain = "localhost",
         ),
     ) {
         recipe(EmailPassword)

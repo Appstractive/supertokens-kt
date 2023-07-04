@@ -38,7 +38,6 @@ class ThirdPartyRecipeTests {
         appConfig = AppConfig(
             name = "TestApp",
             apiDomain = "localhost",
-            websiteDomain = "localhost",
         ),
     ) {
         recipe(ThirdParty) {

@@ -7,7 +7,9 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.BadRequestException
+import com.supertokens.ktor.utils.getFrontEnd
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.sdk.FrontendConfig
 import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.VerifyEmailTokenRequest
@@ -29,8 +31,8 @@ import kotlinx.coroutines.launch
 
 open class EmailVerificationHandler {
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(token: String) =
-        "https://${superTokens.appConfig.websiteDomain}${superTokens.appConfig.websiteBasePath}/verify-email?token=$token"
+    open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(frontend: FrontendConfig, token: String) =
+        "${frontend.fullUrl}/verify-email?token=$token"
 
     /**
      * Override this to send localized mails
@@ -39,7 +41,9 @@ open class EmailVerificationHandler {
         emailService.emailVerificationTemplateName
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendVerificationMail(email: String) {
+        val frontend = call.getFrontEnd()
         emailVerification.emailService?.let {
+            // launch the email sending in another scope, so the call is not blocked
             CoroutineScope(Dispatchers.IO).launch {
                 runCatching {
                     val user = superTokens.getUserByEMail(email)
@@ -50,7 +54,7 @@ open class EmailVerificationHandler {
                         EmailVerificationTemplate(
                             appName = superTokens.appConfig.name,
                             email = email,
-                            verificationLink = createVerificationLink(token),
+                            verificationLink = createVerificationLink(frontend, token),
                         ),
                     )
 

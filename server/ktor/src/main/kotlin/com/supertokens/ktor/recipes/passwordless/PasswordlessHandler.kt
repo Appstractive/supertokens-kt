@@ -6,7 +6,9 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.BadRequestException
+import com.supertokens.ktor.utils.getFrontEnd
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.sdk.FrontendConfig
 import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.PasswordlessMode
@@ -47,11 +49,13 @@ open class PasswordlessHandler {
         PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK -> emailService.magicLinkOtpLoginTemplateName
     }
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(codeData: PasswordlessCodeData): String =
-        "https://${superTokens.appConfig.websiteDomain}${superTokens.appConfig.websiteBasePath}/verify?preAuthSessionId=${codeData.preAuthSessionId}#${codeData.linkCode}"
+    open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(frontend: FrontendConfig, codeData: PasswordlessCodeData): String =
+        "${frontend.fullUrl}/verify?preAuthSessionId=${codeData.preAuthSessionId}#${codeData.linkCode}"
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginMail(email: String, codeData: PasswordlessCodeData): PasswordlessCodeData {
+        val frontend = call.getFrontEnd()
         passwordless.emailService?.let {
+            // launch the email sending in another scope, so the call is not blocked
             CoroutineScope(Dispatchers.IO).launch {
                 val appConfig = superTokens.appConfig
 
@@ -62,7 +66,7 @@ open class PasswordlessHandler {
                             LoginMagicLinkTemplate(
                                 appname = appConfig.name,
                                 toEmail = email,
-                                urlWithLinkCode = createMagicLinkUrl(codeData),
+                                urlWithLinkCode = createMagicLinkUrl(frontend, codeData),
                                 time = convertToTimeString(codeData.codeLifetime),
                             ),
                         )
@@ -86,7 +90,7 @@ open class PasswordlessHandler {
                             LoginMagicLinkOtpTemplate(
                                 appname = appConfig.name,
                                 toEmail = email,
-                                urlWithLinkCode = createMagicLinkUrl(codeData),
+                                urlWithLinkCode = createMagicLinkUrl(frontend, codeData),
                                 otp = codeData.userInputCode,
                                 time = convertToTimeString(codeData.codeLifetime),
                             ),

@@ -6,6 +6,7 @@ import com.supertokens.ktor.plugins.SuperTokensAuth
 import com.supertokens.ktor.plugins.requirePrincipal
 import com.supertokens.ktor.plugins.superTokens
 import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.FrontendConfig
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.ingredients.email.smtp.SmtpConfig
 import com.supertokens.sdk.ingredients.email.smtp.SmtpEmailService
@@ -59,6 +60,14 @@ fun Application.module() {
             connectionURI = "https://try.supertokens.io",
             appConfig = AppConfig(
                 name = "Ktor Example Server",
+                frontends = listOf(
+                    FrontendConfig(),
+                    FrontendConfig(
+                        scheme = "my-app",
+                        host = "callbacks",
+                        path = "",
+                    ),
+                ),
             ),
         ) {
             recipe(EmailPassword) {

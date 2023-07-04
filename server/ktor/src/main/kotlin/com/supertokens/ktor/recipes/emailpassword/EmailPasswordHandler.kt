@@ -4,9 +4,11 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.getEmailFormField
+import com.supertokens.ktor.utils.getFrontEnd
 import com.supertokens.ktor.utils.getInvalidFormFields
 import com.supertokens.ktor.utils.getPasswordFormField
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.sdk.FrontendConfig
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.FormField
 import com.supertokens.sdk.common.requests.FormFieldRequest
@@ -20,9 +22,11 @@ import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.emailpassword.models.EmailResetTemplate
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
+import io.ktor.server.request.header
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
@@ -130,8 +134,8 @@ open class EmailPasswordHandler {
         }
     }
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createPasswordResetLink(token: String) =
-        "https://${superTokens.appConfig.websiteDomain}${superTokens.appConfig.websiteBasePath}/reset-password?token=$token"
+    open suspend fun createPasswordResetLink(frontend: FrontendConfig, token: String) =
+        "${frontend.fullUrl}/reset-password?token=$token"
 
     /**
      * Override this to send localized mails
@@ -140,7 +144,9 @@ open class EmailPasswordHandler {
         emailService.passwordResetTemplateName
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendPasswordResetMail(email: String) {
+        val frontend = call.getFrontEnd()
         emailPassword.emailService?.let {
+            // launch the email sending in another scope, so the call is not blocked
             CoroutineScope(Dispatchers.IO).launch {
                 runCatching {
                     val user = superTokens.getUserByEMail(email)
@@ -151,7 +157,7 @@ open class EmailPasswordHandler {
                         EmailResetTemplate(
                             appname = superTokens.appConfig.name,
                             toEmail = email,
-                            resetLink = createPasswordResetLink(token),
+                            resetLink = createPasswordResetLink(frontend, token),
                         ),
                     )
 

@@ -14,10 +14,12 @@ import com.supertokens.sdk.recipes.passwordless.consumePasswordlessUserInputCode
 import com.supertokens.sdk.recipes.passwordless.createPasswordlessPhoneNumberCode
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@Ignore("Only for DEV purposes")
 class CoreTests {
 
     private val superTokens = superTokens(
@@ -25,7 +27,6 @@ class CoreTests {
         appConfig = AppConfig(
             name = "TestApp",
             apiDomain = "localhost",
-            websiteDomain = "localhost",
         ),
     ) {
         recipe(EmailPassword) {

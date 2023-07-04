@@ -64,7 +64,7 @@ class SessionRecipe(
 
     suspend fun getJwtData(user: User): Map<String, Any?> = buildMap {
         set("iss", superTokens.appConfig.apiDomain)
-        set("aud", superTokens.appConfig.websiteDomain)
+        set("aud", superTokens.appConfig.frontends.map { it.host })
 
         buildMap {
             user.email?.let {

@@ -17,10 +17,21 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
+data class FrontendConfig(
+    val scheme: String = "http",
+    val host: String = "localhost",
+    val path: String = "/auth",
+) {
+
+    val fullUrl = "$scheme://$host$path"
+
+}
+
 data class AppConfig(
     val name: String,
-    val websiteDomain: String = "localhost",
-    val websiteBasePath: String = "/auth",
+    val frontends: List<FrontendConfig> = listOf(
+        FrontendConfig(),
+    ),
     val apiDomain: String = "localhost",
     val apiBasePath: String = "/auth",
 )
@@ -93,6 +104,15 @@ class SuperTokens(
         ?: throw RuntimeException("Recipe ${T::class.java.simpleName} not configured")
 
     inline fun <reified T : Recipe<*>> hasRecipe(): Boolean = recipes.filterIsInstance<T>().isNotEmpty()
+
+    fun getFrontEnd(origin: String?): FrontendConfig {
+        val frontends = appConfig.frontends
+        return origin.takeIf { !it.equals("null", ignoreCase = true) }?.let {
+            frontends.firstOrNull {
+                origin.equals("${it.scheme}://${it.host}", ignoreCase = true)
+            }
+        } ?: frontends.first()
+    }
 
 }
 

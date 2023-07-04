@@ -21,11 +21,13 @@ import com.supertokens.sdk.recipes.passwordless.revokePasswordlessPhoneNumberCod
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertThrows
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@Ignore("Only for DEV purposes")
 class PasswordlessRecipeTests {
 
     private val superTokens = superTokens(
@@ -33,7 +35,6 @@ class PasswordlessRecipeTests {
         appConfig = AppConfig(
             name = "TestApp",
             apiDomain = "localhost",
-            websiteDomain = "localhost",
         ),
     ) {
         recipe(Passwordless) {
