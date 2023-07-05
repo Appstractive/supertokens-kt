@@ -27,14 +27,26 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
-class RolesRecipeConfig: RecipeConfig
+class RolesRecipeConfig: RecipeConfig {
+
+    var addRolesToToken: Boolean = true
+    var addPermissionsToToken: Boolean = true
+
+}
 
 class RolesRecipe(
     private val superTokens: SuperTokens,
     private val config: RolesRecipeConfig
 ): Recipe<RolesRecipeConfig> {
 
+    val addRolesToToken = config.addRolesToToken
+    val addPermissionsToToken = config.addPermissionsToToken
+
     override suspend fun getExtraJwtData(user: User): Map<String, Any?> {
+        if(!addRolesToToken && !addPermissionsToToken) {
+            return emptyMap()
+        }
+
         val userRoles = getUserRoles(user.id)
         val userPermissions = buildSet {
             userRoles.forEach {  role ->
@@ -43,11 +55,11 @@ class RolesRecipe(
         }
 
         return buildMap {
-            if(userRoles.isNotEmpty()) {
+            if(addRolesToToken && userRoles.isNotEmpty()) {
                 set("st-role", userRoles)
             }
 
-            if(userPermissions.isNotEmpty()) {
+            if(addPermissionsToToken && userPermissions.isNotEmpty()) {
                 set("st-perm", userPermissions)
             }
         }

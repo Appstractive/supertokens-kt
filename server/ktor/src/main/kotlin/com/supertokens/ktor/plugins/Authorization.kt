@@ -9,6 +9,7 @@ import io.ktor.server.routing.*
 
 typealias Role = String
 typealias Permission = String
+typealias AuthExtractor = suspend (Principal) -> Set<Role>
 
 class RoleBasedAuthConfiguration {
     var required: Set<String> = emptySet()
@@ -33,22 +34,24 @@ class AuthorizedRouteSelector(private val description: String) : RouteSelector()
     override fun toString(): String = "(authorize ${description})"
 }
 
+
+
 class RoleBasedAuthPluginConfiguration {
-    var roleExtractor: ((Principal) -> Set<Role>) = { emptySet() }
+    var roleExtractor: AuthExtractor = { emptySet() }
         private set
 
-    fun extractRoles(extractor: (Principal) -> Set<Role>) {
+    fun extractRoles(extractor: AuthExtractor) {
         roleExtractor = extractor
     }
 
-    var permissionExtractor: ((Principal) -> Set<Permission>) = { emptySet() }
+    var permissionExtractor: AuthExtractor = { emptySet() }
         private set
 
-    fun extractPermissions(extractor: (Principal) -> Set<Permission>) {
+    fun extractPermissions(extractor: AuthExtractor) {
         permissionExtractor = extractor
     }
 
-    var throwErrorOnUnauthorizedResponse = false
+    var throwOnUnauthorizedResponse = false
 }
 
 private lateinit var pluginGlobalConfig: RoleBasedAuthPluginConfiguration
@@ -141,7 +144,7 @@ val RoleBasedAuth =
                     }
                 }
                 if (denyReasons.isNotEmpty()) {
-                    if (pluginGlobalConfig.throwErrorOnUnauthorizedResponse) {
+                    if (pluginGlobalConfig.throwOnUnauthorizedResponse) {
                         throw UnauthorizedAccessException(denyReasons)
                     } else {
                         val message = denyReasons.joinToString(". ")
