@@ -15,6 +15,8 @@ data class AuthenticatedUser(
     val id: String,
     val sessionHandle: String,
     val jwtPayload: Payload,
+    val roles: Set<String>? = null,
+    val permissions: Set<String>? = null,
 ) : Principal
 
 const val SuperTokensAuth = "SuperTokens"
@@ -23,12 +25,13 @@ val TokenValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = {
     val sub = it.subject
     val sessionHandle = it["sessionHandle"]
 
-
     if (sub != null && sessionHandle != null) {
         AuthenticatedUser(
             id = sub,
             sessionHandle = sessionHandle,
             jwtPayload = it.payload,
+            roles = it.payload.claims["st-role"]?.asList(String::class.java)?.toSet(),
+            permissions = (it.payload.claims["st-perm"]?.asList(String::class.java)?.toSet()),
         )
     } else {
         null

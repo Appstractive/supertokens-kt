@@ -26,7 +26,6 @@ class CoreTests {
         connectionURI = "https://try.supertokens.com/",
         appConfig = AppConfig(
             name = "TestApp",
-            apiDomain = "localhost",
         ),
     ) {
         recipe(EmailPassword) {

@@ -5,8 +5,10 @@ import com.supertokens.ktor.plugins.AuthenticatedUser
 import com.supertokens.ktor.plugins.SuperTokensAuth
 import com.supertokens.ktor.plugins.requirePrincipal
 import com.supertokens.ktor.plugins.superTokens
+import com.supertokens.ktor.plugins.withPermission
+import com.supertokens.ktor.plugins.withRole
 import com.supertokens.sdk.AppConfig
-import com.supertokens.sdk.FrontendConfig
+import com.supertokens.sdk.ServerConfig
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.ingredients.email.smtp.SmtpConfig
 import com.supertokens.sdk.ingredients.email.smtp.SmtpEmailService
@@ -14,6 +16,7 @@ import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailverification.EmailVerification
 import com.supertokens.sdk.recipes.passwordless.Passwordless
+import com.supertokens.sdk.recipes.roles.Roles
 import com.supertokens.sdk.recipes.session.Sessions
 import com.supertokens.sdk.recipes.thirdparty.ThirdParty
 import com.supertokens.sdk.recipes.thirdparty.provider
@@ -61,8 +64,8 @@ fun Application.module() {
             appConfig = AppConfig(
                 name = "Ktor Example Server",
                 frontends = listOf(
-                    FrontendConfig(),
-                    FrontendConfig(
+                    ServerConfig(),
+                    ServerConfig(
                         scheme = "my-app",
                         host = "callbacks",
                         path = "",
@@ -74,6 +77,11 @@ fun Application.module() {
                 emailService = mailService
             }
             recipe(Sessions) {
+                customJwtData { _, _ ->
+                    mapOf(
+                        "isExample" to true,
+                    )
+                }
             }
 
             recipe(ThirdParty) {
@@ -123,6 +131,10 @@ fun Application.module() {
                 emailService = mailService
                 mode = PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK
             }
+
+            recipe(Roles) {
+
+            }
         }
 
         emailPasswordHandler = CustomEmailPasswordHandler()
@@ -158,6 +170,30 @@ fun Application.module() {
                         id = user.id,
                     )
                 )
+            }
+
+            withRole("admin") {
+                get("/admin") {
+                    val user = call.requirePrincipal<AuthenticatedUser>()
+
+                    call.respond(
+                        PrivateUserResponse(
+                            id = user.id,
+                        )
+                    )
+                }
+            }
+
+            withPermission("read:all") {
+                get("/readall") {
+                    val user = call.requirePrincipal<AuthenticatedUser>()
+
+                    call.respond(
+                        PrivateUserResponse(
+                            id = user.id,
+                        )
+                    )
+                }
             }
         }
     }

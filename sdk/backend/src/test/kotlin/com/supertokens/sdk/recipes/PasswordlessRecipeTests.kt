@@ -34,7 +34,6 @@ class PasswordlessRecipeTests {
         connectionURI = "https://try.supertokens.com/",
         appConfig = AppConfig(
             name = "TestApp",
-            apiDomain = "localhost",
         ),
     ) {
         recipe(Passwordless) {

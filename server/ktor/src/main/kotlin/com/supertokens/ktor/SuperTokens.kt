@@ -2,9 +2,11 @@ package com.supertokens.ktor
 
 import com.auth0.jwk.UrlJwkProvider
 import com.auth0.jwt.interfaces.Verification
+import com.supertokens.ktor.plugins.AuthenticatedUser
 import com.supertokens.ktor.plugins.SuperTokensAuth
 import com.supertokens.ktor.plugins.TokenValidator
 import com.supertokens.ktor.plugins.authHeaderCookieWrapper
+import com.supertokens.ktor.plugins.roleBased
 import com.supertokens.ktor.recipes.emailpassword.EmailPasswordHandler
 import com.supertokens.ktor.recipes.emailpassword.emailPasswordRoutes
 import com.supertokens.ktor.recipes.emailverification.EmailVerificationHandler
@@ -19,9 +21,9 @@ import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.emailverification.EmailVerificationRecipe
 import com.supertokens.sdk.recipes.passwordless.PasswordlessRecipe
+import com.supertokens.sdk.recipes.roles.RolesRecipe
 import com.supertokens.sdk.recipes.session.SessionRecipe
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
-import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.application
@@ -78,7 +80,7 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
 
     application.routing {
 
-        route(superTokens.appConfig.apiBasePath) {
+        route(superTokens.appConfig.api.path) {
 
             install(ContentNegotiation) {
                 json(Json {
@@ -101,8 +103,19 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
 
                         authHeader(authHeaderCookieWrapper)
 
-                        verifier(UrlJwkProvider(URL(superTokens.jwksUrl)), superTokens.appConfig.apiDomain) {
+                        verifier(UrlJwkProvider(URL(superTokens.jwksUrl)), superTokens.getRecipe<SessionRecipe>().issuer) {
                             config.jwtVerification?.invoke(this)
+                        }
+                    }
+
+                    if(superTokens.hasRecipe<RolesRecipe>()) {
+                        roleBased {
+                            extractRoles { principal ->
+                                (principal as? AuthenticatedUser)?.roles ?: emptySet()
+                            }
+                            extractPermissions { principal ->
+                                (principal as? AuthenticatedUser)?.permissions ?: emptySet()
+                            }
                         }
                     }
                 }

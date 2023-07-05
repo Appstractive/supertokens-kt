@@ -6,9 +6,9 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.BadRequestException
-import com.supertokens.ktor.utils.getFrontEnd
+import com.supertokens.ktor.utils.fronend
 import com.supertokens.ktor.utils.setSessionInResponse
-import com.supertokens.sdk.FrontendConfig
+import com.supertokens.sdk.ServerConfig
 import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.PasswordlessMode
@@ -49,11 +49,11 @@ open class PasswordlessHandler {
         PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK -> emailService.magicLinkOtpLoginTemplateName
     }
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(frontend: FrontendConfig, codeData: PasswordlessCodeData): String =
+    open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(frontend: ServerConfig, codeData: PasswordlessCodeData): String =
         "${frontend.fullUrl}/verify?preAuthSessionId=${codeData.preAuthSessionId}#${codeData.linkCode}"
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginMail(email: String, codeData: PasswordlessCodeData): PasswordlessCodeData {
-        val frontend = call.getFrontEnd()
+        val frontend = call.fronend
         passwordless.emailService?.let {
             // launch the email sending in another scope, so the call is not blocked
             CoroutineScope(Dispatchers.IO).launch {

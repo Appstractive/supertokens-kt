@@ -17,7 +17,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
-data class FrontendConfig(
+data class ServerConfig(
     val scheme: String = "http",
     val host: String = "localhost",
     val path: String = "/auth",
@@ -29,11 +29,10 @@ data class FrontendConfig(
 
 data class AppConfig(
     val name: String,
-    val frontends: List<FrontendConfig> = listOf(
-        FrontendConfig(),
+    val frontends: List<ServerConfig> = listOf(
+        ServerConfig(),
     ),
-    val apiDomain: String = "localhost",
-    val apiBasePath: String = "/auth",
+    val api: ServerConfig = ServerConfig(),
 )
 
 fun <C: RecipeConfig, R: Recipe<C>> SuperTokensConfig.recipe(builder: RecipeBuilder<C, R>, configure: C.() -> Unit = {}) {
@@ -105,7 +104,7 @@ class SuperTokens(
 
     inline fun <reified T : Recipe<*>> hasRecipe(): Boolean = recipes.filterIsInstance<T>().isNotEmpty()
 
-    fun getFrontEnd(origin: String?): FrontendConfig {
+    fun getFrontEnd(origin: String?): ServerConfig {
         val frontends = appConfig.frontends
         return origin.takeIf { !it.equals("null", ignoreCase = true) }?.let {
             frontends.firstOrNull {

@@ -38,13 +38,13 @@ import io.ktor.client.request.setBody
 
 class SessionConfig: RecipeConfig {
 
-    var cookieDomain: String = "localhost"
-
     var headerBasedSessions: Boolean = true
 
     var cookieBasedSessions: Boolean = true
 
     internal var customJwtData: CustomJwtData? = null
+
+    var issuer: String? = null
 
     fun customJwtData(jwtData: CustomJwtData) {
         customJwtData = jwtData
@@ -57,13 +57,15 @@ class SessionRecipe(
     private val config: SessionConfig
 ) : Recipe<SessionConfig> {
 
-    val cookieDomain = config.cookieDomain
     val headerBasedSessions = config.headerBasedSessions
     val cookieBasedSessions = config.cookieBasedSessions
     val customJwtData: CustomJwtData? = config.customJwtData
+    val issuer by lazy {
+        config.issuer ?: superTokens.appConfig.api.host
+    }
 
     suspend fun getJwtData(user: User): Map<String, Any?> = buildMap {
-        set("iss", superTokens.appConfig.apiDomain)
+        set("iss", issuer)
         set("aud", superTokens.appConfig.frontends.map { it.host })
 
         buildMap {

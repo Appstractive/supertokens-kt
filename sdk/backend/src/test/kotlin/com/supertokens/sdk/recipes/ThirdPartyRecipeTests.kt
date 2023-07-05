@@ -37,7 +37,6 @@ class ThirdPartyRecipeTests {
         connectionURI = "https://try.supertokens.com/",
         appConfig = AppConfig(
             name = "TestApp",
-            apiDomain = "localhost",
         ),
     ) {
         recipe(ThirdParty) {

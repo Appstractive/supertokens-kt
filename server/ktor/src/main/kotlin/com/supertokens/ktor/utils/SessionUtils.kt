@@ -1,7 +1,6 @@
 package com.supertokens.ktor.utils
 
 import com.supertokens.ktor.recipes.session.sessions
-import com.supertokens.ktor.superTokens
 import com.supertokens.sdk.models.Token
 import io.ktor.http.Cookie
 import io.ktor.server.application.ApplicationCall
@@ -47,11 +46,12 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
     }
 
     if (sessions.cookieBasedSessions) {
+        val frontend = call.fronend
         call.response.cookies.append(
             Cookie(
                 name = "sAccessToken",
                 value = accessToken.token,
-                domain = sessions.cookieDomain,
+                domain = frontend.host,
                 httpOnly = true,
                 expires = GMTDate(accessToken.expiry),
                 path = "/",
@@ -59,15 +59,14 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
         )
 
         refreshToken?.let {
-            val basePath = superTokens.appConfig.websiteBasePath
             call.response.cookies.append(
                 Cookie(
                     name = "sRefreshToken",
                     value = it.token,
-                    domain = sessions.cookieDomain,
+                    domain = frontend.host,
                     httpOnly = true,
                     expires = GMTDate(it.expiry),
-                    path = "${basePath}/session/refresh",
+                    path = "${frontend.path}/session/refresh",
                 )
             )
         }

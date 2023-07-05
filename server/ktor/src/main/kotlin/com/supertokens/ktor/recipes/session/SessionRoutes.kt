@@ -37,8 +37,8 @@ fun Route.sessionRoutes(
     get("/.well-known/openid-configuration") {
         call.respond(JsonObject(
             mapOf(
-                "issuer" to JsonPrimitive(superTokens.appConfig.apiDomain),
-                "jwks_uri" to JsonPrimitive("https://${superTokens.appConfig.apiDomain}${superTokens.appConfig.apiBasePath}/jwt/jwks.json"),
+                "issuer" to JsonPrimitive(sessions.issuer),
+                "jwks_uri" to JsonPrimitive("${superTokens.appConfig.api.scheme}://${superTokens.appConfig.api.host}${superTokens.appConfig.api.path}/jwt/jwks.json"),
             )
         ))
     }

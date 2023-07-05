@@ -7,9 +7,9 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.BadRequestException
-import com.supertokens.ktor.utils.getFrontEnd
+import com.supertokens.ktor.utils.fronend
 import com.supertokens.ktor.utils.setSessionInResponse
-import com.supertokens.sdk.FrontendConfig
+import com.supertokens.sdk.ServerConfig
 import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.VerifyEmailTokenRequest
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 
 open class EmailVerificationHandler {
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(frontend: FrontendConfig, token: String) =
+    open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(frontend: ServerConfig, token: String) =
         "${frontend.fullUrl}/verify-email?token=$token"
 
     /**
@@ -41,7 +41,7 @@ open class EmailVerificationHandler {
         emailService.emailVerificationTemplateName
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendVerificationMail(email: String) {
-        val frontend = call.getFrontEnd()
+        val frontend = call.fronend
         emailVerification.emailService?.let {
             // launch the email sending in another scope, so the call is not blocked
             CoroutineScope(Dispatchers.IO).launch {

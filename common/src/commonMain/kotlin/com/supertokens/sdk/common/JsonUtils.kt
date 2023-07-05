@@ -22,6 +22,7 @@ fun List<*>.toJsonElement(): JsonElement {
             null -> list.add(JsonNull)
             is Map<*, *> -> list.add(value.toJsonElement())
             is List<*> -> list.add(value.toJsonElement())
+            is Set<*> -> list.add(value.toList().toJsonElement())
             is Boolean -> list.add(JsonPrimitive(value))
             is Number -> list.add(JsonPrimitive(value))
             is String -> list.add(JsonPrimitive(value))
@@ -39,6 +40,7 @@ fun Map<*, *>.toJsonElement(): JsonElement {
             null -> JsonNull
             is Map<*, *> -> value.toJsonElement()
             is List<*> -> value.toJsonElement()
+            is Set<*> -> value.toList().toJsonElement()
             is Boolean -> JsonPrimitive(value)
             is Number -> JsonPrimitive(value)
             is String -> JsonPrimitive(value)

@@ -2,9 +2,9 @@ package com.supertokens.ktor.recipes.thirdparty
 
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
-import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.NotFoundException
+import com.supertokens.ktor.utils.fronend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.common.responses.AuthorizationUrlResponse
@@ -72,6 +72,7 @@ open class ThirdPartyHandler {
         val provider = thirdParty.getProvider(AppleProvider.ID) ?: throw NotFoundException()
         val formParameters = call.receiveParameters()
         val code = formParameters["code"] ?: throw BadRequestException(message = "Form Param 'code' is required")
+        val state = formParameters["state"]
 
         val tokens = provider.getTokens(code, null)
         val userInfo = provider.getUserInfo(tokens)
@@ -93,7 +94,7 @@ open class ThirdPartyHandler {
 
         call.respondRedirect {
             protocol = URLProtocol.HTTPS
-            host = superTokens.appConfig.websiteDomain
+            host = call.fronend.host
         }
     }
 
