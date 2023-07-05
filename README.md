@@ -3,6 +3,7 @@
 Unofficial implementations of **[SuperTokens](https://github.com/supertokens/supertokens-core)** SDKs for Kotlin.
 
 Current supported **Core Driver Interface**: [2.21.1](https://app.swaggerhub.com/apis/supertokens/CDI/2.21.1)
+
 Current supported **Frontend Driver Interface**: [1.16.1](https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0)
 
 Both SDKs are written in pure Kotlin with some Java dependencies.

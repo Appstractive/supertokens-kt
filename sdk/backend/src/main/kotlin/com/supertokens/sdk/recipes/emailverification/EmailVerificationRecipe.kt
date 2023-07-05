@@ -16,6 +16,7 @@ import com.supertokens.sdk.recipes.emailverification.responses.CreateEmailVerifi
 import com.supertokens.sdk.common.responses.VerifyEmailResponse
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.ingredients.email.EmailService
+import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailTokenResponse
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
@@ -44,7 +45,7 @@ class EmailVerificationRecipe(
     suspend fun isVerified(userId: String, email: String?): Boolean {
         return email?.let {
             val response  = runCatching {
-                verifyEmail(userId, it)
+                checkEmailVerified(userId, it)
             }
             response.getOrElse {
                 true
@@ -112,10 +113,12 @@ class EmailVerificationRecipe(
                 userId = it.userId,
                 email = it.email,
             )
+        }.also {
+            superTokens._events.tryEmit(SuperTokensEvent.UserEmailVerified(it.userId, it.email))
         }
     }
 
-    suspend fun verifyEmail(userId: String, email: String): Boolean {
+    suspend fun checkEmailVerified(userId: String, email: String): Boolean {
         val response = superTokens.client.get("$PATH_VERIFY?userId=$userId&email=$email") {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
@@ -140,6 +143,8 @@ class EmailVerificationRecipe(
 
         return response.parse<StatusResponse, SuperTokensStatus> {
             it.status.toStatus()
+        }.also {
+            superTokens._events.tryEmit(SuperTokensEvent.UserEmailUnVerified(userId, email))
         }
     }
 
@@ -180,10 +185,10 @@ suspend fun SuperTokens.verifyToken(
     token: String,
 ) = getRecipe<EmailVerificationRecipe>().verifyToken(token)
 
-suspend fun SuperTokens.verifyEmail(
+suspend fun SuperTokens.checkEmailVerified(
     userId: String,
     email: String,
-) = getRecipe<EmailVerificationRecipe>().verifyEmail(userId, email)
+) = getRecipe<EmailVerificationRecipe>().checkEmailVerified(userId, email)
 
 suspend fun SuperTokens.setUnverified(
     userId: String,

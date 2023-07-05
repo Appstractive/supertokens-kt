@@ -15,6 +15,7 @@ import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.recipes.thirdparty.responses.ThirdPartyGetUsersResponse
 import com.supertokens.sdk.common.responses.SignInUpResponse
+import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -69,6 +70,13 @@ class ThirdPartyRecipe(
                 user = it.user,
                 createdNewUser = it.createdNewUser
             )
+        }.also {
+            if(it.createdNewUser) {
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it.user))
+            }
+            else {
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it.user))
+            }
         }
     }
 

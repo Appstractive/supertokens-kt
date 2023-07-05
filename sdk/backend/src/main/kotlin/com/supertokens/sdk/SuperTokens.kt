@@ -1,6 +1,7 @@
 package com.supertokens.sdk
 
 import com.supertokens.sdk.core.CoreHandler
+import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.BuildRecipe
 import com.supertokens.sdk.recipes.RecipeBuilder
@@ -14,6 +15,9 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
@@ -71,6 +75,13 @@ class SuperTokens(
     val jwksUrl: String = "${config.connectionUrl}/.well-known/jwks.json"
 
     internal val core: CoreHandler = CoreHandler()
+
+    internal val _events = MutableSharedFlow<SuperTokensEvent>(
+        extraBufferCapacity = 50,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+
+    val events = _events.asSharedFlow()
 
     @OptIn(ExperimentalSerializationApi::class)
     val client = config.client ?: HttpClient(CIO) {

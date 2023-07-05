@@ -10,7 +10,7 @@ import com.supertokens.sdk.recipes.emailverification.EmailVerificationRecipe
 import com.supertokens.sdk.recipes.emailverification.createEmailVerificationToken
 import com.supertokens.sdk.recipes.emailverification.removeAllVerificationTokens
 import com.supertokens.sdk.recipes.emailverification.setUnverified
-import com.supertokens.sdk.recipes.emailverification.verifyEmail
+import com.supertokens.sdk.recipes.emailverification.checkEmailVerified
 import com.supertokens.sdk.recipes.emailverification.verifyToken
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
@@ -71,7 +71,7 @@ class EmailVerificationTest {
         val token = superTokens.createEmailVerificationToken(user.id, "test@test.de")
         superTokens.verifyToken(token)
 
-        val isValid = superTokens.verifyEmail(user.id, "test@test.de")
+        val isValid = superTokens.checkEmailVerified(user.id, "test@test.de")
         assertEquals(true, isValid)
     }
 

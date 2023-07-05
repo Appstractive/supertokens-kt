@@ -1,0 +1,14 @@
+package com.supertokens.sdk.models
+
+import com.supertokens.sdk.common.models.User
+
+sealed class SuperTokensEvent {
+
+    class UserSignUp(val user: User): SuperTokensEvent()
+    class UserSignIn(val user: User): SuperTokensEvent()
+    class UserPasswordChanged(val userId: String): SuperTokensEvent()
+    class UserEmailChanged(val userId: String, val email: String): SuperTokensEvent()
+    class UserEmailVerified(val userId: String, val email: String): SuperTokensEvent()
+    class UserEmailUnVerified(val userId: String, val email: String): SuperTokensEvent()
+
+}

@@ -13,6 +13,7 @@ import com.supertokens.sdk.recipes.common.models.SignInUpData
 import com.supertokens.sdk.recipes.passwordless.models.PasswordlessCodeData
 import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequest
 import com.supertokens.sdk.ingredients.email.EmailService
+import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.recipes.passwordless.requests.CreatePasswordlessCodeRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokeAllPasswordlessCodesRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokePasswordlesCodeRequest
@@ -136,9 +137,16 @@ class PasswordlessRecipe(
 
         return response.parse<ConsumePasswordlessCodeResponse, SignInUpData> {
             SignInUpData(
-                user = it.user ?: throw RuntimeException("OK StatusResponse without user"),
-                createdNewUser = it.createdNewUser ?: throw RuntimeException("OK StatusResponse without createdNewUser"),
+                user = checkNotNull(it.user),
+                createdNewUser = checkNotNull(it.createdNewUser),
             )
+        }.also {
+            if(it.createdNewUser) {
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it.user))
+            }
+            else {
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it.user))
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.SuperTokensStatusException
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.common.models.User
+import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -56,7 +57,9 @@ class EmailPasswordRecipe(
             )
         }
 
-        return response.parseUser()
+        return response.parseUser().also {
+            superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it))
+        }
     }
 
     suspend fun signIn(email: String, password: String): User {
@@ -72,7 +75,9 @@ class EmailPasswordRecipe(
             )
         }
 
-        return response.parseUser()
+        return response.parseUser().also {
+            superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it))
+        }
     }
 
     suspend fun createResetPasswordToken(userId: String): String {
@@ -125,7 +130,11 @@ class EmailPasswordRecipe(
             )
         }
 
-        return response.parse()
+        return response.parse().also {
+            if(it == SuperTokensStatus.OK) {
+                superTokens._events.tryEmit(SuperTokensEvent.UserEmailChanged(userId, email))
+            }
+        }
     }
 
     suspend fun updatePassword(userId: String, password: String): SuperTokensStatus {
@@ -145,7 +154,11 @@ class EmailPasswordRecipe(
             )
         }
 
-        return response.parse()
+        return response.parse().also {
+            if(it == SuperTokensStatus.OK) {
+                superTokens._events.tryEmit(SuperTokensEvent.UserPasswordChanged(userId))
+            }
+        }
     }
 
     fun validatePassword(password: String): Boolean {
