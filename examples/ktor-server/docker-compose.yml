@@ -39,7 +39,7 @@ services:
       timeout: 5s
       retries: 5
   supertokens-server:
-    image: supertokens-ktor-example:1.0.2
+    image: supertokens-ktor-example:1.0.3
     environment:
       SUPERTOKENS_URL: "http://supertokens:3567"
       SUPERTOKENS_FRONTEND_SCHEME: "http"

@@ -156,7 +156,7 @@ fun Application.module() {
         emailPasswordHandler = CustomEmailPasswordHandler()
 
         jwtVerification {
-            withAudience("localhost")
+            withAudience(frontendHost)
         }
     }
 
