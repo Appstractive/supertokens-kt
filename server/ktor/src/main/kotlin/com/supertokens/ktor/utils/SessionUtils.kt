@@ -1,12 +1,12 @@
 package com.supertokens.ktor.utils
 
-import Routes
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.sdk.common.COOKIE_ACCESS_TOKEN
 import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
 import com.supertokens.sdk.common.HEADER_ANTI_CSRF
 import com.supertokens.sdk.common.HEADER_REFRESH_TOKEN
+import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.models.Token
 import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders

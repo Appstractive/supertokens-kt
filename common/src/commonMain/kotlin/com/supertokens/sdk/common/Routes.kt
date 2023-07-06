@@ -1,3 +1,5 @@
+package com.supertokens.sdk.common
+
 object Routes {
 
     object EmailPassword {

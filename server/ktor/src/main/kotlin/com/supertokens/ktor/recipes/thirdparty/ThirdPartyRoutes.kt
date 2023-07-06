@@ -1,6 +1,6 @@
 package com.supertokens.ktor.recipes.thirdparty
 
-import Routes
+import com.supertokens.sdk.common.Routes
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post

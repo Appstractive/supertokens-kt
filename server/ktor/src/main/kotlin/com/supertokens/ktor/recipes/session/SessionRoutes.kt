@@ -2,6 +2,7 @@ package com.supertokens.ktor.recipes.session
 
 import com.supertokens.ktor.plugins.SuperTokensAuth
 import com.supertokens.ktor.superTokens
+import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.core.getJwks
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
