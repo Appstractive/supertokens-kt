@@ -1,29 +1,30 @@
 package com.supertokens.ktor.recipes.emailpassword
 
+import Routes
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 
 fun Route.emailPasswordRoutes(handler: EmailPasswordHandler) {
 
-    post("/signin") {
+    post(Routes.EmailPassword.SIGN_IN) {
         with(handler) {
             signIn()
         }
     }
 
-    post("/signup") {
+    post(Routes.EmailPassword.SIGN_UP) {
         with(handler) {
             signUp()
         }
     }
 
-    post("/user/password/reset/token") {
+    post(Routes.EmailPassword.PASSWORD_RESET_TOKEN) {
         with(handler) {
             passwordResetToken()
         }
     }
 
-    post("/user/password/reset") {
+    post(Routes.EmailPassword.PASSWORD_RESET) {
         with(handler) {
             resetPassword()
         }

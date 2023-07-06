@@ -5,6 +5,8 @@ import com.supertokens.ktor.plugins.requirePrincipal
 import com.supertokens.ktor.utils.UnauthorizedException
 import com.supertokens.ktor.utils.clearSessionInResponse
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
+import com.supertokens.sdk.common.HEADER_REFRESH_TOKEN
 import com.supertokens.sdk.common.responses.StatusResponse
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
@@ -22,7 +24,7 @@ open class SessionHandler {
     }
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.refresh() {
-        val refreshToken = call.request.headers["st-refresh-token"] ?: call.request.cookies["sRefreshToken"] ?: throw UnauthorizedException()
+        val refreshToken = call.request.headers[HEADER_REFRESH_TOKEN] ?: call.request.cookies[COOKIE_REFRESH_TOKEN] ?: throw UnauthorizedException()
         val session = sessions.refreshSession(refreshToken)
 
         setSessionInResponse(

@@ -1,5 +1,6 @@
 package com.supertokens.ktor.recipes.passwordless
 
+import Routes
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 
@@ -7,19 +8,19 @@ fun Route.passwordlessRoutes(
     handler: PasswordlessHandler,
 ) {
 
-    post("/signinup/code") {
+    post(Routes.Passwordless.SIGNUP_CODE) {
         with(handler) {
             startSignInUp()
         }
     }
 
-    post("/signinup/code/resend") {
+    post(Routes.Passwordless.SIGNUP_CODE_RESEND) {
         with(handler) {
             resendCode()
         }
     }
 
-    post("/signinup/code/consume") {
+    post(Routes.Passwordless.SIGNUP_CODE_CONSUME) {
         with(handler) {
             consumeCode()
         }

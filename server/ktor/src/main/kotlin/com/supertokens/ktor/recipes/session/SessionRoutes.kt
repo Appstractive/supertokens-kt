@@ -17,24 +17,24 @@ fun Route.sessionRoutes(
 ) {
 
     authenticate(SuperTokensAuth) {
-        post("/signout") {
+        post(Routes.Session.SIGN_OUT) {
             with(handler) {
                 signOut()
             }
         }
     }
 
-    post("/session/refresh") {
+    post(Routes.Session.REFRESH) {
         with(handler) {
             refresh()
         }
     }
 
-    get("/jwt/jwks.json") {
+    get(Routes.Session.JWKS) {
         call.respond(superTokens.getJwks())
     }
 
-    get("/.well-known/openid-configuration") {
+    get(Routes.Session.OIDC) {
         call.respond(JsonObject(
             mapOf(
                 "issuer" to JsonPrimitive(sessions.issuer),

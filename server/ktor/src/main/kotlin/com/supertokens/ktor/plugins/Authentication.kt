@@ -2,6 +2,7 @@ package com.supertokens.ktor.plugins
 
 import com.auth0.jwt.interfaces.Payload
 import com.supertokens.ktor.utils.UnauthorizedException
+import com.supertokens.sdk.common.COOKIE_ACCESS_TOKEN
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.Principal
@@ -46,7 +47,7 @@ val authHeaderCookieWrapper: (ApplicationCall) -> HttpAuthHeader? = { call ->
         null
     }
 
-    authHeader ?: call.request.cookies["sAccessToken"]?.let { HttpAuthHeader.Single("Bearer", it) }?.also {
+    authHeader ?: call.request.cookies[COOKIE_ACCESS_TOKEN]?.let { HttpAuthHeader.Single("Bearer", it) }?.also {
         call.attributes.put(AccessTokenAttributeKey, it.blob)
     }
 }
