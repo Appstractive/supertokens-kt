@@ -18,7 +18,7 @@ allprojects {
             set("mavenPassword", keyProperties["ossrhPassword"].toString())
         }
         else {
-            set("signingKey", rootDir.resolve(System.getenv("GPG_KEY_FILE")).readText())
+            set("signingKey", System.getenv("GPG_KEY"))
             set("signingPassword", System.getenv("GPG_KEY_PASSWORD"))
             set("mavenUser", System.getenv("MAVEN_USERNAME"))
             set("mavenPassword", System.getenv("MAVEN_PASSWORD"))

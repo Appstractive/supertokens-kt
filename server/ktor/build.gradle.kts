@@ -16,6 +16,10 @@ val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
     from(dokkaHtml.outputDirectory)
 }
 
+java {
+    withSourcesJar()
+}
+
 dependencies {
     api(projects.sdk.backend)
 
@@ -75,6 +79,7 @@ publishing {
             pom {
                 name.set("SuperTokens-SDK-Backend-Ktor")
                 description.set("SuperTokens backend SDK")
+                url.set("https://github.com/Appstractive/supertokens-kotlin")
                 licenses {
                     license {
                         name.set("Apache License 2.0")

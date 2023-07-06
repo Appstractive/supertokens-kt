@@ -31,7 +31,7 @@ kotlin {
     iosSimulatorArm64()
 
     mingwX64("win")
-    linuxX64("linuxX64")
+    linuxX64("linux64")
     linuxArm64("linuxArm64")
 
     cocoapods {
@@ -63,7 +63,7 @@ kotlin {
     val publicationsFromMainHost = listOf(
         jvm("jvm").name,
         mingwX64("win").name,
-        linuxX64("linuxX64").name,
+        linuxX64("linux64").name,
         linuxArm64("linuxArm64").name,
         "kotlinMultiplatform",
     )
@@ -96,6 +96,7 @@ kotlin {
                 pom {
                     name.set("SuperTokens-SDK-Common")
                     description.set("SuperTokens common classes for frontend and backend SDKs")
+                    url.set("https://github.com/Appstractive/supertokens-kotlin")
                     licenses {
                         license {
                             name.set("Apache License 2.0")

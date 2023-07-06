@@ -14,6 +14,10 @@ val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
     from(dokkaHtml.outputDirectory)
 }
 
+java {
+    withSourcesJar()
+}
+
 dependencies {
     api(projects.supertokensSdkCommon)
 
@@ -37,18 +41,6 @@ dependencies {
 
     testImplementation(libs.test.kotlin)
 }
-
-/*tasks.withType<Jar>() {
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    from(configurations.runtimeClasspath.get()
-        .filter {
-            it.canonicalPath.contains("common-jvm-.*\\.jar".toRegex())
-        }.map {
-            zipTree(it)
-        })
-}*/
 
 publishing {
     repositories {
@@ -78,6 +70,7 @@ publishing {
             pom {
                 name.set("SuperTokens-SDK-Backend")
                 description.set("SuperTokens backend SDK")
+                url.set("https://github.com/Appstractive/supertokens-kotlin")
                 licenses {
                     license {
                         name.set("Apache License 2.0")
