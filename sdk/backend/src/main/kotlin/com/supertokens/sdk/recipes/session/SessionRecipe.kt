@@ -38,14 +38,18 @@ import io.ktor.client.request.setBody
 
 class SessionConfig: RecipeConfig {
 
+    // if true, attach tokens to response headers
     var headerBasedSessions: Boolean = true
 
+    // if true, set tokens to cookies
     var cookieBasedSessions: Boolean = true
+
+    // the JWT issuer to use
+    var issuer: String? = null
 
     internal var customJwtData: CustomJwtData? = null
 
-    var issuer: String? = null
-
+    // attach any additional data to Jwts on session creation and regeneration
     fun customJwtData(jwtData: CustomJwtData) {
         customJwtData = jwtData
     }
@@ -57,9 +61,13 @@ class SessionRecipe(
     private val config: SessionConfig
 ) : Recipe<SessionConfig> {
 
+    // if true, attach tokens to response headers
     val headerBasedSessions = config.headerBasedSessions
+    // if true, set tokens to cookies
     val cookieBasedSessions = config.cookieBasedSessions
+    // attach any additional data to Jwts on session creation and regeneration
     val customJwtData: CustomJwtData? = config.customJwtData
+    // the JWT issuer to use
     val issuer by lazy {
         config.issuer ?: superTokens.appConfig.api.host
     }
@@ -89,6 +97,9 @@ class SessionRecipe(
         }
     }
 
+    /**
+     * Create a new Session
+     */
     suspend fun createSession(
         userId: String,
         userDataInJWT: Map<String, Any?> = emptyMap(),
@@ -121,6 +132,9 @@ class SessionRecipe(
         }
     }
 
+    /**
+     * Get user and session information for a given session handle
+     */
     suspend fun getSession(sessionHandle: String): GetSessionData {
         val response = superTokens.client.get("$PATH_SESSION?sessionHandle=$sessionHandle") {
 
@@ -143,6 +157,9 @@ class SessionRecipe(
         }
     }
 
+    /**
+     * Get session handles for a user
+     */
     suspend fun getSessions(userId: String): List<String> {
         val response = superTokens.client.get("$PATH_SESSIONS?userId=$userId") {
 
@@ -154,6 +171,9 @@ class SessionRecipe(
         }
     }
 
+    /**
+     * Delete a sesion
+     */
     suspend fun removeSessions(sessionHandles: List<String>): List<String> {
         if (sessionHandles.isEmpty()) {
             return emptyList()
@@ -175,6 +195,9 @@ class SessionRecipe(
         }
     }
 
+    /**
+     * Verify a Session
+     */
     suspend fun verifySession(
         accessToken: String,
         enableAntiCsrf: Boolean = false,
@@ -206,6 +229,9 @@ class SessionRecipe(
         }
     }
 
+    /**
+     * Refresh a Session
+     */
     suspend fun refreshSession(
         refreshToken: String,
         enableAntiCsrf: Boolean = false,
@@ -234,6 +260,9 @@ class SessionRecipe(
         }
     }
 
+    /**
+     * Regenerate a session
+     */
     suspend fun regenerateSession(
         accessToken: String,
         userDataInJWT: Map<String, Any?>? = null,
@@ -259,6 +288,9 @@ class SessionRecipe(
         }
     }
 
+    /**
+     * Change session data
+     */
     suspend fun updateSessionData(sessionHandle: String, userDataInDatabase: Map<String, Any?>): SuperTokensStatus {
         val response = superTokens.client.put(PATH_SESSION_DATA) {
 
@@ -275,6 +307,9 @@ class SessionRecipe(
         return response.parse()
     }
 
+    /**
+     * Change JWT data for a session
+     */
     suspend fun updateJwtData(sessionHandle: String, userDataInJWT: Map<String, Any?>): SuperTokensStatus {
         val response = superTokens.client.put(PATH_JWT_DATA) {
 
@@ -318,6 +353,9 @@ val Sessions = object: RecipeBuilder<SessionConfig, SessionRecipe>() {
 
 }
 
+/**
+ * Create a new Session
+ */
 suspend fun SuperTokens.createSession(
     userId: String,
     userDataInJWT: Map<String, Any?> = emptyMap(),
@@ -326,18 +364,30 @@ suspend fun SuperTokens.createSession(
     useDynamicSigningKey: Boolean = false,
 ) = getRecipe<SessionRecipe>().createSession(userId, userDataInJWT, userDataInDatabase, enableAntiCsrf, useDynamicSigningKey)
 
+/**
+ * Get user and session information for a given session handle
+ */
 suspend fun SuperTokens.getSession(
     sessionHandle: String,
 ) = getRecipe<SessionRecipe>().getSession(sessionHandle)
 
+/**
+ * Get session handles for a user
+ */
 suspend fun SuperTokens.getSessions(
     userId: String,
 ) = getRecipe<SessionRecipe>().getSessions(userId)
 
+/**
+ * Delete a sesion
+ */
 suspend fun SuperTokens.removeSessions(
     sessionHandles: List<String>,
 ) = getRecipe<SessionRecipe>().removeSessions(sessionHandles)
 
+/**
+ * Verify a Session
+ */
 suspend fun SuperTokens.verifySession(
     accessToken: String,
     enableAntiCsrf: Boolean = false,
@@ -346,22 +396,34 @@ suspend fun SuperTokens.verifySession(
     antiCsrfToken: String? = null,
 ) = getRecipe<SessionRecipe>().verifySession(accessToken, enableAntiCsrf, doAntiCsrfCheck, checkDatabase, antiCsrfToken)
 
+/**
+ * Refresh a Session
+ */
 suspend fun SuperTokens.refreshSession(
     refreshToken: String,
     enableAntiCsrf: Boolean = false,
     antiCsrfToken: String? = null,
 ) = getRecipe<SessionRecipe>().refreshSession(refreshToken, enableAntiCsrf, antiCsrfToken)
 
+/**
+ * Regenerate a session
+ */
 suspend fun SuperTokens.regenerateSession(
     accessToken: String,
     userDataInJWT: Map<String, Any?>? = null,
 ) = getRecipe<SessionRecipe>().regenerateSession(accessToken, userDataInJWT)
 
+/**
+ * Change session data
+ */
 suspend fun SuperTokens.updateSessionData(
     accessToken: String,
     userDataInDatabase: Map<String, Any?>,
 ) = getRecipe<SessionRecipe>().updateSessionData(accessToken, userDataInDatabase)
 
+/**
+ * Change JWT data for a session
+ */
 suspend fun SuperTokens.updateJwtData(
     accessToken: String,
     userDataInJWT: Map<String, Any?>,

@@ -4,7 +4,6 @@ import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.thirdparty.ThirdParty
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
-import com.supertokens.sdk.recipes.thirdparty.getUsersByEmail
 import com.supertokens.sdk.recipes.thirdparty.provider
 import com.supertokens.sdk.recipes.thirdparty.providers.apple.Apple
 import com.supertokens.sdk.recipes.thirdparty.providers.apple.AppleProvider
@@ -28,7 +27,6 @@ import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 @Ignore("Only for DEV purposes")
 class ThirdPartyRecipeTests {
@@ -84,7 +82,7 @@ class ThirdPartyRecipeTests {
     fun testGithub() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val github = recipe.getProvider(GithubProvider.ID)
+        val github = recipe.getProviderById(GithubProvider.ID)
         assertNotNull(github)
         assertEquals(
             "https://github.com/login/oauth/access_token?client_id=123456&client_secret=abcdef&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",
@@ -100,7 +98,7 @@ class ThirdPartyRecipeTests {
     fun testApple() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val apple = recipe.getProvider(AppleProvider.ID) as? AppleProvider
+        val apple = recipe.getProviderById(AppleProvider.ID) as? AppleProvider
         assertNotNull(apple)
         assertEquals(
             "https://appleid.apple.com/auth/authorize?scope=email&client_id=123456&response_mode=form_post&response_type=code",
@@ -122,7 +120,7 @@ class ThirdPartyRecipeTests {
     fun testFacebook() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val facebook = recipe.getProvider(FacebookProvider.ID)
+        val facebook = recipe.getProviderById(FacebookProvider.ID)
         assertNotNull(facebook)
         assertEquals(
             "https://graph.facebook.com/v9.0/oauth/access_token?client_id=123456&client_secret=abcdef&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",
@@ -138,7 +136,7 @@ class ThirdPartyRecipeTests {
     fun testBitbucket() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val bitbucket = recipe.getProvider(BitbucketProvider.ID)
+        val bitbucket = recipe.getProviderById(BitbucketProvider.ID)
         assertNotNull(bitbucket)
         assertEquals(
             "https://bitbucket.org/site/oauth2/access_token?client_id=123456&client_secret=abcdef&grant_type=authorization_code&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",
@@ -154,7 +152,7 @@ class ThirdPartyRecipeTests {
     fun testGitlab() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val gitlab = recipe.getProvider(GitLabProvider.ID)
+        val gitlab = recipe.getProviderById(GitLabProvider.ID)
         assertNotNull(gitlab)
         assertEquals(
             "https://gitlab.com/oauth/token?client_id=123456&client_secret=abcdef&grant_type=authorization_code&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",
@@ -170,7 +168,7 @@ class ThirdPartyRecipeTests {
     fun testGoogle() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val google = recipe.getProvider(GoogleProvider.ID)
+        val google = recipe.getProviderById(GoogleProvider.ID)
         assertNotNull(google)
         assertEquals(
             "https://oauth2.googleapis.com/token?client_id=123456&client_secret=abcdef&grant_type=authorization_code&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",
@@ -187,13 +185,6 @@ class ThirdPartyRecipeTests {
         val response = superTokens.thirdPartySignInUp("google", "12345678", "test@test.de")
 
         val thirdParty = assertNotNull(response.user.thirdParty)
-    }
-
-    @Test
-    fun testGetUsersByMail() = runBlocking {
-        val response = superTokens.getUsersByEmail("test@test.de")
-
-        assertTrue(response.isNotEmpty())
     }
 
     companion object {

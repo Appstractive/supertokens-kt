@@ -26,22 +26,29 @@ import io.ktor.client.request.setBody
 
 class EmailVerificationRecipeConfig: RecipeConfig {
 
+    // The email service to use when sending verification mails
     var emailService: EmailService? = null
 
 }
 
 class EmailVerificationRecipe(
     private val superTokens: SuperTokens,
-    private val config: EmailVerificationRecipeConfig
+    config: EmailVerificationRecipeConfig
 ): Recipe<EmailVerificationRecipeConfig> {
 
     val emailService: EmailService? = config.emailService
 
+    /**
+     * Set the users email to verified
+     */
     suspend fun setVerified(userId: String, email: String) {
         val token = createVerificationToken(userId, email)
         verifyToken(token)
     }
 
+    /**
+     * Check if the email is verified for the user (users without an email are verified (to have none))
+     */
     suspend fun isVerified(userId: String, email: String?): Boolean {
         return email?.let {
             val response  = runCatching {
@@ -60,6 +67,9 @@ class EmailVerificationRecipe(
         }
     }
 
+    /**
+     * Generate a new email verification token for this user
+     */
     suspend fun createVerificationToken(userId: String, email: String): String {
         val response = superTokens.client.post(PATH_CREATE_TOKEN) {
 
@@ -78,6 +88,9 @@ class EmailVerificationRecipe(
         }
     }
 
+    /**
+     * Remove all unused email verification tokens for this user
+     */
     suspend fun removeAllVerificationTokens(userId: String, email: String): SuperTokensStatus {
         val response = superTokens.client.post(PATH_DELETE_TOKENS) {
 
@@ -96,6 +109,9 @@ class EmailVerificationRecipe(
         }
     }
 
+    /**
+     * Verify an email
+     */
     suspend fun verifyToken(token: String): VerifyEmailTokenData {
         val response = superTokens.client.post(PATH_VERIFY) {
 
@@ -118,6 +134,9 @@ class EmailVerificationRecipe(
         }
     }
 
+    /**
+     * Check if an email is verified
+     */
     suspend fun checkEmailVerified(userId: String, email: String): Boolean {
         val response = superTokens.client.get("$PATH_VERIFY?userId=$userId&email=$email") {
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -128,6 +147,9 @@ class EmailVerificationRecipe(
         }
     }
 
+    /**
+     * Unverify an email
+     */
     suspend fun setUnverified(userId: String, email: String): SuperTokensStatus {
         val response = superTokens.client.post(PATH_VERIFY_REMOVE) {
 
@@ -171,25 +193,40 @@ val EmailVerification = object: RecipeBuilder<EmailVerificationRecipeConfig, Ema
 
 }
 
+/**
+ * Generate a new email verification token for this user
+ */
 suspend fun SuperTokens.createEmailVerificationToken(
     userId: String,
     email: String,
 ) = getRecipe<EmailVerificationRecipe>().createVerificationToken(userId, email)
 
+/**
+ * Remove all unused email verification tokens for this user
+ */
 suspend fun SuperTokens.removeAllVerificationTokens(
     userId: String,
     email: String,
 ) = getRecipe<EmailVerificationRecipe>().removeAllVerificationTokens(userId, email)
 
+/**
+ * Verify an email
+ */
 suspend fun SuperTokens.verifyToken(
     token: String,
 ) = getRecipe<EmailVerificationRecipe>().verifyToken(token)
 
+/**
+ * Check if an email is verified
+ */
 suspend fun SuperTokens.checkEmailVerified(
     userId: String,
     email: String,
 ) = getRecipe<EmailVerificationRecipe>().checkEmailVerified(userId, email)
 
+/**
+ * Unverify an email
+ */
 suspend fun SuperTokens.setUnverified(
     userId: String,
     email: String,

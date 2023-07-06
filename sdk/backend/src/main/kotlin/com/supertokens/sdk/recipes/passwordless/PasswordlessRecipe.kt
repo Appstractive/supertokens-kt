@@ -47,6 +47,9 @@ class PasswordlessRecipe(
 
     val emailService: EmailService? = config.emailService
 
+    /**
+     * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
+     */
     suspend fun createEmailCode(email: String): PasswordlessCodeData {
         val response = superTokens.client.post(PATH_CREATE_CODE) {
 
@@ -72,6 +75,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
+     */
     suspend fun createPhoneNumberCode(phoneNumber: String): PasswordlessCodeData {
         val response = superTokens.client.post(PATH_CREATE_CODE) {
 
@@ -97,6 +103,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Restarts a sign in process the user can use to sign in.
+     */
     suspend fun recreateCode(deviceId: String): PasswordlessCodeData {
         val response = superTokens.client.post(PATH_CREATE_CODE) {
 
@@ -122,6 +131,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Tries to consume the passed linkCode to sign the user in
+     */
     suspend fun consumeLinkCode(preAuthSessionId: String, linkCode: String): SignInUpData {
         val response = superTokens.client.post(PATH_CONSUME_CODE) {
 
@@ -150,6 +162,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Tries to consume the passed userInputCode+deviceId combo to sign the user in
+     */
     suspend fun consumeUserInputCode(preAuthSessionId: String, deviceId: String, userInputCode: String): SignInUpData {
         val response = superTokens.client.post(PATH_CONSUME_CODE) {
 
@@ -172,6 +187,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Revokes a code by id
+     */
     suspend fun revokeCode(codeId: String): SuperTokensStatus {
         val response = superTokens.client.post(PATH_REVOKE_CODE) {
 
@@ -189,6 +207,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Revokes all codes issued for the user
+     */
     suspend fun revokeEmailCodes(email: String): SuperTokensStatus {
         val response = superTokens.client.post(PATH_REVOKE_CODES) {
 
@@ -206,6 +227,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Revokes all codes issued for the user
+     */
     suspend fun revokePhoneNumberCodes(phoneNumber: String): SuperTokensStatus {
         val response = superTokens.client.post(PATH_REVOKE_CODES) {
 
@@ -223,6 +247,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Lists all active passwordless codes of the user
+     */
     suspend fun getCodesByEmail(email: String): List<PasswordlessDevices> {
         val response = superTokens.client.get("$PATH_GET_CODES?email=${
             withContext(Dispatchers.IO) {
@@ -237,6 +264,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Lists all active passwordless codes of the user
+     */
     suspend fun getCodesByDeviceId(deviceId: String): List<PasswordlessDevices> {
         val response = superTokens.client.get("$PATH_GET_CODES?deviceId=${
             withContext(Dispatchers.IO) {
@@ -251,6 +281,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Lists all active passwordless codes of the user
+     */
     suspend fun getCodesByPhoneNumber(phoneNumber: String): List<PasswordlessDevices> {
         val response = superTokens.client.get("$PATH_GET_CODES?phoneNumber=${
             withContext(Dispatchers.IO) {
@@ -265,6 +298,9 @@ class PasswordlessRecipe(
         }
     }
 
+    /**
+     * Lists all active passwordless codes of the user
+     */
     suspend fun getCodesByPreAuthSessionId(preAuthSessionId: String): List<PasswordlessDevices> {
         val response = superTokens.client.get("$PATH_GET_CODES?preAuthSessionId=${
             withContext(Dispatchers.IO) {
@@ -303,53 +339,89 @@ val Passwordless = object : RecipeBuilder<PasswordlessRecipeConfig, Passwordless
 
 }
 
+/**
+ * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
+ */
 suspend fun SuperTokens.createPasswordlessEmailCode(
     email: String,
 ) = getRecipe<PasswordlessRecipe>().createEmailCode(email)
 
+/**
+ * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
+ */
 suspend fun SuperTokens.createPasswordlessPhoneNumberCode(
     phoneNumber: String,
 ) = getRecipe<PasswordlessRecipe>().createPhoneNumberCode(phoneNumber)
 
+/**
+ * Restarts a sign in process the user can use to sign in.
+ */
 suspend fun SuperTokens.recreatePasswordlessCode(
     deviceId: String,
 ) = getRecipe<PasswordlessRecipe>().recreateCode(deviceId)
 
+/**
+ * Tries to consume the passed linkCode to sign the user in
+ */
 suspend fun SuperTokens.consumePasswordlessLinkCode(
     preAuthSessionId: String,
     linkCode: String,
 ) = getRecipe<PasswordlessRecipe>().consumeLinkCode(preAuthSessionId, linkCode)
 
+/**
+ * Tries to consume the passed userInputCode+deviceId combo to sign the user in
+ */
 suspend fun SuperTokens.consumePasswordlessUserInputCode(
     preAuthSessionId: String,
     deviceId: String,
     userInputCode: String
 ) = getRecipe<PasswordlessRecipe>().consumeUserInputCode(preAuthSessionId, deviceId, userInputCode)
 
+/**
+ * Revokes a code by id
+ */
 suspend fun SuperTokens.revokePasswordlessCode(
     codeId: String,
 ) = getRecipe<PasswordlessRecipe>().revokeCode(codeId)
 
+/**
+ * Revokes all codes issued for the user
+ */
 suspend fun SuperTokens.revokePasswordlessEmailCodes(
     email: String,
 ) = getRecipe<PasswordlessRecipe>().revokeEmailCodes(email)
 
+/**
+ * Revokes all codes issued for the user
+ */
 suspend fun SuperTokens.revokePasswordlessPhoneNumberCodes(
     phoneNumber: String,
 ) = getRecipe<PasswordlessRecipe>().revokePhoneNumberCodes(phoneNumber)
 
+/**
+ * Lists all active passwordless codes of the user
+ */
 suspend fun SuperTokens.getPasswordlessCodesByEmail(
     email: String,
 ) = getRecipe<PasswordlessRecipe>().getCodesByEmail(email)
 
+/**
+ * Lists all active passwordless codes of the user
+ */
 suspend fun SuperTokens.getPasswordlessCodesByDeviceId(
     deviceId: String,
 ) = getRecipe<PasswordlessRecipe>().getCodesByDeviceId(deviceId)
 
+/**
+ * Lists all active passwordless codes of the user
+ */
 suspend fun SuperTokens.getPasswordlessCodesByPhoneNumber(
     phoneNumber: String,
 ) = getRecipe<PasswordlessRecipe>().getCodesByPhoneNumber(phoneNumber)
 
+/**
+ * Lists all active passwordless codes of the user
+ */
 suspend fun SuperTokens.getPasswordlessCodesByPreAuthSessionId(
     preAuthSessionId: String,
 ) = getRecipe<PasswordlessRecipe>().getCodesByPreAuthSessionId(preAuthSessionId)

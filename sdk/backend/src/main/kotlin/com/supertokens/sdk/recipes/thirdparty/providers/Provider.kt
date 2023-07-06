@@ -34,6 +34,7 @@ interface ProviderConfig {
 abstract class Provider<out C: ProviderConfig> {
 
     abstract val id: String
+    abstract val clientId: String
     abstract val isDefault: Boolean
 
     abstract fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?): ProviderEndpoint

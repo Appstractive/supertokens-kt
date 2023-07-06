@@ -47,24 +47,34 @@ typealias JwtVerification = Verification.() -> Unit
 
 class SuperTokensConfig {
 
+    // The SuperTokens instance to use (required)
     var superTokens: SuperTokens? = null
 
+    // Handler for core APIs
     var coreHandler: CoreHandler = CoreHandler()
 
+    // Handler for EmailPassword APIs
     var emailPasswordHandler: EmailPasswordHandler = EmailPasswordHandler()
 
+    // Handler for Session APIs
     var sessionHandler: SessionHandler = SessionHandler()
 
+    // Handler for ThirdParty APIs
     var thirdPartyHandler: ThirdPartyHandler = ThirdPartyHandler()
 
+    // Handler for EmailVerification APIs
     var emailVerificationHandler: EmailVerificationHandler = EmailVerificationHandler()
 
+    // Handler for Passwordless APIs
     var passwordlessHandler: PasswordlessHandler = PasswordlessHandler()
 
+    // Allows you to perform additional validations on the JWT payload.
     var jwtValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = TokenValidator
+
 
     internal var jwtVerification: JwtVerification? = null
 
+    // used to verify a token format and signature
     fun jwtVerification(verify: JwtVerification) {
         jwtVerification = verify
     }

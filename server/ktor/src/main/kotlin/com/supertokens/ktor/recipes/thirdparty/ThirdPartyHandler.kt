@@ -28,7 +28,9 @@ open class ThirdPartyHandler {
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.signInUp() {
         val body = call.receive<ThirdPartySignInUpRequest>()
-        val provider = thirdParty.getProvider(body.thirdPartyId) ?: throw NotFoundException()
+        val provider = body.clientId?.let { thirdParty.getProviderByClientId(it) }
+            ?: thirdParty.getProviderById(body.thirdPartyId)
+            ?: throw NotFoundException()
 
         val tokens = body.code?.let {
             provider.getTokens(it, body.redirectURI)
@@ -59,7 +61,7 @@ open class ThirdPartyHandler {
     open suspend fun PipelineContext<Unit, ApplicationCall>.getAuthorizationUrl() {
         val thirdPartyId = call.parameters["thirdPartyId"] ?: throw NotFoundException()
 
-        val provider = thirdParty.getProvider(thirdPartyId) ?: throw NotFoundException()
+        val provider = thirdParty.getProviderById(thirdPartyId) ?: throw NotFoundException()
 
         call.respond(
             AuthorizationUrlResponse(
@@ -69,7 +71,7 @@ open class ThirdPartyHandler {
     }
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.appleAuthCallback() {
-        val provider = thirdParty.getProvider(AppleProvider.ID) ?: throw NotFoundException()
+        val provider = thirdParty.getProviderById(AppleProvider.ID) ?: throw NotFoundException()
         val formParameters = call.receiveParameters()
         val code = formParameters["code"] ?: throw BadRequestException(message = "Form Param 'code' is required")
         val state = formParameters["state"]

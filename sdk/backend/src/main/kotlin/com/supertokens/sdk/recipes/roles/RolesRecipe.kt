@@ -65,6 +65,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Creates a role with permissions, can also be used to add permissions to a role
+     */
     suspend fun createOrUpdateRole(role: String, permissions: List<String>): SuperTokensStatus {
         val response = superTokens.client.put(PATH_ROLE) {
 
@@ -83,6 +86,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Deletes a role
+     */
     suspend fun deleteRole(role: String): SuperTokensStatus {
         val response = superTokens.client.post(PATH_ROLES_REMOVE) {
 
@@ -100,6 +106,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Retrive all created roles
+     */
     suspend fun getRoles(): List<String> {
         val response = superTokens.client.get(PATH_ROLES) {
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -110,6 +119,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Retrive the permissions associated with a role
+     */
     suspend fun getRolePermissions(role: String): List<String> {
         val response = superTokens.client.get("$PATH_ROLES_PERMISSIONS?role=$role") {
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -120,6 +132,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Retrive the users associated with the role.
+     */
     suspend fun getRoleUsers(role: String): List<String> {
         val response = superTokens.client.get("$PATH_ROLES_USERS?role=$role") {
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -130,6 +145,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Removes permissions mapped to a role, if no permissions are passed all permissions mapped to the role are removed
+     */
     suspend fun removeRolePermissions(role: String, permissions: List<String>): SuperTokensStatus {
         val response = superTokens.client.post(PATH_ROLES_PERMISSIONS_REMOVE) {
 
@@ -148,6 +166,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Retrive the roles associated with the permission
+     */
     suspend fun getPermissionRoles(permission: String): List<String> {
         val response = superTokens.client.get("$PATH_PERMISSIONS_ROLES?permission=$permission") {
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -158,6 +179,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Creates a User Role mapping
+     */
     suspend fun setUserRole(userId: String, role: String): SuperTokensStatus {
         val response = superTokens.client.put(PATH_USER_ROLE) {
 
@@ -176,6 +200,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Removes a User Role mapping
+     */
     suspend fun removeUserRole(userId: String, role: String): SuperTokensStatus {
         val response = superTokens.client.post(PATH_USER_ROLE_REMOVE) {
 
@@ -194,6 +221,9 @@ class RolesRecipe(
         }
     }
 
+    /**
+     * Retrive the roles associated with the user.
+     */
     suspend fun getUserRoles(userId: String): List<String> {
         val response = superTokens.client.get("$PATH_USER_ROLES?userId=$userId") {
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -233,45 +263,75 @@ val Roles = object: RecipeBuilder<RolesRecipeConfig, RolesRecipe>() {
 
 }
 
+/**
+ * Creates a role with permissions, can also be used to add permissions to a role
+ */
 suspend fun SuperTokens.createOrUpdateRole(
     role: String,
     permissions: List<String>,
 ) = getRecipe<RolesRecipe>().createOrUpdateRole(role, permissions)
 
+/**
+ * Deletes a role
+ */
 suspend fun SuperTokens.deleteRole(
     role: String,
 ) = getRecipe<RolesRecipe>().deleteRole(role)
 
+/**
+ * Retrive all created roles
+ */
 suspend fun SuperTokens.getRoles() =
     getRecipe<RolesRecipe>().getRoles()
 
+/**
+ * Retrive the permissions associated with a role
+ */
 suspend fun SuperTokens.getRolePermissions(
     role: String,
 ) = getRecipe<RolesRecipe>().getRolePermissions(role)
 
+/**
+ * Removes permissions mapped to a role, if no permissions are passed all permissions mapped to the role are removed
+ */
 suspend fun SuperTokens.removeRolePermissions(
     role: String,
     permissions: List<String>,
 ) = getRecipe<RolesRecipe>().removeRolePermissions(role, permissions)
 
+/**
+ * Retrive the users associated with the role.
+ */
 suspend fun SuperTokens.getRoleUsers(
     role: String,
 ) = getRecipe<RolesRecipe>().getRoleUsers(role)
 
+/**
+ * Retrive the roles associated with the permission
+ */
 suspend fun SuperTokens.getPermissionRoles(
     permission: String,
 ) = getRecipe<RolesRecipe>().getPermissionRoles(permission)
 
+/**
+ * Creates a User Role mapping
+ */
 suspend fun SuperTokens.setUserRole(
     userId: String,
     role: String,
 ) = getRecipe<RolesRecipe>().setUserRole(userId, role)
 
+/**
+ * Removes a User Role mapping
+ */
 suspend fun SuperTokens.removeUserRole(
     userId: String,
     role: String,
 ) = getRecipe<RolesRecipe>().removeUserRole(userId, role)
 
+/**
+ * Retrive the roles associated with the user.
+ */
 suspend fun SuperTokens.getUserRoles(
     userId: String,
 ) = getRecipe<RolesRecipe>().getUserRoles(userId)

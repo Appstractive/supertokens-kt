@@ -2,7 +2,6 @@ package com.supertokens.sdk.recipes.thirdparty
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -13,11 +12,9 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartySignInUpRequest
-import com.supertokens.sdk.recipes.thirdparty.responses.ThirdPartyGetUsersResponse
 import com.supertokens.sdk.common.responses.SignInUpResponse
 import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.utils.parse
-import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -44,6 +41,9 @@ class ThirdPartyRecipe(
 
     val providers: List<Provider<*>> = config.providers.map { it.invoke(superTokens, this) }
 
+    /**
+     * Signin/up a user
+     */
     suspend fun signInUp(
         thirdPartyId: String,
         thirdPartyUserId: String,
@@ -80,28 +80,22 @@ class ThirdPartyRecipe(
         }
     }
 
-    suspend fun getUsersByEmail(email: String): List<User> {
-        val response = superTokens.client.get("$PATH_USERS_BY_EMAIL?email=$email") {
-
-            header(Constants.HEADER_RECIPE_ID, ID)
-        }
-
-        return response.parse<ThirdPartyGetUsersResponse, List<User>> {
-            it.users
-        }
-    }
-
-    fun getProvider(id: String): Provider<*>? = providers.filter { it.id == id }.let {
+    fun getProviderById(id: String): Provider<*>? = providers.filter { it.id == id }.let {
         it.firstOrNull { provider ->
             provider.isDefault
         } ?: it.firstOrNull()
+    }
+
+    fun getProviderByClientId(clientId: String): Provider<*>? = providers.filter { it.clientId == clientId }.let {
+        it.firstOrNull { provider ->
+            provider.isDefault
+        }
     }
 
     companion object {
         const val ID = "thirdparty"
 
         const val PATH_SIGN_IN_UP = "recipe/signinup"
-        const val PATH_USERS_BY_EMAIL = "recipe/users/by-email"
     }
 
 }
@@ -118,12 +112,11 @@ val ThirdParty = object: RecipeBuilder<ThirdPartyConfig, ThirdPartyRecipe>() {
 
 }
 
+/**
+ * Signin/up a user
+ */
 suspend fun SuperTokens.thirdPartySignInUp(
     thirdPartyId: String,
     thirdPartyUserId: String,
     email: String,
 ) = getRecipe<ThirdPartyRecipe>().signInUp(thirdPartyId, thirdPartyUserId, email)
-
-suspend fun SuperTokens.getUsersByEmail(
-    email: String,
-) = getRecipe<ThirdPartyRecipe>().getUsersByEmail(email)

@@ -27,12 +27,16 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
 class EmailPasswordConfig: RecipeConfig {
+    // The form fields to parse and validate on signup
     var formFields: List<FormField> = EmailPasswordRecipe.DEFAULT_FORM_FIELDS
 
+    // the service to use when sending emails (password reset)
     var emailService: EmailService? = null
 
+    // if true, validate the password before sending it to core on update
     var validatePasswordOnUpdate: Boolean = true
 
+    // if true, validate the password before sending it to core on reset
     var validatePasswordOnReset: Boolean = true
 }
 
@@ -44,6 +48,9 @@ class EmailPasswordRecipe(
     val formFields: List<FormField> = config.formFields.toList()
     val emailService: EmailService? = config.emailService
 
+    /**
+     * Signup a user with email ID and password
+     */
     suspend fun signUp(email: String, password: String): User {
         val response = superTokens.client.post(PATH_SIGNUP) {
 
@@ -62,6 +69,9 @@ class EmailPasswordRecipe(
         }
     }
 
+    /**
+     * Signin a user with email ID and password
+     */
     suspend fun signIn(email: String, password: String): User {
         val response = superTokens.client.post(PATH_SIGNIN) {
 
@@ -80,6 +90,9 @@ class EmailPasswordRecipe(
         }
     }
 
+    /**
+     * Generate a new reset password token for this user
+     */
     suspend fun createResetPasswordToken(userId: String): String {
         val response = superTokens.client.post(PATH_PASSWORD_RESET_TOKEN) {
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -96,6 +109,9 @@ class EmailPasswordRecipe(
         }
     }
 
+    /**
+     * Reset a password using password reset token
+     */
     suspend fun resetPasswordWithToken(token: String, newPassword: String): String {
 
         if(config.validatePasswordOnReset && !validatePassword(newPassword)) {
@@ -118,6 +134,9 @@ class EmailPasswordRecipe(
         }
     }
 
+    /**
+     * Update a user's email
+     */
     suspend fun updateEmail(userId: String, email: String): SuperTokensStatus {
         val response = superTokens.client.put(PATH_UPDATE_USER) {
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -137,6 +156,9 @@ class EmailPasswordRecipe(
         }
     }
 
+    /**
+     * Update a user's password
+     */
     suspend fun updatePassword(userId: String, password: String): SuperTokensStatus {
 
         if(config.validatePasswordOnUpdate && !validatePassword(password)) {
@@ -161,6 +183,9 @@ class EmailPasswordRecipe(
         }
     }
 
+    /**
+     * Validate a password against the configured form field
+     */
     fun validatePassword(password: String): Boolean {
         formFields.firstOrNull {it.id == FORM_FIELD_PASSWORD_ID}?.validate?.let {
             if(!it.invoke(password)) {
@@ -222,20 +247,38 @@ val EmailPassword = object: RecipeBuilder<EmailPasswordConfig, EmailPasswordReci
 
 }
 
+/**
+ * Signup a user with email ID and password
+ */
 suspend fun SuperTokens.emailPasswordSignUp(email: String, password: String) =
     getRecipe<EmailPasswordRecipe>().signUp(email, password)
 
+/**
+ * Signin a user with email ID and password
+ */
 suspend fun SuperTokens.emailPasswordSignIn(email: String, password: String) =
     getRecipe<EmailPasswordRecipe>().signIn(email, password)
 
+/**
+ * Generate a new reset password token for this user
+ */
 suspend fun SuperTokens.createResetPasswordToken(userId: String) =
     getRecipe<EmailPasswordRecipe>().createResetPasswordToken(userId)
 
+/**
+ * Reset a password using password reset token
+ */
 suspend fun SuperTokens.resetPasswordWithToken(token: String, newPassword: String) =
     getRecipe<EmailPasswordRecipe>().resetPasswordWithToken(token, newPassword)
 
+/**
+ * Update a user's email
+ */
 suspend fun SuperTokens.updateEmail(userId: String, email: String) =
     getRecipe<EmailPasswordRecipe>().updateEmail(userId, email)
 
+/**
+ * Update a user's password
+ */
 suspend fun SuperTokens.updatePassword(userId: String, password: String) =
     getRecipe<EmailPasswordRecipe>().updatePassword(userId, password)

@@ -29,7 +29,7 @@ abstract class OAuthProvider<out C: OAuthProviderConfig>(
         }
     }
 
-    val clientId: String = config.clientId ?: throw RuntimeException("clientId not configured for provider ${this::class.simpleName}")
+    override val clientId: String = config.clientId ?: throw RuntimeException("clientId not configured for provider ${this::class.simpleName}")
     val clientSecret: String
         get() = config.clientSecret ?: throw RuntimeException("clientSecret not configured for provider ${this::class.simpleName}")
 
