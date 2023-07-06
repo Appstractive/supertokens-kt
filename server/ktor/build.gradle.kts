@@ -3,12 +3,18 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("kotlin-platform-jvm")
     kotlin("plugin.serialization")
+    id("org.jetbrains.dokka") version "1.8.20"
     `maven-publish`
     signing
 }
 
-version = "1.0.0"
-group = "com.supertokens.backend"
+val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
+
+val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+    dependsOn(dokkaHtml)
+    archiveClassifier.set("javadoc")
+    from(dokkaHtml.outputDirectory)
+}
 
 dependencies {
     api(projects.sdk.backend)
@@ -58,6 +64,8 @@ publishing {
 
     publications {
         create<MavenPublication>("SupertokensSdkBackendKtor") {
+            artifact(javadocJar)
+
             groupId = "com.appstractive"
             artifactId = "supertokens-sdk-backend-ktor"
             version = "1.0.0"
@@ -90,6 +98,11 @@ publishing {
             }
         }
     }
+}
+
+val signingTasks = tasks.withType<Sign>()
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    dependsOn(signingTasks)
 }
 
 signing {

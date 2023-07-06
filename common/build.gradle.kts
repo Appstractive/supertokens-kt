@@ -3,12 +3,21 @@ plugins {
     kotlin("native.cocoapods")
 	id("com.android.library")
     kotlin("plugin.serialization")
+    id("org.jetbrains.dokka") version "1.8.20"
     `maven-publish`
     signing
 }
 
 group = "com.appstractive"
 version = "1.0.0"
+
+val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
+
+val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+    dependsOn(dokkaHtml)
+    archiveClassifier.set("javadoc")
+    from(dokkaHtml.outputDirectory)
+}
 
 kotlin {
     android()
@@ -24,10 +33,6 @@ kotlin {
     mingwX64("win")
     linuxX64("linuxX64")
     linuxArm64("linuxArm64")
-    js(IR) {
-        browser()
-        nodejs()
-    }
 
     cocoapods {
         summary = "Some description for the Shared Module"
@@ -87,6 +92,7 @@ kotlin {
             }
 
             withType<MavenPublication> {
+                artifact(javadocJar)
                 pom {
                     name.set("SuperTokens-SDK-Common")
                     description.set("SuperTokens common classes for frontend and backend SDKs")
@@ -114,6 +120,11 @@ kotlin {
             }
         }
     }
+}
+
+val signingTasks = tasks.withType<Sign>()
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    dependsOn(signingTasks)
 }
 
 signing {
