@@ -30,7 +30,6 @@ import com.supertokens.sdk.superTokens
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.*
 import io.ktor.server.auth.authenticate
-import io.ktor.server.engine.*
 import io.ktor.server.cio.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.StatusPages
@@ -40,27 +39,32 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
 
-fun main() {
-    embeddedServer(CIO, port = 8080, host = "0.0.0.0", module = Application::module)
-        .start(wait = true)
-}
+fun main(args: Array<String>): Unit = EngineMain.main(args)
 
+@Suppress("unused") // application.conf references the main function. This annotation prevents the IDE from marking it as unused.
 fun Application.module() {
+
+    val superTokensUrl = environment.config.propertyOrNull("supertokens.url")?.getString() ?: throw IllegalStateException("supertokens.url not configured")
+
+    val smtpUser = environment.config.propertyOrNull("smtp.user")?.getString() ?: throw IllegalStateException("smtp.user not configured")
+    val smtpPassword = environment.config.propertyOrNull("smtp.password")?.getString() ?: throw IllegalStateException("smtp.password not configured")
+    val smtpHost = environment.config.propertyOrNull("smtp.host")?.getString() ?: throw IllegalStateException("smtp.host not configured")
+    val smtpPort = (environment.config.propertyOrNull("smtp.port")?.getString() ?: throw IllegalStateException("smtp.port not configured")).toInt()
 
     install(SuperTokens) {
 
         val mailService = SmtpEmailService(
             SmtpConfig(
-                host = "localhost",
-                port = 1025,
-                password = "",
-                fromEmail = "test@example.com",
+                host = smtpHost,
+                port = smtpPort,
+                password = smtpPassword,
+                fromEmail = smtpUser,
                 fromName = "SuperTokens Test",
             )
         )
 
         superTokens = superTokens(
-            connectionURI = "https://try.supertokens.io",
+            connectionURI = superTokensUrl,
             appConfig = AppConfig(
                 name = "Ktor Example Server",
                 frontends = listOf(
