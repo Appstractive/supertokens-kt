@@ -45,6 +45,11 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 fun Application.module() {
 
     val superTokensUrl = environment.config.propertyOrNull("supertokens.url")?.getString() ?: throw IllegalStateException("supertokens.url not configured")
+    val superTokensIssuer = environment.config.propertyOrNull("supertokens.issuer")?.getString() ?: "localhost"
+
+    val frontendScheme = environment.config.propertyOrNull("supertokens.frontend.scheme")?.getString() ?: throw IllegalStateException("supertokens.frontend.scheme not configured")
+    val frontendHost = environment.config.propertyOrNull("supertokens.frontend.host")?.getString() ?: throw IllegalStateException("supertokens.frontend.host not configured")
+    val frontendPath = environment.config.propertyOrNull("supertokens.frontend.path")?.getString() ?: throw IllegalStateException("supertokens.frontend.path not configured")
 
     val smtpUser = environment.config.propertyOrNull("smtp.user")?.getString() ?: throw IllegalStateException("smtp.user not configured")
     val smtpPassword = environment.config.propertyOrNull("smtp.password")?.getString() ?: throw IllegalStateException("smtp.password not configured")
@@ -68,7 +73,11 @@ fun Application.module() {
             appConfig = AppConfig(
                 name = "Ktor Example Server",
                 frontends = listOf(
-                    ServerConfig(),
+                    ServerConfig(
+                        scheme = frontendScheme,
+                        host = frontendHost,
+                        path = frontendPath,
+                    ),
                     ServerConfig(
                         scheme = "my-app",
                         host = "callbacks",
@@ -81,6 +90,9 @@ fun Application.module() {
                 emailService = mailService
             }
             recipe(Sessions) {
+
+                issuer = superTokensIssuer
+
                 customJwtData { _, _ ->
                     mapOf(
                         "isExample" to true,

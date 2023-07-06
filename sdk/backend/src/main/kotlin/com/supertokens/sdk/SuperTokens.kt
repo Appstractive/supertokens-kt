@@ -24,7 +24,7 @@ import kotlinx.serialization.json.Json
 data class ServerConfig(
     val scheme: String = "http",
     val host: String = "localhost",
-    val path: String = "/auth",
+    val path: String = "/",
 ) {
 
     val fullUrl = "$scheme://$host$path"
