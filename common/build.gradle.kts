@@ -4,6 +4,7 @@ plugins {
 	id("com.android.library")
     kotlin("plugin.serialization")
     `maven-publish`
+    signing
 }
 
 group = "com.appstractive"
@@ -23,7 +24,10 @@ kotlin {
     mingwX64("win")
     linuxX64("linuxX64")
     linuxArm64("linuxArm64")
-    js("js")
+    js(IR) {
+        browser()
+        nodejs()
+    }
 
     cocoapods {
         summary = "Some description for the Shared Module"
@@ -56,22 +60,68 @@ kotlin {
         mingwX64("win").name,
         linuxX64("linuxX64").name,
         linuxArm64("linuxArm64").name,
-        js("js").name,
         "kotlinMultiplatform",
     )
 
     publishing {
+
+        repositories {
+            maven {
+                name="oss"
+                val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+
+                credentials {
+                    username = extra["mavenUser"].toString()
+                    password = extra["mavenPassword"].toString()
+                }
+            }
+        }
+
         publications {
             matching { it.name in publicationsFromMainHost }.all {
-                group = "com.appstractive"
-                version = "1.0.0"
-
                 val targetPublication = this@all
                 tasks.withType<AbstractPublishToMaven>()
                     .matching { it.publication == targetPublication }
             }
+
+            withType<MavenPublication> {
+                pom {
+                    name.set("SuperTokens-SDK-Common")
+                    description.set("SuperTokens common classes for frontend and backend SDKs")
+                    licenses {
+                        license {
+                            name.set("Apache License 2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                        }
+                    }
+                    issueManagement {
+                        system.set("Github")
+                        url.set("https://github.com/Appstractive/supertokens-kotlin/issues")
+                    }
+                    scm {
+                        connection.set("https://github.com/Appstractive/supertokens-kotlin.git")
+                        url.set("https://github.com/Appstractive/supertokens-kotlin")
+                    }
+                    developers {
+                        developer {
+                            name.set("Andreas Schulz")
+                            email.set("dev@appstractive.com")
+                        }
+                    }
+                }
+            }
         }
     }
+}
+
+signing {
+    useInMemoryPgpKeys(
+        extra["signingKey"].toString(),
+        extra["signingPassword"].toString(),
+    )
+    sign(publishing.publications)
 }
 
 android {

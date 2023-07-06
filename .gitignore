@@ -43,3 +43,6 @@ bin/
 /local.properties
 
 *.env
+
+key.properties
+key.txt

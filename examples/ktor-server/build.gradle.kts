@@ -9,18 +9,17 @@ version = "1.0.0"
 group = "com.appstractive"
 
 dependencies {
-    implementation(projects.server.ktor)
+    implementation("com.appstractive:supertokens-sdk-backend-ktor:1.0.0")
 
-    implementation(libs.kotlin.serialization)
-    implementation(libs.kotlin.coroutines)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
-    implementation(libs.ktor.serialization)
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.3")
+    implementation("io.ktor:ktor-server-cio-jvm:2.2.3")
 
-    implementation(libs.ktor.server.cio)
+    implementation("org.slf4j:slf4j-simple:1.6.1")
 
-    implementation(libs.slf4j)
-
-    testImplementation(libs.test.kotlin)
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.22")
 }
 
 application {
