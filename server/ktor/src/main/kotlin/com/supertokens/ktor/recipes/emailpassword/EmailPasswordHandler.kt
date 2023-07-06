@@ -21,6 +21,8 @@ import com.supertokens.sdk.core.getUserByEMail
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
+import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe.Companion.FORM_FIELD_EMAIL_ID
+import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe.Companion.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.recipes.emailpassword.models.EmailResetTemplate
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -108,9 +110,18 @@ open class EmailPasswordHandler {
             val user = emailPassword.signUp(email, password)
 
             if (sessionsEnabled) {
+                val additionalFormField = body.formFields.filter {
+                    it.id != FORM_FIELD_EMAIL_ID && it.id != FORM_FIELD_PASSWORD_ID
+                }
+
                 val session = sessions.createSession(
                     userId = user.id,
                     userDataInJWT = sessions.getJwtData(user),
+                    userDataInDatabase = buildMap {
+                        additionalFormField.forEach {
+                            set(it.id, it.value)
+                        }
+                    },
                 )
 
                 setSessionInResponse(
