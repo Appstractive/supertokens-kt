@@ -199,12 +199,11 @@ class EmailPasswordRecipe(
     companion object {
         const val ID = "emailpassword"
 
-        const val PATH_SIGNIN = "recipe/signin"
-        const val PATH_SIGNUP = "recipe/signup"
-        const val PATH_GET_USER = "recipe/user"
-        const val PATH_UPDATE_USER = "recipe/user"
-        const val PATH_PASSWORD_RESET_TOKEN = "recipe/user/password/reset/token"
-        const val PATH_PASSWORD_RESET = "recipe/user/password/reset"
+        const val PATH_SIGNIN = "/recipe/signin"
+        const val PATH_SIGNUP = "/recipe/signup"
+        const val PATH_UPDATE_USER = "/recipe/user"
+        const val PATH_PASSWORD_RESET_TOKEN = "/recipe/user/password/reset/token"
+        const val PATH_PASSWORD_RESET = "/recipe/user/password/reset"
 
         const val FORM_FIELD_EMAIL_ID = "email"
         const val FORM_FIELD_PASSWORD_ID = "password"

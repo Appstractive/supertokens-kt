@@ -1,15 +1,14 @@
 package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.core.deleteUser
 import com.supertokens.sdk.core.getUserByEMail
 import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.core.getUserByPhoneNumber
-import com.supertokens.sdk.ingredients.email.smtp.SmtpConfig
-import com.supertokens.sdk.ingredients.email.smtp.SmtpEmailService
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
-import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignIn
-import com.supertokens.sdk.recipes.passwordless.Passwordless
+import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignUp
 import com.supertokens.sdk.recipes.passwordless.consumePasswordlessUserInputCode
 import com.supertokens.sdk.recipes.passwordless.createPasswordlessPhoneNumberCode
 import com.supertokens.sdk.superTokens
@@ -28,23 +27,12 @@ class CoreTests {
             name = "TestApp",
         ),
     ) {
-        recipe(EmailPassword) {
-            emailService = SmtpEmailService(
-                SmtpConfig(
-                    host = "localhost",
-                    port = 1025,
-                    password = "",
-                    fromEmail = "test@example.com",
-                    fromName = "SuperTokens Test",
-                )
-            )
-        }
-        recipe(Passwordless)
+        recipe(EmailPassword)
     }
 
     @Test
     fun testGetUserById() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUserByEMail("test@test.de")
 
         val getResponse = superTokens.getUserById(user.id)
 
@@ -67,6 +55,14 @@ class CoreTests {
         val user = superTokens.getUserByPhoneNumber("+491601234567")
 
         assertEquals("+491601234567", user.phoneNumber)
+    }
+
+    @Test
+    fun testDeleteUser() = runBlocking {
+        val user = superTokens.emailPasswordSignUp("test42@test.de", "a1234567")
+
+        val response = superTokens.deleteUser(user.id)
+        assertEquals(SuperTokensStatus.OK, response)
     }
 
 }

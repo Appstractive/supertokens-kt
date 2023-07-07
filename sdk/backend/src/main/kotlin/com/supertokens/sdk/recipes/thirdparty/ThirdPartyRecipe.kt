@@ -95,7 +95,7 @@ class ThirdPartyRecipe(
     companion object {
         const val ID = "thirdparty"
 
-        const val PATH_SIGN_IN_UP = "recipe/signinup"
+        const val PATH_SIGN_IN_UP = "/recipe/signinup"
     }
 
 }

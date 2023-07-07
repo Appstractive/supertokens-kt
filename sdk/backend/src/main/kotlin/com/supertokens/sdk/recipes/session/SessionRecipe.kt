@@ -350,14 +350,14 @@ class SessionRecipe(
     companion object {
         const val ID = "session"
 
-        const val PATH_SESSION = "recipe/session"
-        const val PATH_SESSION_REMOVE = "recipe/session/remove"
-        const val PATH_SESSION_VERIFY = "recipe/session/verify"
-        const val PATH_SESSION_REFRESH = "recipe/session/refresh"
-        const val PATH_SESSION_REGENERATE = "recipe/session/regenerate"
-        const val PATH_SESSION_DATA = "recipe/session/data"
-        const val PATH_JWT_DATA = "recipe/jwt/data"
-        const val PATH_SESSIONS = "recipe/session/user"
+        const val PATH_SESSION = "/recipe/session"
+        const val PATH_SESSION_REMOVE = "/recipe/session/remove"
+        const val PATH_SESSION_VERIFY = "/recipe/session/verify"
+        const val PATH_SESSION_REFRESH = "/recipe/session/refresh"
+        const val PATH_SESSION_REGENERATE = "/recipe/session/regenerate"
+        const val PATH_SESSION_DATA = "/recipe/session/data"
+        const val PATH_JWT_DATA = "/recipe/jwt/data"
+        const val PATH_SESSIONS = "/recipe/session/user"
     }
 
 }
