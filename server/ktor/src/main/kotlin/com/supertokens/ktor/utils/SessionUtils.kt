@@ -1,6 +1,7 @@
 package com.supertokens.ktor.utils
 
 import com.supertokens.ktor.recipes.session.sessions
+import com.supertokens.ktor.superTokens
 import com.supertokens.sdk.common.COOKIE_ACCESS_TOKEN
 import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
@@ -62,6 +63,10 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
                 httpOnly = true,
                 expires = GMTDate(accessToken.expiry),
                 path = "/",
+                secure = sessions.secureCookies,
+                extensions = mapOf(
+                    "SameSite" to sessions.cookieSameSite,
+                ),
             )
         )
 
@@ -70,10 +75,14 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
                 Cookie(
                     name = COOKIE_REFRESH_TOKEN,
                     value = it.token,
-                    domain = frontend.host,
+                    domain = superTokens.appConfig.api.host,
                     httpOnly = true,
                     expires = GMTDate(it.expiry),
+                    secure = sessions.secureCookies,
                     path = "${frontend.path}${Routes.Session.REFRESH}",
+                    extensions = mapOf(
+                        "SameSite" to sessions.cookieSameSite,
+                    ),
                 )
             )
         }

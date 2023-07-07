@@ -19,7 +19,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
+  mailhog:
+    image: 'mailhog/mailhog:latest'
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - app_network
+    restart: unless-stopped
   supertokens:
     image: registry.supertokens.io/supertokens/supertokens-postgresql:6.0
     depends_on:
@@ -48,8 +55,8 @@ services:
       SUPERTOKENS_ISSUER: "localhost"
       SMTP_USER: 
       SMTP_PW: 
-      SMTP_HOST: 
-      SMTP_PORT: 
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
     depends_on:
       - supertokens
     ports:

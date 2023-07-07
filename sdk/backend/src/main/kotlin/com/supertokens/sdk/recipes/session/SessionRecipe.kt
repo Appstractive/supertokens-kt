@@ -44,6 +44,8 @@ class SessionConfig: RecipeConfig {
     // if true, set tokens to cookies
     var cookieBasedSessions: Boolean = true
 
+    var secureCookies: Boolean = false
+
     // the JWT issuer to use
     var issuer: String? = null
 
@@ -63,10 +65,29 @@ class SessionRecipe(
 
     // if true, attach tokens to response headers
     val headerBasedSessions = config.headerBasedSessions
+
     // if true, set tokens to cookies
     val cookieBasedSessions = config.cookieBasedSessions
+
+    val secureCookies by lazy {
+        superTokens.appConfig.api.scheme == "https"
+    }
+
+    val cookieSameSite by lazy {
+        // will be 'none' if https is used and frontend and api are different hosts, else 'lax'
+        if(
+            secureCookies &&
+            (superTokens.appConfig.frontends.size > 1 ||
+                    superTokens.appConfig.frontends.first().host != superTokens.appConfig.api.host)
+        )
+            "none"
+        else
+            "lax"
+    }
+
     // attach any additional data to Jwts on session creation and regeneration
     val customJwtData: CustomJwtData? = config.customJwtData
+
     // the JWT issuer to use
     val issuer by lazy {
         config.issuer ?: superTokens.appConfig.api.host
