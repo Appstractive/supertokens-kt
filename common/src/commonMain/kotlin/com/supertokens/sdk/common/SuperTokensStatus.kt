@@ -23,6 +23,11 @@ sealed class SuperTokensStatus(
     object PasswordlessCodeAlreadyUsedError: SuperTokensStatus("USER_INPUT_CODE_ALREADY_USED_ERROR")
     object PasswordlessIncorrectCodeError: SuperTokensStatus("INCORRECT_USER_INPUT_CODE_ERROR")
     object PasswordlessExpiredCodeError: SuperTokensStatus("EXPIRED_USER_INPUT_CODE_ERROR")
+    object TotpDeviceAlreadyExistsError: SuperTokensStatus("DEVICE_ALREADY_EXISTS_ERROR")
+    object TotpNotEnabledError: SuperTokensStatus("TOTP_NOT_ENABLED_ERROR")
+    object TotpDeviceUnknownError: SuperTokensStatus("UNKNOWN_DEVICE_ERROR")
+    object InvalidTotpCodeError: SuperTokensStatus("INVALID_TOTP_ERROR")
+    object TotpLimitReachedError: SuperTokensStatus("LIMIT_REACHED_ERROR")
 
     data class UnknownError(val message: String = "UNKNOWN_ERROR"): SuperTokensStatus(message)
 
@@ -48,6 +53,11 @@ fun String.toStatus(): SuperTokensStatus {
         SuperTokensStatus.PasswordlessIncorrectCodeError.value -> SuperTokensStatus.PasswordlessIncorrectCodeError
         SuperTokensStatus.PasswordlessExpiredCodeError.value -> SuperTokensStatus.PasswordlessExpiredCodeError
         SuperTokensStatus.UnknownPhoneNumberError.value -> SuperTokensStatus.UnknownPhoneNumberError
+        SuperTokensStatus.TotpDeviceAlreadyExistsError.value -> SuperTokensStatus.TotpDeviceAlreadyExistsError
+        SuperTokensStatus.TotpNotEnabledError.value -> SuperTokensStatus.TotpNotEnabledError
+        SuperTokensStatus.TotpDeviceUnknownError.value -> SuperTokensStatus.TotpDeviceUnknownError
+        SuperTokensStatus.InvalidTotpCodeError.value -> SuperTokensStatus.InvalidTotpCodeError
+        SuperTokensStatus.TotpLimitReachedError.value -> SuperTokensStatus.TotpLimitReachedError
         else -> SuperTokensStatus.UnknownError(this)
     }
 }

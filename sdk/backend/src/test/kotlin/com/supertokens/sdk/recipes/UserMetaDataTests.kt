@@ -2,9 +2,8 @@ package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.core.getUserByEMail
 import com.supertokens.sdk.recipe
-import com.supertokens.sdk.recipes.emailpassword.EmailPassword
-import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignIn
 import com.supertokens.sdk.recipes.usermetadata.UserMetaData
 import com.supertokens.sdk.recipes.usermetadata.UserMetaDataRecipe
 import com.supertokens.sdk.recipes.usermetadata.deleteUserMetaData
@@ -43,7 +42,6 @@ class UserMetaDataTests {
             name = "TestApp",
         ),
     ) {
-        recipe(EmailPassword)
         recipe(UserMetaData)
     }
 
@@ -54,7 +52,7 @@ class UserMetaDataTests {
 
     @Test
     fun testUpdateMetaData() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUserByEMail("test@test.de")
 
         val response = superTokens.updateUserMetaData(
             user.id,
@@ -67,7 +65,7 @@ class UserMetaDataTests {
 
     @Test
     fun testDeleteMetaData() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUserByEMail("test@test.de")
 
         superTokens.updateUserMetaData(
             user.id,

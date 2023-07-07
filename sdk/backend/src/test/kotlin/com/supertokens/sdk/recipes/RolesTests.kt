@@ -1,7 +1,6 @@
 package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
-import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.core.getUserByEMail
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.roles.Roles
@@ -19,11 +18,10 @@ import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-//@Ignore("Only for DEV purposes")
+@Ignore("Only for DEV purposes")
 class RolesTests {
 
     private val superTokens = superTokens(
@@ -42,8 +40,7 @@ class RolesTests {
 
     @Test
     fun testCreateOrUpdateRole() = runBlocking {
-        val response = superTokens.createOrUpdateRole("Everyone", listOf("do:whatever"))
-        assertEquals(SuperTokensStatus.OK, response)
+        superTokens.createOrUpdateRole("Everyone", listOf("do:whatever"))
 
         val roles = superTokens.getRoles()
         assertTrue(roles.contains("Everyone"))
@@ -57,8 +54,7 @@ class RolesTests {
 
     @Test
     fun testDeleteRole() = runBlocking {
-        val response = superTokens.deleteRole("Everyone")
-        assertEquals(SuperTokensStatus.OK, response)
+        superTokens.deleteRole("Everyone")
 
         val roles = superTokens.getRoles()
         assertFalse(roles.contains("Everyone"))
@@ -69,8 +65,7 @@ class RolesTests {
 
     @Test
     fun testRemoveRolePermissions() = runBlocking {
-        val response = superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
-        assertEquals(SuperTokensStatus.OK, response)
+        superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
 
         var permissions = superTokens.getRolePermissions("Everyone")
         assertTrue(permissions.contains("do:whatever"))
@@ -89,8 +84,7 @@ class RolesTests {
 
         superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
 
-        val response = superTokens.setUserRole(user.id, "Everyone")
-        assertEquals(SuperTokensStatus.OK, response)
+        superTokens.setUserRole(user.id, "Everyone")
 
         val roles = superTokens.getUserRoles(user.id)
         assertTrue(roles.contains("Everyone"))
@@ -107,8 +101,7 @@ class RolesTests {
         var roles = superTokens.getUserRoles(user.id)
         assertTrue(roles.contains("Everyone"))
 
-        val response = superTokens.removeUserRole(user.id, "Everyone")
-        assertEquals(SuperTokensStatus.OK, response)
+        superTokens.removeUserRole(user.id, "Everyone")
 
         roles = superTokens.getUserRoles(user.id)
         assertFalse(roles.contains("Everyone"))

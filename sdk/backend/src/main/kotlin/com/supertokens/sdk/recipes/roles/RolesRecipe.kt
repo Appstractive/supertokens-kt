@@ -67,8 +67,10 @@ class RolesRecipe(
 
     /**
      * Creates a role with permissions, can also be used to add permissions to a role
+     *
+     * @return true, if the role was newly created
      */
-    suspend fun createOrUpdateRole(role: String, permissions: List<String>): SuperTokensStatus {
+    suspend fun createOrUpdateRole(role: String, permissions: List<String>): Boolean {
         val response = superTokens.client.put(PATH_ROLE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -81,15 +83,17 @@ class RolesRecipe(
             )
         }
 
-        return response.parse<CreateOrUpdateRoleResponse, SuperTokensStatus> {
-            it.status.toStatus()
+        return response.parse<CreateOrUpdateRoleResponse, Boolean> {
+            it.createdNewRole
         }
     }
 
     /**
      * Deletes a role
+     *
+     * @return true, if the did exist
      */
-    suspend fun deleteRole(role: String): SuperTokensStatus {
+    suspend fun deleteRole(role: String): Boolean {
         val response = superTokens.client.post(PATH_ROLES_REMOVE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -101,8 +105,8 @@ class RolesRecipe(
             )
         }
 
-        return response.parse<DeleteRoleResponse, SuperTokensStatus> {
-            it.status.toStatus()
+        return response.parse<DeleteRoleResponse, Boolean> {
+            it.didRoleExist
         }
     }
 
@@ -181,8 +185,10 @@ class RolesRecipe(
 
     /**
      * Creates a User Role mapping
+     *
+     * @return true, if the user already had the role assigned
      */
-    suspend fun setUserRole(userId: String, role: String): SuperTokensStatus {
+    suspend fun setUserRole(userId: String, role: String): Boolean {
         val response = superTokens.client.put(PATH_USER_ROLE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -195,15 +201,17 @@ class RolesRecipe(
             )
         }
 
-        return response.parse<SetUserRoleResponse, SuperTokensStatus> {
-            it.status.toStatus()
+        return response.parse<SetUserRoleResponse, Boolean> {
+            it.didUserAlreadyHaveRole
         }
     }
 
     /**
      * Removes a User Role mapping
+     *
+     * @return true, if the user had the role
      */
-    suspend fun removeUserRole(userId: String, role: String): SuperTokensStatus {
+    suspend fun removeUserRole(userId: String, role: String): Boolean {
         val response = superTokens.client.post(PATH_USER_ROLE_REMOVE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -216,8 +224,8 @@ class RolesRecipe(
             )
         }
 
-        return response.parse<RemoveUserRoleResponse, SuperTokensStatus> {
-            it.status.toStatus()
+        return response.parse<RemoveUserRoleResponse, Boolean> {
+            it.didUserHaveRole
         }
     }
 
