@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 repositories {
     google()
     mavenCentral()
+    mavenLocal()
     maven("https://jitpack.io")
 }
 
@@ -27,17 +28,18 @@ plugins {
     id("io.ktor.plugin") version "2.3.1"
 }
 
-version = "1.0.3"
+version = "1.0.4"
 group = "com.appstractive"
 
 dependencies {
-    implementation("com.appstractive:supertokens-sdk-backend-ktor:1.0.0")
+    implementation("com.appstractive:supertokens-sdk-backend-ktor:1.1.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
 
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
     implementation("io.ktor:ktor-server-cio-jvm:2.3.1")
+    implementation("io.ktor:ktor-server-call-logging:2.3.1")
 
     implementation("org.slf4j:slf4j-simple:1.6.1")
 
