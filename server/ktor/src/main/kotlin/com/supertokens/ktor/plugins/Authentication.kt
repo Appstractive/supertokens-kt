@@ -1,8 +1,10 @@
 package com.supertokens.ktor.plugins
 
 import com.auth0.jwt.interfaces.Payload
+import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.utils.UnauthorizedException
 import com.supertokens.sdk.common.COOKIE_ACCESS_TOKEN
+import com.supertokens.sdk.common.HEADER_ANTI_CSRF
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.Principal
@@ -23,6 +25,13 @@ data class AuthenticatedUser(
 const val SuperTokensAuth = "SuperTokens"
 
 val TokenValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = {
+    if(sessions.verifySessionInCore) {
+        sessions.verifySession(
+            accessToken = accessToken,
+            antiCsrfToken = request.headers[HEADER_ANTI_CSRF],
+        )
+    }
+
     val sub = it.subject
     val sessionHandle = it["sessionHandle"]
 

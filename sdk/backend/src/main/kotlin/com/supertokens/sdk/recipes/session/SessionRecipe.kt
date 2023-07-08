@@ -44,6 +44,8 @@ class SessionConfig: RecipeConfig {
     // if true, set tokens to cookies
     var cookieBasedSessions: Boolean = true
 
+    var verifySessionInCore: Boolean = false
+
     // the JWT issuer to use
     var issuer: String? = null
 
@@ -88,6 +90,8 @@ class SessionRecipe(
     }
 
     val enableAntiCsrfCheck = config.antiCsrfCheck
+
+    val verifySessionInCore = config.verifySessionInCore
 
     val useDynamicSigningKey = config.useDynamicSigningKey
 
@@ -247,7 +251,7 @@ class SessionRecipe(
 
         return response.parse<VerifySessionResponse, VerifySessionData> {
             VerifySessionData(
-                session = it.session?.toData() ?: throw RuntimeException("VerifySession returned OK but no session"),
+                session = checkNotNull(it.session?.toData()),
                 accessToken = it.accessToken,
             )
         }
