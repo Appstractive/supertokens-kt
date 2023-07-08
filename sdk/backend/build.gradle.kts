@@ -63,7 +63,7 @@ publishing {
 
             groupId = "com.appstractive"
             artifactId = "supertokens-sdk-backend"
-            version = "1.0.0"
+            version = "1.1.0"
 
             from(components["java"])
 

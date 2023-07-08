@@ -6,6 +6,7 @@ import com.supertokens.ktor.utils.UnauthorizedException
 import com.supertokens.ktor.utils.clearSessionInResponse
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
+import com.supertokens.sdk.common.HEADER_ANTI_CSRF
 import com.supertokens.sdk.common.HEADER_REFRESH_TOKEN
 import com.supertokens.sdk.common.responses.StatusResponse
 import io.ktor.server.application.ApplicationCall
@@ -25,7 +26,11 @@ open class SessionHandler {
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.refresh() {
         val refreshToken = call.request.headers[HEADER_REFRESH_TOKEN] ?: call.request.cookies[COOKIE_REFRESH_TOKEN] ?: throw UnauthorizedException()
-        val session = sessions.refreshSession(refreshToken)
+        val antiCsrfToken = call.request.headers[HEADER_ANTI_CSRF]
+        val session = sessions.refreshSession(
+            refreshToken = refreshToken,
+            antiCsrfToken = antiCsrfToken,
+        )
 
         setSessionInResponse(
             accessToken = session.accessToken,

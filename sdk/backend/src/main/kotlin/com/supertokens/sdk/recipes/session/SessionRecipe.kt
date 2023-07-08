@@ -44,10 +44,12 @@ class SessionConfig: RecipeConfig {
     // if true, set tokens to cookies
     var cookieBasedSessions: Boolean = true
 
-    var secureCookies: Boolean = false
-
     // the JWT issuer to use
     var issuer: String? = null
+
+    var antiCsrfCheck: Boolean = false
+
+    var useDynamicSigningKey: Boolean = false
 
     internal var customJwtData: CustomJwtData? = null
 
@@ -84,6 +86,10 @@ class SessionRecipe(
         else
             "lax"
     }
+
+    val enableAntiCsrfCheck = config.antiCsrfCheck
+
+    val useDynamicSigningKey = config.useDynamicSigningKey
 
     // attach any additional data to Jwts on session creation and regeneration
     val customJwtData: CustomJwtData? = config.customJwtData
@@ -125,8 +131,6 @@ class SessionRecipe(
         userId: String,
         userDataInJWT: Map<String, Any?> = emptyMap(),
         userDataInDatabase: Map<String, Any?> = emptyMap(),
-        enableAntiCsrf: Boolean = false,
-        useDynamicSigningKey: Boolean = false,
     ): CreateSessionData {
         val response = superTokens.client.post(PATH_SESSION) {
 
@@ -137,7 +141,7 @@ class SessionRecipe(
                     userId = userId,
                     userDataInJWT = userDataInJWT.toJsonElement(),
                     userDataInDatabase = userDataInDatabase.toJsonElement(),
-                    enableAntiCsrf = enableAntiCsrf,
+                    enableAntiCsrf = enableAntiCsrfCheck,
                     useDynamicSigningKey = useDynamicSigningKey,
                 )
             )
@@ -221,7 +225,6 @@ class SessionRecipe(
      */
     suspend fun verifySession(
         accessToken: String,
-        enableAntiCsrf: Boolean = false,
         doAntiCsrfCheck: Boolean = false,
         checkDatabase: Boolean = false,
         antiCsrfToken: String? = null,
@@ -234,7 +237,7 @@ class SessionRecipe(
             setBody(
                 VerifySessionRequest(
                     accessToken = accessToken,
-                    enableAntiCsrf = enableAntiCsrf,
+                    enableAntiCsrf = enableAntiCsrfCheck,
                     doAntiCsrfCheck = doAntiCsrfCheck,
                     checkDatabase = checkDatabase,
                     antiCsrfToken = antiCsrfToken,
@@ -255,7 +258,6 @@ class SessionRecipe(
      */
     suspend fun refreshSession(
         refreshToken: String,
-        enableAntiCsrf: Boolean = false,
         antiCsrfToken: String? = null,
     ): CreateSessionData {
         val response = superTokens.client.post(PATH_SESSION_REFRESH) {
@@ -265,7 +267,7 @@ class SessionRecipe(
             setBody(
                 RefreshSessionRequest(
                     refreshToken = refreshToken,
-                    enableAntiCsrf = enableAntiCsrf,
+                    enableAntiCsrf = enableAntiCsrfCheck,
                     antiCsrfToken = antiCsrfToken,
                 )
             )
@@ -381,9 +383,7 @@ suspend fun SuperTokens.createSession(
     userId: String,
     userDataInJWT: Map<String, Any?> = emptyMap(),
     userDataInDatabase: Map<String, Any?> = emptyMap(),
-    enableAntiCsrf: Boolean = false,
-    useDynamicSigningKey: Boolean = false,
-) = getRecipe<SessionRecipe>().createSession(userId, userDataInJWT, userDataInDatabase, enableAntiCsrf, useDynamicSigningKey)
+) = getRecipe<SessionRecipe>().createSession(userId, userDataInJWT, userDataInDatabase)
 
 /**
  * Get user and session information for a given session handle
@@ -411,20 +411,18 @@ suspend fun SuperTokens.removeSessions(
  */
 suspend fun SuperTokens.verifySession(
     accessToken: String,
-    enableAntiCsrf: Boolean = false,
     doAntiCsrfCheck: Boolean = false,
     checkDatabase: Boolean = false,
     antiCsrfToken: String? = null,
-) = getRecipe<SessionRecipe>().verifySession(accessToken, enableAntiCsrf, doAntiCsrfCheck, checkDatabase, antiCsrfToken)
+) = getRecipe<SessionRecipe>().verifySession(accessToken, doAntiCsrfCheck, checkDatabase, antiCsrfToken)
 
 /**
  * Refresh a Session
  */
 suspend fun SuperTokens.refreshSession(
     refreshToken: String,
-    enableAntiCsrf: Boolean = false,
     antiCsrfToken: String? = null,
-) = getRecipe<SessionRecipe>().refreshSession(refreshToken, enableAntiCsrf, antiCsrfToken)
+) = getRecipe<SessionRecipe>().refreshSession(refreshToken, antiCsrfToken)
 
 /**
  * Regenerate a session
