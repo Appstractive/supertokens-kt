@@ -14,5 +14,5 @@ data class User(
     val email: String? = null,
     val phoneNumber: String? = null,
     val timeJoined: Long,
-    val thirdParty: ThirdParty?,
+    val thirdParty: ThirdParty? = null,
 )

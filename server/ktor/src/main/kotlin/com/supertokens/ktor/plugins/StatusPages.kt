@@ -1,7 +1,7 @@
 package com.supertokens.ktor.plugins
 
 import com.supertokens.ktor.utils.ResponseException
-import com.supertokens.sdk.SuperTokensStatusException
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.responses.ErrorResponse
 import com.supertokens.sdk.common.responses.StatusResponse

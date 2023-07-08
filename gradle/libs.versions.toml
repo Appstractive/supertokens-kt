@@ -6,6 +6,9 @@ compileSdk = "33"
 minSdk = "24"
 targetSdk = "33"
 
+android-startup = "1.1.1"
+android-crypto = "1.1.0-alpha06"
+
 ktor_version = "2.3.1"
 
 kotlin-datetime = "0.4.0"
@@ -19,9 +22,14 @@ slf4j = "1.6.1"
 mail = "1.5"
 freemarker = "2.3.14"
 
+settings = "1.0.0"
+
 [libraries]
 androidGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kotlinGradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
+android-startup = {module = "androidx.startup:startup-runtime", version.ref = "android-startup"}
+android-crypto = {module = "androidx.security:security-crypto-ktx", version.ref = "android-crypto"}
 
 kotlin-serialization = {module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization"}
 kotlin-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization"}
@@ -37,6 +45,7 @@ ktor-client-logging = {module = "io.ktor:ktor-client-logging", version.ref = "kt
 ktor-client-serialization = {module = "io.ktor:ktor-client-serialization", version.ref = "ktor_version"}
 ktor-client-json = {module = "io.ktor:ktor-client-json", version.ref = "ktor_version"}
 ktor-client-contentnegotiation = {module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor_version"}
+ktor-client-auth = {module = "io.ktor:ktor-client-auth", version.ref = "ktor_version"}
 
 ktor-server-core = {module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor_version"}
 ktor-server-cio = {module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor_version"}
@@ -44,6 +53,8 @@ ktor-server-contentnegotiation = {module = "io.ktor:ktor-server-content-negotiat
 ktor-server-statuspages = {module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor_version"}
 ktor-server-auth = {module = "io.ktor:ktor-server-auth", version.ref = "ktor_version"}
 ktor-server-auth-jwt = {module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor_version"}
+
+settings = {module = "com.russhwolf:multiplatform-settings", version.ref = "settings"}
 
 javax-mail = {module = "org.apache.commons:commons-email", version.ref = "mail"}
 freemarker = {module = "org.freemarker:freemarker", version.ref = "freemarker"}

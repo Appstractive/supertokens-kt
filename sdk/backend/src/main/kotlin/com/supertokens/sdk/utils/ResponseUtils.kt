@@ -1,7 +1,7 @@
 package com.supertokens.sdk.utils
 
 import com.supertokens.sdk.common.SuperTokensStatus
-import com.supertokens.sdk.SuperTokensStatusException
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.common.responses.BaseResponse

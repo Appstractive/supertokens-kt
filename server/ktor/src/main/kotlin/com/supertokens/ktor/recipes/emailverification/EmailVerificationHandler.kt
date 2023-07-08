@@ -10,7 +10,7 @@ import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.fronend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.ServerConfig
-import com.supertokens.sdk.SuperTokensStatusException
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.VerifyEmailTokenRequest
 import com.supertokens.sdk.common.responses.StatusResponse

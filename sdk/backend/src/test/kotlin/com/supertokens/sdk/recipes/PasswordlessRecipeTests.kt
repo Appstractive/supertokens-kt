@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
-import com.supertokens.sdk.SuperTokensStatusException
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.passwordless.Passwordless

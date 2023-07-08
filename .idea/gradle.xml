@@ -12,6 +12,13 @@
                   <project path="$PROJECT_DIR$/examples/ktor-server" />
                 </projects>
               </build>
+              <build path="$PROJECT_DIR$/examples/app" name="MyApplication">
+                <projects>
+                  <project path="$PROJECT_DIR$/examples/app" />
+                  <project path="$PROJECT_DIR$/examples/app/androidApp" />
+                  <project path="$PROJECT_DIR$/examples/app/shared" />
+                </projects>
+              </build>
             </builds>
           </compositeBuild>
         </compositeConfiguration>
@@ -23,6 +30,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/examples/app" />
+            <option value="$PROJECT_DIR$/examples/app/androidApp" />
+            <option value="$PROJECT_DIR$/examples/app/shared" />
             <option value="$PROJECT_DIR$/examples/ktor-server" />
             <option value="$PROJECT_DIR$/sdk" />
             <option value="$PROJECT_DIR$/sdk/backend" />

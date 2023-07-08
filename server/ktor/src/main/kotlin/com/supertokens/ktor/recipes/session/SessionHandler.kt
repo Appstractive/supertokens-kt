@@ -9,6 +9,7 @@ import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
 import com.supertokens.sdk.common.HEADER_ANTI_CSRF
 import com.supertokens.sdk.common.HEADER_REFRESH_TOKEN
 import com.supertokens.sdk.common.responses.StatusResponse
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
@@ -27,10 +28,15 @@ open class SessionHandler {
     open suspend fun PipelineContext<Unit, ApplicationCall>.refresh() {
         val refreshToken = call.request.headers[HEADER_REFRESH_TOKEN] ?: call.request.cookies[COOKIE_REFRESH_TOKEN] ?: throw UnauthorizedException()
         val antiCsrfToken = call.request.headers[HEADER_ANTI_CSRF]
-        val session = sessions.refreshSession(
-            refreshToken = refreshToken,
-            antiCsrfToken = antiCsrfToken,
-        )
+        val session = kotlin.runCatching {
+            sessions.refreshSession(
+                refreshToken = refreshToken,
+                antiCsrfToken = antiCsrfToken,
+            )
+        }.getOrElse {
+            clearSessionInResponse()
+            return call.respond(HttpStatusCode.Unauthorized)
+        }
 
         setSessionInResponse(
             accessToken = session.accessToken,

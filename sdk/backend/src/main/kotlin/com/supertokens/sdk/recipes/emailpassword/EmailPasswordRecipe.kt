@@ -3,7 +3,9 @@ package com.supertokens.sdk.recipes.emailpassword
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.SuperTokensStatusException
+import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
+import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.models.SuperTokensEvent
@@ -205,8 +207,7 @@ class EmailPasswordRecipe(
         const val PATH_PASSWORD_RESET_TOKEN = "/recipe/user/password/reset/token"
         const val PATH_PASSWORD_RESET = "/recipe/user/password/reset"
 
-        const val FORM_FIELD_EMAIL_ID = "email"
-        const val FORM_FIELD_PASSWORD_ID = "password"
+
 
         private val DEFAULT_PASSWORD_REGEXP = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")
         private val DEFAULT_PASSWORD_VALIDATOR: Validate = {

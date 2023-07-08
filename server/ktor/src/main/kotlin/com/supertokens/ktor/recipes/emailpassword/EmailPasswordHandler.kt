@@ -9,6 +9,8 @@ import com.supertokens.ktor.utils.getInvalidFormFields
 import com.supertokens.ktor.utils.getPasswordFormField
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.ServerConfig
+import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
+import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.FormField
 import com.supertokens.sdk.common.requests.FormFieldRequest
@@ -20,9 +22,6 @@ import com.supertokens.sdk.common.responses.UserResponse
 import com.supertokens.sdk.core.getUserByEMail
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
-import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
-import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe.Companion.FORM_FIELD_EMAIL_ID
-import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe.Companion.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.recipes.emailpassword.models.EmailResetTemplate
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -42,6 +41,7 @@ private suspend fun ApplicationCall.validateFormFields(
 
     if (invalidFormFields.isNotEmpty()) {
         return respond(
+            HttpStatusCode.BadRequest,
             SignInResponse(
                 status = SuperTokensStatus.FormFieldError.value,
                 formFields = invalidFormFields.map {
@@ -56,12 +56,14 @@ private suspend fun ApplicationCall.validateFormFields(
 
     val email: String = getEmailFormField(fields)?.value
         ?: return respond(
+            HttpStatusCode.Unauthorized,
             SignInResponse(
                 status = SuperTokensStatus.WrongCredentialsError.value,
             )
         )
     val password: String = getPasswordFormField(fields)?.value
         ?: return respond(
+            HttpStatusCode.Unauthorized,
             SignInResponse(
                 status = SuperTokensStatus.WrongCredentialsError.value,
             )
@@ -186,7 +188,7 @@ open class EmailPasswordHandler {
     open suspend fun PipelineContext<Unit, ApplicationCall>.passwordResetToken() {
         val body = call.receive<FormFieldRequest>()
 
-        val emailField = body.formFields.firstOrNull { it.id == EmailPasswordRecipe.FORM_FIELD_EMAIL_ID }
+        val emailField = body.formFields.firstOrNull { it.id == FORM_FIELD_EMAIL_ID }
 
         emailField?.value?.let { email ->
             sendPasswordResetMail(email)
@@ -208,13 +210,13 @@ open class EmailPasswordHandler {
                     )
                 )
 
-                val password: String = body.formFields.firstOrNull { it.id == EmailPasswordRecipe.FORM_FIELD_PASSWORD_ID }?.value
+                val password: String = body.formFields.firstOrNull { it.id == FORM_FIELD_PASSWORD_ID }?.value
                     ?: return call.respond(
                         SignInResponse(
                             status = SuperTokensStatus.FormFieldError.value,
                             formFields = listOf(
                                 FormFieldError(
-                                    id = EmailPasswordRecipe.FORM_FIELD_PASSWORD_ID,
+                                    id = FORM_FIELD_PASSWORD_ID,
                                     error = "Password missing",
                                 )
                             )

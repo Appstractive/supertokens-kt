@@ -6,3 +6,6 @@ const val HEADER_ANTI_CSRF = "anti-csrf"
 
 const val COOKIE_ACCESS_TOKEN = "sAccessToken"
 const val COOKIE_REFRESH_TOKEN = "sRefreshToken"
+
+const val FORM_FIELD_EMAIL_ID = "email"
+const val FORM_FIELD_PASSWORD_ID = "password"

@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserResponse(
     val id: String,
-    val email: String?,
+    val email: String? = null,
+    val phoneNumber: String? = null,
     val timeJoined: Long,
 )
