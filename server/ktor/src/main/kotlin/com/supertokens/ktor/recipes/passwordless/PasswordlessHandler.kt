@@ -126,7 +126,7 @@ open class PasswordlessHandler {
         } ?: body.phoneNumber?.let {
             val data = passwordless.createPhoneNumberCode(it)
             sendLoginSms(it, data)
-        } ?: throw BadRequestException("email or phoneNumber is required")
+        } ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError)
 
         call.respond(
             StartPasswordlessSignInUpResponse(
@@ -158,13 +158,13 @@ open class PasswordlessHandler {
         val response = when (passwordless.flowType) {
             PasswordlessMode.MAGIC_LINK -> passwordless.consumeLinkCode(
                 body.preAuthSessionId,
-                body.linkCode ?: throw BadRequestException("linkCode is required"),
+                body.linkCode ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
             )
 
             PasswordlessMode.USER_INPUT_CODE -> passwordless.consumeUserInputCode(
                 preAuthSessionId = body.preAuthSessionId,
-                deviceId = body.deviceId ?: throw BadRequestException("deviceId is required"),
-                userInputCode = body.userInputCode ?: throw BadRequestException("userInputCode is required"),
+                deviceId = body.deviceId ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
+                userInputCode = body.userInputCode ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
             )
 
             PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK -> {
@@ -184,7 +184,7 @@ open class PasswordlessHandler {
                         userInputCode = userInputCode,
                     )
                 } else {
-                    throw BadRequestException("Either linkCode or deviceId and userInputCode is required")
+                    throw SuperTokensStatusException(SuperTokensStatus.FormFieldError)
                 }
             }
         }

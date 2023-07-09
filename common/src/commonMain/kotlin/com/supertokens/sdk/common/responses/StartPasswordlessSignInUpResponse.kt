@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class StartPasswordlessSignInUpResponse(
     override val status: String = SuperTokensStatus.OK.value,
-    val deviceId: String,
-    val preAuthSessionId: String,
-    val flowType: PasswordlessMode,
+    val deviceId: String? = null,
+    val preAuthSessionId: String? = null,
+    val flowType: PasswordlessMode? = null,
 ): BaseResponse

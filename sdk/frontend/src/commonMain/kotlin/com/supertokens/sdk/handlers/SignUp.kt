@@ -3,21 +3,20 @@ package com.supertokens.sdk.handlers
 import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.common.responses.FormFieldError
 
 interface SignupProviderConfig
 
-interface SignUpProvider<C: SignupProviderConfig> {
+interface SignUpProvider<C: SignupProviderConfig, R> {
 
-    suspend fun signUp(superTokensClient: SuperTokensClient, configure: (C.() -> Unit)): User
+    suspend fun signUp(superTokensClient: SuperTokensClient, configure: (C.() -> Unit)): R
 
 }
 
-suspend fun <C, Provider : SignUpProvider<C>> SuperTokensClient.signUpWith(
+suspend fun <C, Provider : SignUpProvider<C, R>, R> SuperTokensClient.signUpWith(
     provider: Provider,
     config: (C.() -> Unit)
-): User {
+): R {
     return provider.signUp(this, config)
 }
 

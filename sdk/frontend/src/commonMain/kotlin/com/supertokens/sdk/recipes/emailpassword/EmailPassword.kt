@@ -20,7 +20,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
-object EmailPassword : SignInProvider<EmailPassword.Config>, SignUpProvider<EmailPassword.Config> {
+object EmailPassword : SignInProvider<EmailPassword.Config, User>, SignUpProvider<EmailPassword.Config, User> {
 
     data class Config(var email: String = "", var password: String = "") : SignInProviderConfig, SignupProviderConfig
 
