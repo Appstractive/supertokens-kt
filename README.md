@@ -10,9 +10,9 @@ Both SDKs are written in pure Kotlin with some Java dependencies.
 
 Please refer to the respective directories for installation and usage instructions:
 
-- [Backend SDK](https://github.com/Appstractive/supertokens-kotlin/tree/main/sdk/backend)
-- [KTOR Server Plugin](https://github.com/Appstractive/supertokens-kotlin/tree/main/server/ktor)
-- [KTOR Server Example](https://github.com/Appstractive/supertokens-kotlin/tree/main/examples/ktor-server)
-- [Frontend SDK (TODO)](https://github.com/Appstractive/supertokens-kotlin/tree/main/sdk/frontend)
-- [Multiplatform App Example (TODO)](https://github.com/Appstractive/supertokens-kotlin/tree/main/sdk/frontend)
+- [Backend SDK](https://github.com/Appstractive/supertokens-kt/tree/main/sdk/backend)
+- [KTOR Server Plugin](https://github.com/Appstractive/supertokens-kt/tree/main/server/ktor)
+- [KTOR Server Example](https://github.com/Appstractive/supertokens-kt/tree/main/examples/ktor-server)
+- [Frontend SDK (TODO)](https://github.com/Appstractive/supertokens-kt/tree/main/sdk/frontend)
+- [Multiplatform App Example (TODO)](https://github.com/Appstractive/supertokens-kt/tree/main/sdk/frontend)
 

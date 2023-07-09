@@ -4,7 +4,7 @@
 
 Gradle:
 ```
-implementation("com.appstractive:supertokens-sdk-backend:1.0.0")
+implementation("com.appstractive:supertokens-sdk-backend:1.1.0")
 ```
 
 ## Usage

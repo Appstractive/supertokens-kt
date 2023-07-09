@@ -4,7 +4,7 @@
 
 Gradle
 ```
-implementation("com.appstractive:supertokens-sdk-backend-ktor:1.0.0")
+implementation("com.appstractive:supertokens-sdk-backend-ktor:1.1.0")
 ```
 
 ## Usage
