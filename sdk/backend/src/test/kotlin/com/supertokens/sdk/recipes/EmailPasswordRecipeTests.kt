@@ -1,6 +1,8 @@
 package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
+import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.ingredients.email.smtp.SmtpConfig
 import com.supertokens.sdk.ingredients.email.smtp.SmtpEmailService
@@ -45,8 +47,8 @@ class EmailPasswordRecipeTests {
     fun testConfig() {
         val recipe = superTokens.getRecipe<EmailPasswordRecipe>()
         assertEquals(2, recipe.formFields.size)
-        assertEquals(EmailPasswordRecipe.FORM_FIELD_EMAIL_ID, recipe.formFields[0].id)
-        assertEquals(EmailPasswordRecipe.FORM_FIELD_PASSWORD_ID, recipe.formFields[1].id)
+        assertEquals(FORM_FIELD_EMAIL_ID, recipe.formFields[0].id)
+        assertEquals(FORM_FIELD_PASSWORD_ID, recipe.formFields[1].id)
     }
 
     @Test

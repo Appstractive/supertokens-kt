@@ -1,13 +1,15 @@
 package com.supertokens.sdk.recipes.thirdparty.providers.github
 
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
+import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
-import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
@@ -17,16 +19,16 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 
-class GithubConfig : OAuthProviderConfig() {
+class GitHubConfig : OAuthProviderConfig() {
     override var clientSecret: String? = null
 }
 
-class GithubProvider(
+class GitHubProvider(
     superTokens: SuperTokens,
-    config: GithubConfig,
-) : OAuthProvider<GithubConfig>(superTokens, config) {
+    config: GitHubConfig,
+) : OAuthProvider<GitHubConfig>(superTokens, config) {
 
-    override val id = ID
+    override val id = ThirdPartyProvider.GITHUB
     override val authUrl = AUTH_URL
     override val tokenUrl = TOKEN_URL
     override val defaultScopes = listOf(
@@ -41,10 +43,10 @@ class GithubProvider(
         }
 
         if (response.status != HttpStatusCode.OK) {
-            throw ThirdPartyProviderException(response.bodyAsText())
+            throw SuperTokensStatusException(SuperTokensStatus.WrongCredentialsError, response.bodyAsText())
         }
 
-        val body = response.body<GithubGetUserResponse>()
+        val body = response.body<GitHubGetUserResponse>()
 
         return ThirdPartyUserInfo(
             id = body.id.toString(),
@@ -57,7 +59,7 @@ class GithubProvider(
         )
     }
 
-    private suspend fun getEmail(accessToken: String): GithubGetEmailsResponse? {
+    private suspend fun getEmail(accessToken: String): GitHubGetEmailsResponse? {
         val response = superTokens.client.get(EMAIL_URL) {
             bearerAuth(accessToken)
             contentType(HEADER_CONTENT_TYPE)
@@ -67,14 +69,12 @@ class GithubProvider(
             return null
         }
 
-        val body = response.body<List<GithubGetEmailsResponse>>()
+        val body = response.body<List<GitHubGetEmailsResponse>>()
 
         return (body.firstOrNull { it.primary } ?: body.firstOrNull())
     }
 
     companion object {
-        const val ID = "github"
-
         const val AUTH_URL = "https://github.com/login/oauth/authorize"
         const val TOKEN_URL = "https://github.com/login/oauth/access_token"
         const val USER_URL = "https://api.github.com/user"
@@ -85,13 +85,13 @@ class GithubProvider(
 
 }
 
-val Github = object : ProviderBuilder<GithubConfig, GithubProvider>() {
+val Github = object : ProviderBuilder<GitHubConfig, GitHubProvider>() {
 
-    override fun install(configure: GithubConfig.() -> Unit): (SuperTokens, ThirdPartyRecipe) -> GithubProvider {
-        val config = GithubConfig().apply(configure)
+    override fun install(configure: GitHubConfig.() -> Unit): (SuperTokens, ThirdPartyRecipe) -> GitHubProvider {
+        val config = GitHubConfig().apply(configure)
 
         return { superTokens, _ ->
-            GithubProvider(
+            GitHubProvider(
                 superTokens, config,
             )
         }

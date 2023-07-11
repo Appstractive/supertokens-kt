@@ -67,8 +67,8 @@ class ThirdPartyRecipe(
 
         return response.parse<SignInUpResponse, SignInUpData> {
             SignInUpData(
-                user = it.user,
-                createdNewUser = it.createdNewUser
+                user = checkNotNull(it.user),
+                createdNewUser = checkNotNull(it.createdNewUser)
             )
         }.also {
             if(it.createdNewUser) {

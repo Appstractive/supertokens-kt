@@ -1,13 +1,15 @@
 package com.supertokens.sdk.recipes.thirdparty.providers.google
 
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
+import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
-import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
@@ -24,7 +26,7 @@ class GoogleProvider(
     config: GoogleConfig,
 ): OAuthProvider<GoogleConfig>(superTokens, config) {
 
-    override val id = ID
+    override val id = ThirdPartyProvider.GOOGLE
     override val authUrl = AUTH_URL
     override val tokenUrl = TOKEN_URL
     override val defaultScopes = listOf(
@@ -49,7 +51,7 @@ class GoogleProvider(
         }
 
         if (response.status != HttpStatusCode.OK) {
-            throw ThirdPartyProviderException(response.bodyAsText())
+            throw SuperTokensStatusException(SuperTokensStatus.WrongCredentialsError, response.bodyAsText())
         }
 
         val body = response.body<GoogleGetUserResponse>()
@@ -66,8 +68,6 @@ class GoogleProvider(
     }
 
     companion object {
-        const val ID = "google"
-
         const val AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
         const val TOKEN_URL = "https://oauth2.googleapis.com/token"
         const val USER_URL = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json"

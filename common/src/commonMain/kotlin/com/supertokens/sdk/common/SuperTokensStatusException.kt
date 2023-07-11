@@ -2,4 +2,5 @@ package com.supertokens.sdk.common
 
 open class SuperTokensStatusException(
     val status: SuperTokensStatus,
-): RuntimeException(status.value)
+    message: String? = null,
+): RuntimeException(message ?: status.value)

@@ -11,16 +11,23 @@ import io.ktor.server.response.respond
 
 fun StatusPagesConfig.superTokens(catchGeneralError: Boolean = false) {
     exception<SuperTokensStatusException> { call, cause ->
-        call.respond(HttpStatusCode.BadRequest, StatusResponse(cause.status.value))
+        call.respond(
+            status = HttpStatusCode.BadRequest,
+            message = StatusResponse(cause.status.value)
+        )
     }
 
     exception<ResponseException> { call, cause ->
-        call.respond(cause.status, StatusResponse(SuperTokensStatus.UnknownError().value))
+        call.respond(
+            status = cause.status,
+            message = StatusResponse(SuperTokensStatus.UnknownError().value)
+        )
     }
 
     if (catchGeneralError) {
         exception<Exception> { call, cause ->
             call.respond(
+                status = HttpStatusCode.InternalServerError,
                 message = ErrorResponse(
                     message = cause.message ?: "Unknown Error"
                 )

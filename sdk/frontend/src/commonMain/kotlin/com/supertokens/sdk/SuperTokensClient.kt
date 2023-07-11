@@ -14,7 +14,9 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.plugin
+import io.ktor.client.request.header
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -32,6 +34,8 @@ class SuperTokensClientConfig(
     var tokensRepository: TokensRepository? = null
 
     var userRepository: UserRepository? = null
+
+    var clientName: String = "MyMobileApp"
 
 }
 
@@ -75,6 +79,7 @@ class SuperTokensClient(
             defaultRequest {
                 url(config.apiBaseUrl)
                 contentType(ContentType.Application.Json)
+                header(HttpHeaders.Origin, config.clientName)
             }
         }).also {
             it.plugin(HttpSend).intercept(tokenHeaderInterceptor())

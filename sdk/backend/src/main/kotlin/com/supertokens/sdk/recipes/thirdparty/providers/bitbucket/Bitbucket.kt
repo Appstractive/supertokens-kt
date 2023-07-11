@@ -1,13 +1,15 @@
 package com.supertokens.sdk.recipes.thirdparty.providers.bitbucket
 
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
+import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
-import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
@@ -24,7 +26,7 @@ class BitbucketProvider(
     config: BitbucketConfig,
 ): OAuthProvider<BitbucketConfig>(superTokens, config) {
 
-    override val id = ID
+    override val id = ThirdPartyProvider.BITBUCKET
 
     override val authUrl = AUTH_URL
     override val tokenUrl = TOKEN_URL
@@ -50,7 +52,7 @@ class BitbucketProvider(
         }
 
         if (response.status != HttpStatusCode.OK) {
-            throw ThirdPartyProviderException(response.bodyAsText())
+            throw SuperTokensStatusException(SuperTokensStatus.WrongCredentialsError, response.bodyAsText())
         }
 
         val body = response.body<BitbucketGetUserResponse>()
@@ -81,8 +83,6 @@ class BitbucketProvider(
     }
 
     companion object {
-        const val ID = "bitbucket"
-
         const val AUTH_URL = "https://bitbucket.org/site/oauth2/authorize"
         const val TOKEN_URL = "https://bitbucket.org/site/oauth2/access_token"
         const val USER_URL = "https://api.bitbucket.org/2.0/user"

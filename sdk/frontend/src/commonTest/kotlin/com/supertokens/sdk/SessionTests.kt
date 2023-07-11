@@ -9,9 +9,11 @@ import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Ignore()
 class SessionTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {

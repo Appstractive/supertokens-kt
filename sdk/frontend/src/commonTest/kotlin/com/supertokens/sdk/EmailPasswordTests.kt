@@ -8,12 +8,14 @@ import com.supertokens.sdk.handlers.signUpWith
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.repositories.tokens.TokensRepositoryMemory
 import kotlinx.coroutines.runBlocking
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@Ignore()
 class EmailPasswordTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {

@@ -1,6 +1,7 @@
 package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.thirdparty.ThirdParty
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
@@ -8,11 +9,8 @@ import com.supertokens.sdk.recipes.thirdparty.provider
 import com.supertokens.sdk.recipes.thirdparty.providers.apple.Apple
 import com.supertokens.sdk.recipes.thirdparty.providers.apple.AppleProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.bitbucket.Bitbucket
-import com.supertokens.sdk.recipes.thirdparty.providers.bitbucket.BitbucketProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.facebook.Facebook
-import com.supertokens.sdk.recipes.thirdparty.providers.facebook.FacebookProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.github.Github
-import com.supertokens.sdk.recipes.thirdparty.providers.github.GithubProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.gitlab.GitLab
 import com.supertokens.sdk.recipes.thirdparty.providers.gitlab.GitLabProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.google.Google
@@ -82,7 +80,7 @@ class ThirdPartyRecipeTests {
     fun testGithub() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val github = recipe.getProviderById(GithubProvider.ID)
+        val github = recipe.getProviderById(ThirdPartyProvider.GITHUB)
         assertNotNull(github)
         assertEquals(
             "https://github.com/login/oauth/access_token?client_id=123456&client_secret=abcdef&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",
@@ -98,7 +96,7 @@ class ThirdPartyRecipeTests {
     fun testApple() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val apple = recipe.getProviderById(AppleProvider.ID) as? AppleProvider
+        val apple = recipe.getProviderById(ThirdPartyProvider.APPLE) as? AppleProvider
         assertNotNull(apple)
         assertEquals(
             "https://appleid.apple.com/auth/authorize?scope=email&client_id=123456&response_mode=form_post&response_type=code",
@@ -120,7 +118,7 @@ class ThirdPartyRecipeTests {
     fun testFacebook() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val facebook = recipe.getProviderById(FacebookProvider.ID)
+        val facebook = recipe.getProviderById(ThirdPartyProvider.FACEBOOK)
         assertNotNull(facebook)
         assertEquals(
             "https://graph.facebook.com/v9.0/oauth/access_token?client_id=123456&client_secret=abcdef&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",
@@ -136,7 +134,7 @@ class ThirdPartyRecipeTests {
     fun testBitbucket() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val bitbucket = recipe.getProviderById(BitbucketProvider.ID)
+        val bitbucket = recipe.getProviderById(ThirdPartyProvider.BITBUCKET)
         assertNotNull(bitbucket)
         assertEquals(
             "https://bitbucket.org/site/oauth2/access_token?client_id=123456&client_secret=abcdef&grant_type=authorization_code&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",
@@ -152,7 +150,7 @@ class ThirdPartyRecipeTests {
     fun testGitlab() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val gitlab = recipe.getProviderById(GitLabProvider.ID)
+        val gitlab = recipe.getProviderById(ThirdPartyProvider.GITLAB)
         assertNotNull(gitlab)
         assertEquals(
             "https://gitlab.com/oauth/token?client_id=123456&client_secret=abcdef&grant_type=authorization_code&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",
@@ -168,7 +166,7 @@ class ThirdPartyRecipeTests {
     fun testGoogle() {
         val recipe = superTokens.getRecipe<ThirdPartyRecipe>()
 
-        val google = recipe.getProviderById(GoogleProvider.ID)
+        val google = recipe.getProviderById(ThirdPartyProvider.GOOGLE)
         assertNotNull(google)
         assertEquals(
             "https://oauth2.googleapis.com/token?client_id=123456&client_secret=abcdef&grant_type=authorization_code&code=auth&redirect_uri=redirect%3A%2F%2Fsomewhere",

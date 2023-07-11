@@ -2,6 +2,9 @@ package com.supertokens.sdk.common
 
 object Routes {
 
+    const val EMAIL_EXISTS = "/signup/email/exists"
+    const val PHONE_NUMBER_EXISTS = "/signup/phonenumber/exists"
+
     object EmailPassword {
 
         const val SIGN_IN = "/signin"

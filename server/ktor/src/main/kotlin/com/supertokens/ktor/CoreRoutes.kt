@@ -2,6 +2,7 @@ package com.supertokens.ktor
 
 import com.supertokens.ktor.recipes.emailpassword.isEmailPasswordEnabled
 import com.supertokens.ktor.recipes.passwordless.passwordlessEnabled
+import com.supertokens.sdk.common.Routes
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 
@@ -10,7 +11,7 @@ fun Route.coreRoutes(
 ) {
 
     if(passwordlessEnabled) {
-        get("/signup/phonenumber/exists") {
+        get(Routes.PHONE_NUMBER_EXISTS) {
             with(handler) {
                 phoneNumberExists()
             }
@@ -18,7 +19,7 @@ fun Route.coreRoutes(
     }
 
     if(passwordlessEnabled || isEmailPasswordEnabled) {
-        get("/signup/email/exists") {
+        get(Routes.EMAIL_EXISTS) {
             with(handler) {
                 emailExists()
             }

@@ -5,7 +5,6 @@ import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.models.PasswordlessMode
-import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequest
 import com.supertokens.sdk.common.requests.StartPasswordlessSignInUpRequest
 import com.supertokens.sdk.common.responses.SignInUpResponse
@@ -15,6 +14,7 @@ import com.supertokens.sdk.handlers.SignInProvider
 import com.supertokens.sdk.handlers.SignInProviderConfig
 import com.supertokens.sdk.handlers.SignUpProvider
 import com.supertokens.sdk.handlers.SignupProviderConfig
+import com.supertokens.sdk.models.SignInData
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -25,24 +25,12 @@ data class PasswordlessSignUpData(
     val flowType: PasswordlessMode,
 )
 
-data class PasswordlessSignInData(
-    val createdNewUser: Boolean,
-    val user: User,
-)
-
-object Passwordless : SignInProvider<Passwordless.SignInConfig, PasswordlessSignInData>, SignUpProvider<Passwordless.SignUpConfig, PasswordlessSignUpData> {
+object Passwordless : SignUpProvider<Passwordless.SignUpConfig, PasswordlessSignUpData> {
 
     data class SignUpConfig(
         var email: String? = null,
         var phoneNumber: String? = null
     ) : SignupProviderConfig
-
-    data class SignInConfig(
-        var preAuthSessionId: String = "",
-        var linkCode: String? = null,
-        var deviceId: String? = null,
-        var userInputCode: String? = null,
-    ) : SignInProviderConfig
 
     override suspend fun signUp(superTokensClient: SuperTokensClient, configure: SignUpConfig.() -> Unit): PasswordlessSignUpData {
         val config = SignUpConfig().apply(configure)
@@ -70,7 +58,16 @@ object Passwordless : SignInProvider<Passwordless.SignInConfig, PasswordlessSign
         }
     }
 
-    override suspend fun signIn(superTokensClient: SuperTokensClient, configure: SignInConfig.() -> Unit): PasswordlessSignInData {
+}
+
+object PasswordlessLinkCode : SignInProvider<PasswordlessLinkCode.SignInConfig, SignInData> {
+
+    data class SignInConfig(
+        var preAuthSessionId: String = "",
+        var linkCode: String = "",
+    ) : SignInProviderConfig
+
+    override suspend fun signIn(superTokensClient: SuperTokensClient, configure: SignInConfig.() -> Unit): SignInData {
         val config = SignInConfig().apply(configure)
 
         val response = superTokensClient.apiClient.post(Routes.Passwordless.SIGNUP_CODE_CONSUME) {
@@ -78,6 +75,40 @@ object Passwordless : SignInProvider<Passwordless.SignInConfig, PasswordlessSign
                 ConsumePasswordlessCodeRequest(
                     preAuthSessionId = config.preAuthSessionId,
                     linkCode = config.linkCode,
+                )
+            )
+        }
+
+        val body = response.body<SignInUpResponse>()
+
+        return when(val status = body.status.toStatus()) {
+            SuperTokensStatus.OK -> {
+                SignInData(
+                    user = checkNotNull(body.user),
+                    createdNewUser = checkNotNull(body.createdNewUser),
+                )
+            }
+            else -> throw SuperTokensStatusException(status)
+        }
+    }
+
+}
+
+object PasswordlessInputCode : SignInProvider<PasswordlessInputCode.SignInConfig, SignInData> {
+
+    data class SignInConfig(
+        var preAuthSessionId: String = "",
+        var deviceId: String = "",
+        var userInputCode: String = "",
+    ) : SignInProviderConfig
+
+    override suspend fun signIn(superTokensClient: SuperTokensClient, configure: SignInConfig.() -> Unit): SignInData {
+        val config = SignInConfig().apply(configure)
+
+        val response = superTokensClient.apiClient.post(Routes.Passwordless.SIGNUP_CODE_CONSUME) {
+            setBody(
+                ConsumePasswordlessCodeRequest(
+                    preAuthSessionId = config.preAuthSessionId,
                     deviceId = config.deviceId,
                     userInputCode = config.userInputCode,
                 )
@@ -88,7 +119,7 @@ object Passwordless : SignInProvider<Passwordless.SignInConfig, PasswordlessSign
 
         return when(val status = body.status.toStatus()) {
             SuperTokensStatus.OK -> {
-                PasswordlessSignInData(
+                SignInData(
                     user = checkNotNull(body.user),
                     createdNewUser = checkNotNull(body.createdNewUser),
                 )
@@ -96,5 +127,6 @@ object Passwordless : SignInProvider<Passwordless.SignInConfig, PasswordlessSign
             else -> throw SuperTokensStatusException(status)
         }
     }
+
 
 }

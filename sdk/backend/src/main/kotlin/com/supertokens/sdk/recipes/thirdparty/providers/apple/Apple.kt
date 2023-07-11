@@ -1,6 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers.apple
 
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
@@ -45,7 +46,7 @@ class AppleProvider(
     config: AppleConfig,
 ) : OAuthProvider<AppleConfig>(superTokens, config) {
 
-    override val id = ID
+    override val id = ThirdPartyProvider.APPLE
     override val authUrl = AUTH_URL
     override val tokenUrl = TOKEN_URL
     override val defaultScopes = listOf(
@@ -88,7 +89,6 @@ class AppleProvider(
     }
 
     companion object {
-        const val ID = "apple"
 
         const val AUTH_URL = "https://appleid.apple.com/auth/authorize"
         const val TOKEN_URL = "https://appleid.apple.com/auth/token"

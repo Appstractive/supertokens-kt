@@ -16,31 +16,30 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.ktor.http.path
 import kotlinx.serialization.json.JsonObject
-import java.net.URLEncoder
 
 internal class CoreHandler {
 
     suspend fun SuperTokens.getUserById(userId: String): User {
 
-        val response = client.get("${PATH_GET_USER}?userId=${
-            withContext(Dispatchers.IO) {
-                URLEncoder.encode(userId, "UTF-8")
+        val response = client.get {
+            url {
+                path(PATH_GET_USER)
+                parameters.append("userId", userId)
             }
-        }")
+        }
 
         return response.parseUser()
     }
 
     suspend fun SuperTokens.getUserByEMail(email: String, recipeId: String = EmailPasswordRecipe.ID): User {
 
-        val response = client.get("${PATH_GET_USER}?email=${
-            withContext(Dispatchers.IO) {
-                URLEncoder.encode(email, "UTF-8")
+        val response = client.get {
+            url {
+                path(PATH_GET_USER)
+                parameters.append("email", email)
             }
-        }") {
             header(Constants.HEADER_RECIPE_ID, recipeId)
         }
 
@@ -49,11 +48,11 @@ internal class CoreHandler {
 
     suspend fun SuperTokens.getUserByPhoneNumber(phoneNumber: String, recipeId: String = PasswordlessRecipe.ID): User {
 
-        val response = client.get("${PATH_GET_USER}?phoneNumber=${
-            withContext(Dispatchers.IO) {
-                URLEncoder.encode(phoneNumber, "UTF-8")
+        val response = client.get {
+            url {
+                path(PATH_GET_USER)
+                parameters.append("phoneNumber", phoneNumber)
             }
-        }") {
             header(Constants.HEADER_RECIPE_ID, recipeId)
         }
 

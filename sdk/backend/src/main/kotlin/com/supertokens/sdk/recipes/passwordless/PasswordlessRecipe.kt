@@ -26,9 +26,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.net.URLEncoder
+import io.ktor.http.path
 
 class PasswordlessRecipeConfig : RecipeConfig {
 
@@ -251,11 +249,11 @@ class PasswordlessRecipe(
      * Lists all active passwordless codes of the user
      */
     suspend fun getCodesByEmail(email: String): List<PasswordlessDevices> {
-        val response = superTokens.client.get("$PATH_GET_CODES?email=${
-            withContext(Dispatchers.IO) {
-                URLEncoder.encode(email, "UTF-8")
+        val response = superTokens.client.get {
+            url {
+                path(PATH_GET_CODES)
+                parameters.append("email", email)
             }
-        }") {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -268,11 +266,11 @@ class PasswordlessRecipe(
      * Lists all active passwordless codes of the user
      */
     suspend fun getCodesByDeviceId(deviceId: String): List<PasswordlessDevices> {
-        val response = superTokens.client.get("$PATH_GET_CODES?deviceId=${
-            withContext(Dispatchers.IO) {
-                URLEncoder.encode(deviceId, "UTF-8")
+        val response = superTokens.client.get {
+            url {
+                path(PATH_GET_CODES)
+                parameters.append("deviceId", deviceId)
             }
-        }") {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -285,11 +283,11 @@ class PasswordlessRecipe(
      * Lists all active passwordless codes of the user
      */
     suspend fun getCodesByPhoneNumber(phoneNumber: String): List<PasswordlessDevices> {
-        val response = superTokens.client.get("$PATH_GET_CODES?phoneNumber=${
-            withContext(Dispatchers.IO) {
-                URLEncoder.encode(phoneNumber, "UTF-8")
+        val response = superTokens.client.get {
+            url {
+                path(PATH_GET_CODES)
+                parameters.append("phoneNumber", phoneNumber)
             }
-        }") {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -302,11 +300,11 @@ class PasswordlessRecipe(
      * Lists all active passwordless codes of the user
      */
     suspend fun getCodesByPreAuthSessionId(preAuthSessionId: String): List<PasswordlessDevices> {
-        val response = superTokens.client.get("$PATH_GET_CODES?preAuthSessionId=${
-            withContext(Dispatchers.IO) {
-                URLEncoder.encode(preAuthSessionId, "UTF-8")
+        val response = superTokens.client.get {
+            url {
+                path(PATH_GET_CODES)
+                parameters.append("preAuthSessionId", preAuthSessionId)
             }
-        }") {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 

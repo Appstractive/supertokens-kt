@@ -1,13 +1,15 @@
 package com.supertokens.sdk.recipes.thirdparty.providers.gitlab
 
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
+import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyEmail
-import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyProviderException
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
@@ -27,7 +29,7 @@ class GitLabProvider(
     config: GitLabConfig,
 ): OAuthProvider<GitLabConfig>(superTokens, config) {
 
-    override val id = ID
+    override val id = ThirdPartyProvider.GITLAB
     override val authUrl = "${config.baseUrl}$AUTH_PATH"
     override val tokenUrl = "${config.baseUrl}$TOKEN_PATH"
     override val defaultScopes = listOf(
@@ -50,7 +52,7 @@ class GitLabProvider(
         }
 
         if (response.status != HttpStatusCode.OK) {
-            throw ThirdPartyProviderException(response.bodyAsText())
+            throw SuperTokensStatusException(SuperTokensStatus.WrongCredentialsError, response.bodyAsText())
         }
 
         val body = response.body<GitLabGetUserResponse>()
@@ -67,8 +69,6 @@ class GitLabProvider(
     }
 
     companion object {
-        const val ID = "gitlab"
-
         const val AUTH_PATH = "/oauth/authorize"
         const val TOKEN_PATH = "/oauth/token"
         const val USER_PATH = "/api/v4/user"

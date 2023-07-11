@@ -9,3 +9,14 @@ const val COOKIE_REFRESH_TOKEN = "sRefreshToken"
 
 const val FORM_FIELD_EMAIL_ID = "email"
 const val FORM_FIELD_PASSWORD_ID = "password"
+
+object ThirdPartyProvider {
+
+    const val APPLE = "apple"
+    const val BITBUCKET = "bitbucket"
+    const val FACEBOOK = "facebook"
+    const val GITHUB = "github"
+    const val GITLAB = "gitlab"
+    const val GOOGLE = "google"
+
+}

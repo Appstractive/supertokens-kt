@@ -6,6 +6,7 @@ import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.NotFoundException
 import com.supertokens.ktor.utils.fronend
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.common.responses.AuthorizationUrlResponse
 import com.supertokens.sdk.recipes.thirdparty.providers.Provider
@@ -71,7 +72,7 @@ open class ThirdPartyHandler {
     }
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.appleAuthCallback() {
-        val provider = thirdParty.getProviderById(AppleProvider.ID) ?: throw NotFoundException()
+        val provider = thirdParty.getProviderById(ThirdPartyProvider.APPLE) ?: throw NotFoundException()
         val formParameters = call.receiveParameters()
         val code = formParameters["code"] ?: throw BadRequestException(message = "Form Param 'code' is required")
         val state = formParameters["state"]
