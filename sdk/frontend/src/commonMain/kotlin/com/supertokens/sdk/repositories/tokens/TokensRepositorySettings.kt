@@ -2,10 +2,11 @@ package com.supertokens.sdk.repositories.tokens
 
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
+import com.supertokens.sdk.repositories.user.UserRepositorySettings
 
 class TokensRepositorySettings(
     private val settings: Settings,
-): TokensRepository {
+): TokensRepository() {
 
     // AccessToken is always in memory, because it is short lived anyway and will need to be refreshed on app start.
     private var accessToken: String? = null

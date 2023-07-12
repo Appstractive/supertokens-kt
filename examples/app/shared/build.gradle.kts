@@ -3,14 +3,17 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
     id("org.jetbrains.compose")
+    kotlin("plugin.serialization") version "1.8.20"
 }
+
+val voyagerVersion = "1.0.0-rc05"
 
 kotlin {
     android()
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    //iosX64()
+    //iosArm64()
+    //iosSimulatorArm64()
 
     cocoapods {
         version = "1.0.0"
@@ -28,11 +31,22 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+
+                implementation("com.appstractive:supertokens-sdk-frontend:1.2.0")
+
+                implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
+
+                implementation("io.fusionauth:fusionauth-jwt:5.2.4")
             }
         }
         val androidMain by getting {
@@ -42,7 +56,7 @@ kotlin {
                 api("androidx.core:core-ktx:1.9.0")
             }
         }
-        val iosX64Main by getting
+        /*val iosX64Main by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
@@ -50,7 +64,7 @@ kotlin {
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
-        }
+        }*/
     }
 }
 
@@ -64,7 +78,6 @@ android {
 
     defaultConfig {
         minSdk = (findProperty("android.minSdk") as String).toInt()
-        targetSdk = (findProperty("android.targetSdk") as String).toInt()
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

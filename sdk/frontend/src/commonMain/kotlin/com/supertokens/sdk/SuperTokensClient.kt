@@ -4,7 +4,10 @@ import com.russhwolf.settings.Settings
 import com.supertokens.sdk.recipes.sessions.tokenHeaderInterceptor
 import com.supertokens.sdk.repositories.tokens.TokensRepositorySettings
 import com.supertokens.sdk.repositories.tokens.TokensRepository
+import com.supertokens.sdk.repositories.tokens.getRefreshToken
 import com.supertokens.sdk.repositories.user.UserRepository
+import com.supertokens.sdk.repositories.user.UserRepositorySettings
+import com.supertokens.sdk.usercases.TokensUseCase
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.auth.Auth
@@ -57,7 +60,7 @@ class SuperTokensClient(
             }
 
             install(HttpCookies) {
-                storage = tokensRepository
+                storage = tokensUseCase.cookies
             }
 
             install(Auth) {
@@ -69,7 +72,7 @@ class SuperTokensClient(
                     }
 
                     refreshTokens {
-                        with(tokensRepository) {
+                        with(tokensUseCase) {
                             refreshTokens()
                         }
                     }
@@ -87,6 +90,16 @@ class SuperTokensClient(
     }
 
     val tokensRepository = config.tokensRepository ?: TokensRepositorySettings(getDefaultSettings())
+    val userRepository = config.userRepository ?: UserRepositorySettings(getDefaultSettings())
+
+    val tokensUseCase by lazy {
+        TokensUseCase(
+            tokensRepository = tokensRepository,
+            userRepository = userRepository
+        )
+    }
+
+    suspend fun isLoggedIn(): Boolean = getRefreshToken() != null
 
 }
 

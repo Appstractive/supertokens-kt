@@ -32,7 +32,7 @@ version = "1.0.4"
 group = "com.appstractive"
 
 dependencies {
-    implementation("com.appstractive:supertokens-sdk-backend-ktor:1.1.0")
+    implementation("com.appstractive:supertokens-sdk-backend-ktor:1.2.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
@@ -47,7 +47,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("io.supertokens.ApplicationKt")
+    mainClass.set("com.appstractive.ApplicationKt")
 }
 
 tasks.withType<KotlinCompile> {

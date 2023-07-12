@@ -1,6 +1,6 @@
 package com.supertokens.sdk.repositories.tokens
 
-class TokensRepositoryMemory: TokensRepository {
+class TokensRepositoryMemory: TokensRepository() {
 
     private var accessToken: String? = null
     private var refreshToken: String? = null

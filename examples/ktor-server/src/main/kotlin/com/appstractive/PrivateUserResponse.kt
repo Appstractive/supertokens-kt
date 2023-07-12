@@ -1,4 +1,4 @@
-package io.supertokens
+package com.appstractive
 
 import kotlinx.serialization.Serializable
 

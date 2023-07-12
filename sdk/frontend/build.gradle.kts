@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.appstractive"
-version = "1.1.0"
+version = "1.2.0"
 
 val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
 
@@ -20,7 +20,9 @@ val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
 }
 
 kotlin {
-    android()
+    android {
+        publishLibraryVariants("release", "debug")
+    }
     jvm("jvm") {
         compilations.all {
             kotlinOptions.jvmTarget = "17"
@@ -119,7 +121,13 @@ kotlin {
 
             withType<MavenPublication> {
                 artifactId = "supertokens-sdk-frontend"
-                if (name != "kotlinMultiplatform") {
+                if(name == "androidRelease") {
+                    afterEvaluate { artifactId = "supertokens-sdk-frontend-android" }
+                }
+                else if(name == "androidDebug") {
+                    afterEvaluate { artifactId = "supertokens-sdk-frontend-android-debug" }
+                }
+                else if (name != "kotlinMultiplatform") {
                     artifactId = "$artifactId-$name"
                 }
 
@@ -171,6 +179,7 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     namespace = "com.supertokens.sdk"
+
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()

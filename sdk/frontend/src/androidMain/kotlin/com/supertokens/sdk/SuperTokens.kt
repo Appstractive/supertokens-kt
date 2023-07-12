@@ -8,10 +8,10 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
 
 actual fun getDefaultSettings(): Settings {
-    return defaultSettings
+    return settings
 }
 
-lateinit var defaultSettings: Settings
+lateinit var settings: Settings
 
 class DefaultSettingsInitializer : Initializer<Settings> {
     override fun create(context: Context): Settings {
@@ -26,7 +26,7 @@ class DefaultSettingsInitializer : Initializer<Settings> {
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             ), false
         ).also {
-            defaultSettings = it
+            settings = it
         }
     }
 

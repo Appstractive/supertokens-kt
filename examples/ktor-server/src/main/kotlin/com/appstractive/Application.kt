@@ -1,4 +1,4 @@
-package io.supertokens
+package com.appstractive
 
 import com.supertokens.ktor.SuperTokens
 import com.supertokens.ktor.plugins.AuthenticatedUser

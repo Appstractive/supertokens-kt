@@ -2,6 +2,7 @@ package com.supertokens.sdk.recipes.emailverification
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.CLAIM_EMAIL_VERIFIED
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.responses.StatusResponse
@@ -63,7 +64,7 @@ class EmailVerificationRecipe(
 
     override suspend fun getExtraJwtData(user: User): Map<String, Any?> {
         return buildMap {
-            set("st-ev", isVerified(user.id, user.email))
+            set(CLAIM_EMAIL_VERIFIED, isVerified(user.id, user.email))
         }
     }
 

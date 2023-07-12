@@ -1,4 +1,4 @@
-package io.supertokens
+package com.appstractive
 
 import com.supertokens.ktor.recipes.emailpassword.EmailPasswordHandler
 import io.ktor.server.application.ApplicationCall

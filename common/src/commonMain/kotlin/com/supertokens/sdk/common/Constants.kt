@@ -10,6 +10,9 @@ const val COOKIE_REFRESH_TOKEN = "sRefreshToken"
 const val FORM_FIELD_EMAIL_ID = "email"
 const val FORM_FIELD_PASSWORD_ID = "password"
 
+const val CLAIM_USER_ID = "sub"
+const val CLAIM_EMAIL_VERIFIED = "st-ev"
+
 object ThirdPartyProvider {
 
     const val APPLE = "apple"
