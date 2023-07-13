@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class VerifyEmailResponse(
     override val status: String = SuperTokensStatus.OK.value,
-    val isVerified: Boolean,
+    val isVerified: Boolean?,
 ): BaseResponse
