@@ -21,6 +21,9 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.appstractive.screens.auth.emailpassword.EmailPassword
+import com.appstractive.screens.auth.passwordless.Passwordless
+import com.appstractive.screens.auth.thirdparty.ThirdParty
 
 object AuthScreen : Screen {
 
@@ -96,7 +99,7 @@ object PasswordlessTab : Tab {
 
     @Composable
     override fun Content() {
-        // ...
+        Passwordless()
     }
 }
 
@@ -116,6 +119,6 @@ object ThirdPartyTab : Tab {
 
     @Composable
     override fun Content() {
-        // ...
+        ThirdParty()
     }
 }

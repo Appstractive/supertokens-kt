@@ -39,6 +39,11 @@ object HomeScreen : Screen {
                 style = TextStyle(fontSize = 32.sp),
             )
 
+            Text(
+                text = "Private API response: ${viewModel.privateResponse.value ?: "LOADING"}",
+                style = TextStyle(fontSize = 18.sp),
+            )
+
             Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                 Button(
                     enabled = !viewModel.isLoading.value,

@@ -1,4 +1,4 @@
-package com.appstractive.screens.auth
+package com.appstractive.screens.auth.emailpassword
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -98,8 +98,8 @@ fun SignIn() {
 
 @Composable
 fun SignUp() {
-    val viewModel = remember { EmailPasswordSignUpViewModel() }
     val scope = rememberCoroutineScope()
+    val viewModel = remember { EmailPasswordSignUpViewModel(scope) }
     val navigator = LocalNavigator.currentOrThrow
 
     Text(
@@ -132,9 +132,18 @@ fun SignUp() {
         onValueChange = viewModel::confirmPasswordChanged,
     )
 
+    val error = viewModel.error.value
+    if(error != null) {
+        Text(
+            text = error,
+            style = TextStyle(color = Color.Red),
+        )
+    }
+
     Spacer(modifier = Modifier.height(20.dp))
     Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
         Button(
+            enabled = !viewModel.isLoading.value,
             onClick = {
                 scope.launch {
                     if(viewModel.submit()) {

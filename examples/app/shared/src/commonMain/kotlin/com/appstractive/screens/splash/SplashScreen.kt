@@ -19,7 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SplashScreen(
-    private val apiClient: SuperTokensClient = dependencies.apiClient,
+    private val client: SuperTokensClient = dependencies.superTokensClient,
 ) : Screen {
     @Composable
     override fun Content() {
@@ -31,7 +31,7 @@ class SplashScreen(
             scope.launch {
                 delay(500)
 
-                if(apiClient.isLoggedIn()) {
+                if(client.isLoggedIn()) {
                     navigator.replace(HomeScreen)
                 }
                 else {

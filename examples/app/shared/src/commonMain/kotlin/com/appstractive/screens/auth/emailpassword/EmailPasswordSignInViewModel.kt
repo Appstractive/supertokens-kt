@@ -1,4 +1,4 @@
-package com.appstractive.screens.auth
+package com.appstractive.screens.auth.emailpassword
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
@@ -13,12 +13,11 @@ import kotlinx.coroutines.withContext
 
 class EmailPasswordSignInViewModel(
     scope: CoroutineScope,
-    private val apiClient: SuperTokensClient = dependencies.apiClient,
+    private val client: SuperTokensClient = dependencies.superTokensClient,
 ): ViewModel(scope) {
 
     val email = mutableStateOf(TextFieldValue("test@test.de"))
     val password = mutableStateOf(TextFieldValue("a1234567"))
-    val error = mutableStateOf<String?>(null)
 
     fun emailChanged(value: TextFieldValue) {
         email.value = value
@@ -31,8 +30,8 @@ class EmailPasswordSignInViewModel(
     suspend fun submit(): Boolean {
         return withContext(Dispatchers.IO) {
             isLoading.value = true
-            val result = kotlin.runCatching {
-                apiClient.signInWith(EmailPassword) {
+            val result = runCatching {
+                client.signInWith(EmailPassword) {
                     email = this@EmailPasswordSignInViewModel.email.value.text
                     password = this@EmailPasswordSignInViewModel.password.value.text
                 }

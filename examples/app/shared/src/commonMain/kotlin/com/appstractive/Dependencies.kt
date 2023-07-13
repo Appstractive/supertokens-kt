@@ -4,11 +4,11 @@ import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.superTokensClient
 
 interface Dependencies {
-    val apiClient: SuperTokensClient
+    val superTokensClient: SuperTokensClient
 }
 
 var dependencies = object: Dependencies {
-    override val apiClient = superTokensClient("https://auth.appstractive.com") {
+    override val superTokensClient = superTokensClient("https://auth.appstractive.com") {
 
     }
 }

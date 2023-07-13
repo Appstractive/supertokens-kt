@@ -9,5 +9,6 @@ abstract class ViewModel(
 ): ScreenModel {
 
     val isLoading = mutableStateOf(false)
+    val error = mutableStateOf<String?>(null)
 
 }
