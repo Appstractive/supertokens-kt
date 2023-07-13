@@ -82,8 +82,8 @@ fun Application.module() {
                     ),
                     ServerConfig(
                         scheme = "my-app",
-                        host = "callbacks",
-                        path = "",
+                        host = "MyMobileApp",
+                        path = "/callbacks",
                     ),
                 ),
             ),
