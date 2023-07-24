@@ -41,7 +41,7 @@ kotlin {
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
 
-                implementation("com.appstractive:supertokens-sdk-frontend:1.2.0")
+                implementation("com.appstractive:supertokens-sdk-frontend:1.2.1")
 
                 implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
                 implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
