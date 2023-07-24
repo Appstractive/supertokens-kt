@@ -39,7 +39,7 @@ fun Route.sessionRoutes(
         call.respond(JsonObject(
             mapOf(
                 "issuer" to JsonPrimitive(sessions.issuer),
-                "jwks_uri" to JsonPrimitive("${superTokens.appConfig.api.scheme}://${superTokens.appConfig.api.host}${superTokens.appConfig.api.path}/jwt/jwks.json"),
+                "jwks_uri" to JsonPrimitive("${superTokens.appConfig.api.scheme}://${superTokens.appConfig.api.host}${superTokens.appConfig.api.path}jwt/jwks.json"),
             )
         ))
     }
