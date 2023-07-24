@@ -34,11 +34,10 @@ kotlin {
     iosSimulatorArm64()
 
     cocoapods {
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
-        version = "1.0"
+        summary = "SuperTokens frontend SDK"
+        homepage = "https://github.com/Appstractive/supertokens-kt"
+        version = properties["version"].toString()
         ios.deploymentTarget = "14.1"
-        podfile = project.file("../ios/Podfile")
         framework {
             baseName = "frontend_sdk"
             isStatic = true
@@ -135,7 +134,7 @@ kotlin {
                 pom {
                     name.set("SuperTokens-SDK-Frontend")
                     description.set("SuperTokens frontend SDK")
-                    url.set("https://github.com/Appstractive/supertokens-kotlin")
+                    url.set("https://github.com/Appstractive/supertokens-kt")
                     licenses {
                         license {
                             name.set("Apache License 2.0")
@@ -144,11 +143,11 @@ kotlin {
                     }
                     issueManagement {
                         system.set("Github")
-                        url.set("https://github.com/Appstractive/supertokens-kotlin/issues")
+                        url.set("https://github.com/Appstractive/supertokens-kt/issues")
                     }
                     scm {
-                        connection.set("https://github.com/Appstractive/supertokens-kotlin.git")
-                        url.set("https://github.com/Appstractive/supertokens-kotlin")
+                        connection.set("https://github.com/Appstractive/supertokens-kt.git")
+                        url.set("https://github.com/Appstractive/supertokens-kt")
                     }
                     developers {
                         developer {

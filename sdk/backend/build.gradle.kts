@@ -70,7 +70,7 @@ publishing {
             pom {
                 name.set("SuperTokens-SDK-Backend")
                 description.set("SuperTokens backend SDK")
-                url.set("https://github.com/Appstractive/supertokens-kotlin")
+                url.set("https://github.com/Appstractive/supertokens-kt")
                 licenses {
                     license {
                         name.set("Apache License 2.0")
@@ -79,11 +79,11 @@ publishing {
                 }
                 issueManagement {
                     system.set("Github")
-                    url.set("https://github.com/Appstractive/supertokens-kotlin/issues")
+                    url.set("https://github.com/Appstractive/supertokens-kt/issues")
                 }
                 scm {
-                    connection.set("https://github.com/Appstractive/supertokens-kotlin.git")
-                    url.set("https://github.com/Appstractive/supertokens-kotlin")
+                    connection.set("https://github.com/Appstractive/supertokens-kt.git")
+                    url.set("https://github.com/Appstractive/supertokens-kt")
                 }
                 developers {
                     developer {

@@ -35,11 +35,10 @@ kotlin {
     linuxArm64("linuxArm64")
 
     cocoapods {
-        summary = "Some description for the Shared Module"
+        summary = "SuperTokens common classes for frontend and backend SDKs"
         homepage = "Link to the Shared Module homepage"
-        version = "1.0"
+        version = properties["version"].toString()
         ios.deploymentTarget = "14.1"
-        podfile = project.file("../ios/Podfile")
         framework {
             baseName = "common"
             isStatic = true
@@ -96,7 +95,7 @@ kotlin {
                 pom {
                     name.set("SuperTokens-SDK-Common")
                     description.set("SuperTokens common classes for frontend and backend SDKs")
-                    url.set("https://github.com/Appstractive/supertokens-kotlin")
+                    url.set("https://github.com/Appstractive/supertokens-kt")
                     licenses {
                         license {
                             name.set("Apache License 2.0")
@@ -105,11 +104,11 @@ kotlin {
                     }
                     issueManagement {
                         system.set("Github")
-                        url.set("https://github.com/Appstractive/supertokens-kotlin/issues")
+                        url.set("https://github.com/Appstractive/supertokens-kt/issues")
                     }
                     scm {
-                        connection.set("https://github.com/Appstractive/supertokens-kotlin.git")
-                        url.set("https://github.com/Appstractive/supertokens-kotlin")
+                        connection.set("https://github.com/Appstractive/supertokens-kt.git")
+                        url.set("https://github.com/Appstractive/supertokens-kt")
                     }
                     developers {
                         developer {
