@@ -38,7 +38,7 @@ class UserMetaDataRecipe(
         }
 
         return response.parse<UserMetaDataResponse, Map<String, Any?>> {
-            it.metadata.extractedContent
+            it.metadata?.extractedContent ?: emptyMap()
         }
     }
 
@@ -63,7 +63,7 @@ class UserMetaDataRecipe(
         }
 
         return response.parse<UserMetaDataResponse, Map<String, Any?>> {
-            it.metadata.extractedContent
+            it.metadata?.extractedContent ?: emptyMap()
         }
     }
 

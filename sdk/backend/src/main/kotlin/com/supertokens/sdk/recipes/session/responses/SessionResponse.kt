@@ -8,5 +8,5 @@ import kotlinx.serialization.json.JsonObject
 data class SessionResponse(
     val handle: String,
     val userId: String,
-    val userDataInJWT: JsonObject?,
+    val userDataInJWT: JsonObject? = null,
 )

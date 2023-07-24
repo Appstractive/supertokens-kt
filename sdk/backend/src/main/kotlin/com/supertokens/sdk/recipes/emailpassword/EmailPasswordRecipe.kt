@@ -107,7 +107,7 @@ class EmailPasswordRecipe(
         }
 
         return response.parse<CreateResetPasswordTokenResponse, String> {
-            it.token
+            checkNotNull(it.token)
         }
     }
 
@@ -132,7 +132,7 @@ class EmailPasswordRecipe(
         }
 
         return response.parse<ResetPasswordWithTokenResponse, String> {
-            it.userId
+            checkNotNull(it.userId)
         }
     }
 

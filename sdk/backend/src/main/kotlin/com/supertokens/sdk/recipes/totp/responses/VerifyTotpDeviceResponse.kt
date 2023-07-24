@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class VerifyTotpDeviceResponse(
     override val status: String,
-    val wasAlreadyVerified: Boolean?,
+    val wasAlreadyVerified: Boolean? = null,
 ): BaseResponse

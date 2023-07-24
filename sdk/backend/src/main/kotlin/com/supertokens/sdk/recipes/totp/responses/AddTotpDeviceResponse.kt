@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AddTotpDeviceResponse(
     override val status: String,
-    val secret: String?,
+    val secret: String? = null,
 ): BaseResponse

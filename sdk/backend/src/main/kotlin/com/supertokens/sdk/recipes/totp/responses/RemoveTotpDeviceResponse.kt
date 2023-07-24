@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RemoveTotpDeviceResponse(
     override val status: String,
-    val didDeviceExist: Boolean?,
+    val didDeviceExist: Boolean? = null,
 ): BaseResponse

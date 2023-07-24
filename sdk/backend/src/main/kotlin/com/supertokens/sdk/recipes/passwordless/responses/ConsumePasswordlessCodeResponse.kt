@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ConsumePasswordlessCodeResponse(
     override val status: String,
-    val createdNewUser: Boolean?,
-    val user: User?,
-    val failedCodeInputAttemptCount: Int?,
-    val maximumCodeInputAttempts: Int?,
+    val createdNewUser: Boolean? = null,
+    val user: User? = null,
+    val failedCodeInputAttemptCount: Int? = null,
+    val maximumCodeInputAttempts: Int? = null,
 ): BaseResponse

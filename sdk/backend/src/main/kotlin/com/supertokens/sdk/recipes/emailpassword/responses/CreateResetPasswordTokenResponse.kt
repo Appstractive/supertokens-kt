@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateResetPasswordTokenResponse(
     override val status: String,
-    val token: String,
+    val token: String?,
 ): BaseResponse

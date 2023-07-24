@@ -127,8 +127,8 @@ class EmailVerificationRecipe(
 
         return response.parse<VerifyEmailTokenResponse, VerifyEmailTokenData> {
             VerifyEmailTokenData(
-                userId = it.userId,
-                email = it.email,
+                userId = checkNotNull(it.userId),
+                email = checkNotNull(it.email),
             )
         }.also {
             superTokens._events.tryEmit(SuperTokensEvent.UserEmailVerified(it.userId, it.email))

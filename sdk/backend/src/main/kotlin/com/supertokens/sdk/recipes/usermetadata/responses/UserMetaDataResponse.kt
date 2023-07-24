@@ -7,5 +7,5 @@ import kotlinx.serialization.json.JsonObject
 @Serializable
 data class UserMetaDataResponse(
     override val status: String,
-    val metadata: JsonObject,
+    val metadata: JsonObject? = null,
 ): BaseResponse

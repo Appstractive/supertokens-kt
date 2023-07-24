@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class VerifyEmailTokenResponse(
     override val status: String,
-    val userId: String,
-    val email: String,
+    val userId: String? = null,
+    val email: String? = null,
 ): BaseResponse

@@ -7,10 +7,10 @@ import kotlinx.serialization.json.JsonObject
 @Serializable
 data class GetSessionResponse(
     override val status: String,
-    val userDataInDatabase: JsonObject?,
-    val userDataInJWT: JsonObject?,
-    val userId: String,
-    val expiry: Long,
-    val timeCreated: Long,
-    val sessionHandle: String,
+    val userDataInDatabase: JsonObject? = null,
+    val userDataInJWT: JsonObject? = null,
+    val userId: String? = null,
+    val expiry: Long? = null,
+    val timeCreated: Long? = null,
+    val sessionHandle: String? = null,
 ): BaseResponse

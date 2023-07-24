@@ -172,9 +172,9 @@ class SessionRecipe(
 
         return response.parse<GetSessionResponse, GetSessionData> {
             GetSessionData(
-                userId = it.userId,
-                expiry = it.expiry,
-                timeCreated = it.timeCreated,
+                userId = checkNotNull(it.userId),
+                expiry = checkNotNull(it.expiry),
+                timeCreated = checkNotNull(it.timeCreated),
                 sessionHandle = sessionHandle,
                 userDataInDatabase = it.userDataInDatabase?.entries?.associate { entry ->
                     entry.key to entry.value.extractedContent
