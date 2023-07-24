@@ -32,18 +32,18 @@ version = "1.0.4"
 group = "com.appstractive"
 
 dependencies {
-    implementation("com.appstractive:supertokens-sdk-backend-ktor:1.2.0")
+    implementation(libs.supertokens)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+    implementation(libs.kotlin.serialization)
+    implementation(libs.kotlin.coroutines)
 
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
-    implementation("io.ktor:ktor-server-cio-jvm:2.3.1")
-    implementation("io.ktor:ktor-server-call-logging:2.3.1")
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.server.cio)
+    implementation(libs.ktor.server.logging)
 
-    implementation("org.slf4j:slf4j-simple:1.6.1")
+    implementation(libs.slf4j)
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.22")
+    testImplementation(libs.test.kotlin)
 }
 
 application {

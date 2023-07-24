@@ -7,6 +7,7 @@ import com.appstractive.dependencies
 import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.handlers.signUpWith
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
+import com.supertokens.sdk.recipes.emailverification.sendVerificationEmail
 import kotlinx.coroutines.CoroutineScope
 
 class EmailPasswordSignUpViewModel(
@@ -38,10 +39,13 @@ class EmailPasswordSignUpViewModel(
                 email = this@EmailPasswordSignUpViewModel.email.value.text
                 password = this@EmailPasswordSignUpViewModel.password.value.text
             }
-        }
-
-        if(result.isFailure) {
-            error.value = result.exceptionOrNull()?.message
+        }.onSuccess {
+            runCatching {
+                client.sendVerificationEmail()
+            }
+        }.onFailure {
+            error.value = it.message
+            return false
         }
 
         isLoading.value = false

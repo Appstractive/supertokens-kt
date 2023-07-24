@@ -72,7 +72,7 @@ publishing {
 
             groupId = "com.appstractive"
             artifactId = "supertokens-sdk-backend-ktor"
-            version = "1.2.0"
+            version = properties["version"].toString()
 
             from(components["java"])
 

@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.appstractive"
-version = "1.2.0"
+version = properties["version"].toString()
 
 val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
 
