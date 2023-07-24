@@ -1,11 +1,11 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'supertokens_sdk_common'
-    spec.version                  = '1.0'
+    spec.version                  = '1.2.1'
     spec.homepage                 = 'Link to the Shared Module homepage'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'Some description for the Shared Module'
+    spec.summary                  = 'SuperTokens common classes for frontend and backend SDKs'
     spec.vendored_frameworks      = 'build/cocoapods/framework/common.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '14.1'

@@ -144,7 +144,7 @@ class EmailVerificationRecipe(
         }
 
         return response.parse<VerifyEmailResponse, Boolean> {
-            it.isVerified
+            it.isVerified == true
         }
     }
 

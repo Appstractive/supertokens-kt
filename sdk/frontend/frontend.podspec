@@ -1,11 +1,11 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'frontend'
-    spec.version                  = '1.0'
-    spec.homepage                 = 'Link to the Shared Module homepage'
+    spec.version                  = '1.2.1'
+    spec.homepage                 = 'https://github.com/Appstractive/supertokens-kt'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'Some description for the Shared Module'
+    spec.summary                  = 'SuperTokens frontend SDK'
     spec.vendored_frameworks      = 'build/cocoapods/framework/frontend_sdk.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '14.1'
