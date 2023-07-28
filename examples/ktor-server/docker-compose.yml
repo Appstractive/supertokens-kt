@@ -15,7 +15,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'supertoken_user', '-d', 'supertokens']
+      test: ['CMD', 'pg_isready', '-U', 'supertokens_user', '-d', 'supertokens']
       interval: 5s
       timeout: 5s
       retries: 5
