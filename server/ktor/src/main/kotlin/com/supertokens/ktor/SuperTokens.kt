@@ -45,6 +45,7 @@ import java.net.URL
 
 typealias JwtVerification = Verification.() -> Unit
 
+@SuperTokensKtorDslMarker
 class SuperTokensConfig {
 
     // The SuperTokens instance to use (required)
