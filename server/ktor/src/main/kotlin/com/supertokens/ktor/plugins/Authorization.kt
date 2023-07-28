@@ -14,6 +14,7 @@ typealias AuthExtractor = suspend (Principal) -> Set<Role>
 class RoleBasedAuthConfiguration {
     var required: Set<String> = emptySet()
     var authCheckType: AuthCheckType = AuthCheckType.ALL
+    var failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden
     lateinit var authType: AuthType
 }
 
@@ -63,6 +64,7 @@ private fun Route.buildAuthorizedRoute(
     required: Set<String>,
     type: AuthType,
     authCheckType: AuthCheckType,
+    failStatusCode: HttpStatusCode,
     build: Route.() -> Unit
 ): Route {
     val authorizedRoute = createChild(AuthorizedRouteSelector(required.joinToString(",")))
@@ -70,34 +72,35 @@ private fun Route.buildAuthorizedRoute(
         this.authType = type
         this.required = required
         this.authCheckType = authCheckType
+        this.failStatusCode = failStatusCode
     }
     authorizedRoute.build()
     return authorizedRoute
 }
 
-fun Route.withRole(role: Role, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = setOf(role), authCheckType = AuthCheckType.ALL, build = build)
+fun Route.withRole(role: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
+    buildAuthorizedRoute(type = AuthType.PERMISSION, required = setOf(role), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
 
-fun Route.withRoles(vararg roles: Role, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = roles.toSet(), authCheckType = AuthCheckType.ALL, build = build)
+fun Route.withRoles(vararg roles: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
+    buildAuthorizedRoute(type = AuthType.PERMISSION, required = roles.toSet(), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
 
-fun Route.withAnyRole(vararg roles: Role, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = roles.toSet(), authCheckType = AuthCheckType.ANY, build = build)
+fun Route.withAnyRole(vararg roles: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
+    buildAuthorizedRoute(type = AuthType.PERMISSION, required = roles.toSet(), authCheckType = AuthCheckType.ANY, failStatusCode = failStatusCode, build = build)
 
-fun Route.withoutRoles(vararg roles: Role, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = roles.toSet(), authCheckType = AuthCheckType.NONE, build = build)
+fun Route.withoutRoles(vararg roles: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
+    buildAuthorizedRoute(type = AuthType.PERMISSION, required = roles.toSet(), authCheckType = AuthCheckType.NONE, failStatusCode = failStatusCode, build = build)
 
-fun Route.withPermission(permission: Permission, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = setOf(permission), authCheckType = AuthCheckType.ALL, build = build)
+fun Route.withPermission(permission: Permission, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
+    buildAuthorizedRoute(type = AuthType.PERMISSION, required = setOf(permission), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
 
-fun Route.withPermissions(vararg permissions: Permission, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = permissions.toSet(), authCheckType = AuthCheckType.ALL, build = build)
+fun Route.withPermissions(vararg permissions: Permission, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
+    buildAuthorizedRoute(type = AuthType.PERMISSION, required = permissions.toSet(), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
 
-fun Route.withAnyPermission(vararg permissions: Permission, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = permissions.toSet(), authCheckType = AuthCheckType.ANY, build = build)
+fun Route.withAnyPermission(vararg permissions: Permission, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
+    buildAuthorizedRoute(type = AuthType.PERMISSION, required = permissions.toSet(), authCheckType = AuthCheckType.ANY, failStatusCode = failStatusCode, build = build)
 
-fun Route.withoutPermission(vararg permissions: Permission, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = permissions.toSet(), authCheckType = AuthCheckType.NONE, build = build)
+fun Route.withoutPermission(vararg permissions: Permission, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
+    buildAuthorizedRoute(type = AuthType.PERMISSION, required = permissions.toSet(), authCheckType = AuthCheckType.NONE, failStatusCode = failStatusCode, build = build)
 
 
 val RoleBasedAuth =
@@ -151,7 +154,7 @@ val RoleBasedAuth =
                         if (application.developmentMode) {
                             application.log.warn("Authorization failed for ${call.request.path()} $message")
                         }
-                        call.respond(HttpStatusCode.Forbidden)
+                        call.respond(failStatusCode)
                     }
                 }
             }
