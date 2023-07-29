@@ -3,6 +3,7 @@ package com.supertokens.ktor.recipes.emailpassword
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
+import com.supertokens.ktor.userHandler
 import com.supertokens.ktor.utils.fronend
 import com.supertokens.ktor.utils.getEmailFormField
 import com.supertokens.ktor.utils.getInvalidFormFields
@@ -84,6 +85,10 @@ open class EmailPasswordHandler {
         call.validateFormFields(body.formFields) { email, password ->
             val user = emailPassword.signIn(email, password)
 
+            with(userHandler) {
+                onUserSignedIn(user)
+            }
+
             if (sessionsEnabled) {
                 val session = sessions.createSession(
                     userId = user.id,
@@ -118,6 +123,10 @@ open class EmailPasswordHandler {
 
         call.validateFormFields(body.formFields) { email, password ->
             val user = emailPassword.signUp(email, password)
+
+            with(userHandler) {
+                onUserSignedUp(user)
+            }
 
             if (sessionsEnabled) {
                 val additionalFormField = body.formFields.filter {

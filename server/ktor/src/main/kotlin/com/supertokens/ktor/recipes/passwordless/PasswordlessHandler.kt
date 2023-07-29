@@ -5,7 +5,7 @@ import com.supertokens.ktor.recipes.emailverification.emailVerificationEnabled
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
-import com.supertokens.ktor.utils.BadRequestException
+import com.supertokens.ktor.userHandler
 import com.supertokens.ktor.utils.fronend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.ServerConfig
@@ -207,6 +207,15 @@ open class PasswordlessHandler {
                 it.email?.let { email ->
                     emailVerification.setVerified(response.user.id, email)
                 }
+            }
+        }
+
+        with(userHandler) {
+            if(response.createdNewUser) {
+                onUserSignedUp(response.user)
+            }
+            else {
+                onUserSignedIn(response.user)
             }
         }
 

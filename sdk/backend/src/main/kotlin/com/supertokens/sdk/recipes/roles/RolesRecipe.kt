@@ -32,6 +32,8 @@ class RolesRecipeConfig : RecipeConfig {
     var addRolesToToken: Boolean = true
     var addPermissionsToToken: Boolean = true
 
+    var defaultUserRoles: List<String> = emptyList()
+
 }
 
 class RolesRecipe(
@@ -41,6 +43,7 @@ class RolesRecipe(
 
     val addRolesToToken = config.addRolesToToken
     val addPermissionsToToken = config.addPermissionsToToken
+    val defaultUserRoles = config.defaultUserRoles
 
     override suspend fun getExtraJwtData(user: User): Map<String, Any?> {
         if (!addRolesToToken && !addPermissionsToToken) {
@@ -49,7 +52,7 @@ class RolesRecipe(
 
         val userRoles = getUserRoles(user.id)
 
-        val userPermissions = if (addRolesToToken) {
+        val userPermissions = if (addPermissionsToToken) {
             buildSet {
                 userRoles.forEach { role ->
                     addAll(getRolePermissions(role))

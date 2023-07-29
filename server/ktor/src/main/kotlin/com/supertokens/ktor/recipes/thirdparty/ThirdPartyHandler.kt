@@ -2,6 +2,7 @@ package com.supertokens.ktor.recipes.thirdparty
 
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
+import com.supertokens.ktor.userHandler
 import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.NotFoundException
 import com.supertokens.ktor.utils.fronend
@@ -11,7 +12,6 @@ import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.common.responses.AuthorizationUrlResponse
 import com.supertokens.sdk.recipes.thirdparty.providers.Provider
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
-import com.supertokens.sdk.recipes.thirdparty.providers.apple.AppleProvider
 import io.ktor.http.URLProtocol
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
@@ -44,6 +44,15 @@ open class ThirdPartyHandler {
         val userInfo = provider.getUserInfo(tokens)
 
         val response = thirdParty.signInUp(body.thirdPartyId, userInfo.id, userInfo.email?.id ?: handleMissingEmail(provider, userInfo))
+
+        with(userHandler) {
+            if(response.createdNewUser) {
+                onUserSignedUp(response.user)
+            }
+            else {
+                onUserSignedIn(response.user)
+            }
+        }
 
         if (sessionsEnabled) {
             val session = sessions.createSession(

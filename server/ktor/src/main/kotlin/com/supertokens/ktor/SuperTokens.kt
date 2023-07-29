@@ -54,6 +54,8 @@ class SuperTokensConfig {
     // Handler for core APIs
     var coreHandler: CoreHandler = CoreHandler()
 
+    var userHandler: UserHandler = UserHandler()
+
     // Handler for EmailPassword APIs
     var emailPasswordHandler: EmailPasswordHandler = EmailPasswordHandler()
 
@@ -88,6 +90,7 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
     val superTokens = config.superTokens ?: throw RuntimeException("SuperTokens SDK not configured")
 
     application.attributes.put(SuperTokensAttributeKey, superTokens)
+    application.attributes.put(UserHandlerAttributeKey, config.userHandler)
 
     application.routing {
 

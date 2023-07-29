@@ -1,6 +1,7 @@
 package com.supertokens.ktor.recipes.roles
 
 import com.supertokens.ktor.SuperTokensAttributeKey
+import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.recipes.roles.RolesRecipe
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.application
@@ -27,3 +28,11 @@ val PipelineContext<Unit, ApplicationCall>.rolesEnabled: Boolean
 val Route.rolesEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<RolesRecipe>()
+
+suspend fun PipelineContext<Unit, ApplicationCall>.setDefaultRoles(user: User) {
+    if(rolesEnabled) {
+        roles.defaultUserRoles.forEach {
+            roles.setUserRole(user.id, it)
+        }
+    }
+}
