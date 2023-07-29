@@ -27,7 +27,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
-class RolesRecipeConfig: RecipeConfig {
+class RolesRecipeConfig : RecipeConfig {
 
     var addRolesToToken: Boolean = true
     var addPermissionsToToken: Boolean = true
@@ -37,29 +37,32 @@ class RolesRecipeConfig: RecipeConfig {
 class RolesRecipe(
     private val superTokens: SuperTokens,
     private val config: RolesRecipeConfig
-): Recipe<RolesRecipeConfig> {
+) : Recipe<RolesRecipeConfig> {
 
     val addRolesToToken = config.addRolesToToken
     val addPermissionsToToken = config.addPermissionsToToken
 
     override suspend fun getExtraJwtData(user: User): Map<String, Any?> {
-        if(!addRolesToToken && !addPermissionsToToken) {
+        if (!addRolesToToken && !addPermissionsToToken) {
             return emptyMap()
         }
 
         val userRoles = getUserRoles(user.id)
-        val userPermissions = buildSet {
-            userRoles.forEach {  role ->
-                addAll(getRolePermissions(role))
+
+        val userPermissions = if (addRolesToToken) {
+            buildSet {
+                userRoles.forEach { role ->
+                    addAll(getRolePermissions(role))
+                }
             }
-        }
+        } else emptySet()
 
         return buildMap {
-            if(addRolesToToken && userRoles.isNotEmpty()) {
+            if (addRolesToToken && userRoles.isNotEmpty()) {
                 set("st-role", userRoles)
             }
 
-            if(addPermissionsToToken && userPermissions.isNotEmpty()) {
+            if (userPermissions.isNotEmpty()) {
                 set("st-perm", userPermissions)
             }
         }
@@ -259,7 +262,7 @@ class RolesRecipe(
 
 }
 
-val Roles = object: RecipeBuilder<RolesRecipeConfig, RolesRecipe>() {
+val Roles = object : RecipeBuilder<RolesRecipeConfig, RolesRecipe>() {
 
     override fun install(configure: RolesRecipeConfig.() -> Unit): (SuperTokens) -> RolesRecipe {
         val config = RolesRecipeConfig().apply(configure)
