@@ -8,8 +8,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateSessionResponse(
     override val status: String,
-    val session: SessionResponse,
-    val accessToken: Token,
-    val refreshToken: Token,
-    val antiCsrfToken: String?,
+    val session: SessionResponse? = null,
+    val accessToken: Token? = null,
+    val refreshToken: Token? = null,
+    val antiCsrfToken: String? = null,
 ): BaseResponse

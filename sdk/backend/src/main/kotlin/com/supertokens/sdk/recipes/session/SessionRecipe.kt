@@ -153,9 +153,9 @@ class SessionRecipe(
 
         return response.parse<CreateSessionResponse, CreateSessionData> {
             CreateSessionData(
-                session = it.session.toData(),
-                accessToken = it.accessToken,
-                refreshToken = it.refreshToken,
+                session = checkNotNull(it.session).toData(),
+                accessToken = checkNotNull(it.accessToken),
+                refreshToken = checkNotNull(it.refreshToken),
                 antiCsrfToken = it.antiCsrfToken,
             )
         }
@@ -279,9 +279,9 @@ class SessionRecipe(
 
         return response.parse<CreateSessionResponse, CreateSessionData> {
             CreateSessionData(
-                session = it.session.toData(),
-                accessToken = it.accessToken,
-                refreshToken = it.refreshToken,
+                session = checkNotNull(it.session).toData(),
+                accessToken = checkNotNull(it.accessToken),
+                refreshToken = checkNotNull(it.refreshToken),
                 antiCsrfToken = it.antiCsrfToken,
             )
         }
