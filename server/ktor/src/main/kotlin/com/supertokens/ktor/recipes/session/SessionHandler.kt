@@ -17,6 +17,10 @@ import io.ktor.util.pipeline.PipelineContext
 
 open class SessionHandler {
 
+    /**
+     * A call to POST /signout
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Session%20Recipe/signout">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.signOut() {
         val user =  call.requirePrincipal<AuthenticatedUser>()
         val session = sessions.getSession(user.sessionHandle)
@@ -25,6 +29,10 @@ open class SessionHandler {
         call.respond(StatusResponse())
     }
 
+    /**
+     * A call to POST /session/refresh
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Session%20Recipe/refresh">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.refresh() {
         val refreshToken = call.request.headers[HEADER_REFRESH_TOKEN] ?: call.request.cookies[COOKIE_REFRESH_TOKEN] ?: throw UnauthorizedException()
         val antiCsrfToken = call.request.headers[HEADER_ANTI_CSRF]

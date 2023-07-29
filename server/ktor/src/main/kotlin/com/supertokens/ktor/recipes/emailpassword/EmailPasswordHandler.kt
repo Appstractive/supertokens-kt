@@ -33,7 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-private suspend fun ApplicationCall.validateFormFields(
+suspend fun ApplicationCall.validateFormFields(
     fields: List<FormField>,
     success: suspend (email: String, password: String) -> Unit,
 ) {
@@ -74,6 +74,10 @@ private suspend fun ApplicationCall.validateFormFields(
 
 open class EmailPasswordHandler {
 
+    /**
+     * A call to POST /signin
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/signIn">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.signIn() {
         val body = call.receive<FormFieldRequest>()
 
@@ -105,6 +109,10 @@ open class EmailPasswordHandler {
         }
     }
 
+    /**
+     * A call to POST /signup
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/signUp">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.signUp() {
         val body = call.receive<FormFieldRequest>()
 
@@ -185,7 +193,11 @@ open class EmailPasswordHandler {
         }
     }
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.passwordResetToken() {
+    /**
+     * A call to POST /user/password/reset/token
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/passwordResetToken">Frontend Driver Interface</a>
+     */
+    open suspend fun PipelineContext<Unit, ApplicationCall>.passwordResetWithToken() {
         val body = call.receive<FormFieldRequest>()
 
         val emailField = body.formFields.firstOrNull { it.id == FORM_FIELD_EMAIL_ID }
@@ -199,6 +211,10 @@ open class EmailPasswordHandler {
         )
     }
 
+    /**
+     * A call to POST /user/password/reset
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/passwordReset">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.resetPassword() {
         val body = call.receive<PasswordResetRequest>()
 

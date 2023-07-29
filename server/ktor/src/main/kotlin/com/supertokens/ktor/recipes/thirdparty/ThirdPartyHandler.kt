@@ -27,6 +27,10 @@ open class ThirdPartyHandler {
         return "${userInfo.id}@${provider.id}.temp"
     }
 
+    /**
+     * A call to POST /signinup
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/ThirdParty%20Recipe/signInUp">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.signInUp() {
         val body = call.receive<ThirdPartySignInUpRequest>()
         val provider = body.clientId?.let { thirdParty.getProviderByClientId(it) }
@@ -59,6 +63,10 @@ open class ThirdPartyHandler {
         } ?: call.respond(response)
     }
 
+    /**
+     * A call to GET /authorisationurl
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/ThirdParty%20Recipe/authorisationUrl">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.getAuthorizationUrl() {
         val thirdPartyId = call.parameters["thirdPartyId"] ?: throw NotFoundException()
 
@@ -71,6 +79,10 @@ open class ThirdPartyHandler {
         )
     }
 
+    /**
+     * A call to POST /callback/apple
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/ThirdParty%20Recipe/thirdPartyCallbackApple">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.appleAuthCallback() {
         val provider = thirdParty.getProviderById(ThirdPartyProvider.APPLE) ?: throw NotFoundException()
         val formParameters = call.receiveParameters()

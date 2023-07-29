@@ -11,6 +11,10 @@ import io.ktor.util.pipeline.PipelineContext
 
 open class CoreHandler {
 
+    /**
+     * A call to GET /signup/email/exists
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/emailExists">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.emailExists() {
         val email = call.parameters["email"] ?: return call.respond(HttpStatusCode.NotFound)
 
@@ -25,6 +29,10 @@ open class CoreHandler {
         )
     }
 
+    /**
+     * A call to GET /signup/phonenumber/exists
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessPhoneNumberExists">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.phoneNumberExists() {
         val phoneNumber = call.parameters["phoneNumber"] ?: return call.respond(HttpStatusCode.NotFound)
 

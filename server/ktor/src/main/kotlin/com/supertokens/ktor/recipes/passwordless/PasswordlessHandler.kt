@@ -117,6 +117,10 @@ open class PasswordlessHandler {
         return codeData
     }
 
+    /**
+     * A call to POST /signinup/code
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessSignInUpStart">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.startSignInUp() {
         val body = call.receive<StartPasswordlessSignInUpRequest>()
 
@@ -137,6 +141,10 @@ open class PasswordlessHandler {
         )
     }
 
+    /**
+     * A call to POST /signinup/code/resend
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessSignInUpResend">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.resendCode() {
         val body = call.receive<ResendPasswordlessCodeRequest>()
         val session = passwordless.getCodesByPreAuthSessionId(body.preAuthSessionId).firstOrNull {
@@ -153,6 +161,10 @@ open class PasswordlessHandler {
         call.respond(StatusResponse())
     }
 
+    /**
+     * A call to POST /signinup/code/consume
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessSignInUpConsume">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.consumeCode() {
         val body = call.receive<ConsumePasswordlessCodeRequest>()
         val response = when (passwordless.flowType) {

@@ -71,6 +71,10 @@ open class EmailVerificationHandler {
         }
     }
 
+    /**
+     * A call to POST /user/email/verify/token
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailVerification%20Recipe/verifyEmailToken">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendEmailVerification() {
         val user = call.requirePrincipal<AuthenticatedUser>()
         val email = superTokens.getUserById(user.id).email ?: throw SuperTokensStatusException(SuperTokensStatus.UnknownEMailError)
@@ -80,6 +84,10 @@ open class EmailVerificationHandler {
         call.respond(StatusResponse())
     }
 
+    /**
+     * A call to POST /user/email/verify
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailVerification%20Recipe/verifyEmail">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.verifyEmail() {
         val body = call.receive<VerifyEmailTokenRequest>()
 
@@ -94,6 +102,10 @@ open class EmailVerificationHandler {
 
     }
 
+    /**
+     * A call to GET /user/email/verify
+     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailVerification%20Recipe/getVerifyEmail">Frontend Driver Interface</a>
+     */
     open suspend fun PipelineContext<Unit, ApplicationCall>.checkEmailVerified() {
         val user = call.requirePrincipal<AuthenticatedUser>()
         val email = superTokens.getUserById(user.id).email

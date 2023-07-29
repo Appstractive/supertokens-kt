@@ -20,7 +20,7 @@ fun Route.emailPasswordRoutes(handler: EmailPasswordHandler) {
 
     post(Routes.EmailPassword.PASSWORD_RESET_TOKEN) {
         with(handler) {
-            passwordResetToken()
+            passwordResetWithToken()
         }
     }
 
