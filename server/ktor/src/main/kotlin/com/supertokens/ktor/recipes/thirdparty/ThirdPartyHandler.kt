@@ -10,6 +10,7 @@ import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.common.responses.AuthorizationUrlResponse
+import com.supertokens.sdk.common.responses.SignInUpResponse
 import com.supertokens.sdk.recipes.thirdparty.providers.Provider
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
 import io.ktor.http.URLProtocol
@@ -46,10 +47,9 @@ open class ThirdPartyHandler {
         val response = thirdParty.signInUp(body.thirdPartyId, userInfo.id, userInfo.email?.id ?: handleMissingEmail(provider, userInfo))
 
         with(userHandler) {
-            if(response.createdNewUser) {
+            if (response.createdNewUser) {
                 onUserSignedUp(response.user)
-            }
-            else {
+            } else {
                 onUserSignedIn(response.user)
             }
         }
@@ -69,7 +69,12 @@ open class ThirdPartyHandler {
 
         body.redirectURI?.let {
             call.respondRedirect(it)
-        } ?: call.respond(response)
+        } ?: call.respond(
+            SignInUpResponse(
+                user = response.user,
+                createdNewUser = response.createdNewUser,
+            )
+        )
     }
 
     /**

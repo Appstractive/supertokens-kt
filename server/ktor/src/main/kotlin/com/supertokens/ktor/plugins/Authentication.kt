@@ -6,12 +6,14 @@ import com.supertokens.ktor.utils.UnauthorizedException
 import com.supertokens.sdk.common.COOKIE_ACCESS_TOKEN
 import com.supertokens.sdk.common.HEADER_ANTI_CSRF
 import io.ktor.http.auth.HttpAuthHeader
+import io.ktor.server.application.call
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.Principal
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.auth.parseAuthorizationHeader
 import io.ktor.util.AttributeKey
+import io.ktor.util.pipeline.PipelineContext
 
 
 data class AuthenticatedUser(
@@ -68,3 +70,4 @@ inline fun <reified P : Principal> ApplicationCall.requirePrincipal(provider: St
 val AccessTokenAttributeKey = AttributeKey<String>("AccessToken")
 
 val ApplicationCall.accessToken: String get() = attributes[AccessTokenAttributeKey]
+val PipelineContext<Unit, ApplicationCall>.accessToken: String get() = call.attributes[AccessTokenAttributeKey]
