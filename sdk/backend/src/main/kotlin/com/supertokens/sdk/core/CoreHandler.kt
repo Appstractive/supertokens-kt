@@ -90,7 +90,7 @@ suspend fun SuperTokens.getUserById(userId: String): User = with(core) {
     return getUserById(userId)
 }
 
-suspend fun SuperTokens.getUserByIdOrlNull(userId: String): User? = with(core) {
+suspend fun SuperTokens.getUserByIdOrNull(userId: String): User? = with(core) {
     return runCatching {
         getUserById(userId)
     }.getOrNull()
