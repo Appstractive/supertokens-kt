@@ -2,6 +2,7 @@ package com.supertokens.sdk.recipes.session
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.Claims
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.toJsonElement
@@ -104,16 +105,14 @@ class SessionRecipe(
     }
 
     suspend fun getJwtData(user: User): Map<String, Any?> = buildMap {
-        set("iss", issuer)
-        set("aud", superTokens.appConfig.frontends.map { it.host })
+        set(Claims.ISSUER, issuer)
+        set(Claims.AUDIENCE, superTokens.appConfig.frontends.map { it.host })
 
-        buildMap {
-            user.email?.let {
-                set("email", it)
-            }
-            user.phoneNumber?.let {
-                set("phoneNumber", it)
-            }
+        user.email?.let {
+            set(Claims.EMAIL, it)
+        }
+        user.phoneNumber?.let {
+            set(Claims.PHONE_NUMBER, it)
         }
 
         superTokens.recipes.forEach {

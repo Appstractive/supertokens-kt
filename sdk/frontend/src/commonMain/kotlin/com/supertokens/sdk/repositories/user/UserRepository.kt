@@ -1,8 +1,7 @@
 package com.supertokens.sdk.repositories.user
 
 import com.supertokens.sdk.SuperTokensClient
-import com.supertokens.sdk.common.CLAIM_EMAIL_VERIFIED
-import com.supertokens.sdk.common.CLAIM_USER_ID
+import com.supertokens.sdk.common.Claims
 import com.supertokens.sdk.common.extractedContent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -31,9 +30,13 @@ fun String.parseJwtClaims(): Map<String, Any?> {
 }
 
 suspend fun SuperTokensClient.getUserId(): String? {
-    return userRepository.getClaims()?.get(CLAIM_USER_ID)?.toString()
+    return userRepository.getClaims()?.get(Claims.USER_ID)?.toString()
+}
+
+suspend fun SuperTokensClient.getEmail(): String? {
+    return userRepository.getClaims()?.get(Claims.EMAIL)?.toString()
 }
 
 suspend fun SuperTokensClient.isEmailVerified(): Boolean {
-    return userRepository.getClaims()?.get(CLAIM_EMAIL_VERIFIED) != false
+    return userRepository.getClaims()?.get(Claims.EMAIL_VERIFIED) != false
 }

@@ -90,12 +90,30 @@ suspend fun SuperTokens.getUserById(userId: String): User = with(core) {
     return getUserById(userId)
 }
 
+suspend fun SuperTokens.getUserByIdOrlNull(userId: String): User? = with(core) {
+    return runCatching {
+        getUserById(userId)
+    }.getOrNull()
+}
+
 suspend fun SuperTokens.getUserByEMail(email: String, recipeId: String = EmailPasswordRecipe.ID): User = with(core) {
     return getUserByEMail(email, recipeId)
 }
 
+suspend fun SuperTokens.getUserByEMailOrNull(email: String, recipeId: String = EmailPasswordRecipe.ID): User? = with(core) {
+    return runCatching {
+        getUserByEMail(email, recipeId)
+    }.getOrNull()
+}
+
 suspend fun SuperTokens.getUserByPhoneNumber(phoneNumber: String, recipeId: String = PasswordlessRecipe.ID): User = with(core) {
     return getUserByPhoneNumber(phoneNumber, recipeId)
+}
+
+suspend fun SuperTokens.getUserByPhoneNumberOrNull(phoneNumber: String, recipeId: String = PasswordlessRecipe.ID): User? = with(core) {
+    return runCatching {
+        getUserByPhoneNumber(phoneNumber, recipeId)
+    }.getOrNull()
 }
 
 suspend fun SuperTokens.deleteUser(userId: String): SuperTokensStatus = with(core) {
