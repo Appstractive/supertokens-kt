@@ -9,6 +9,7 @@ import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.core.requests.DeleteUserRequest
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.passwordless.PasswordlessRecipe
+import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.utils.parse
 import com.supertokens.sdk.utils.parseUser
 import io.ktor.client.call.body
@@ -21,13 +22,14 @@ import kotlinx.serialization.json.JsonObject
 
 internal class CoreHandler {
 
-    suspend fun SuperTokens.getUserById(userId: String): User {
+    suspend fun SuperTokens.getUserById(userId: String, recipeId: String = EmailPasswordRecipe.ID): User {
 
         val response = client.get {
             url {
                 path(PATH_GET_USER)
                 parameters.append("userId", userId)
             }
+            header(Constants.HEADER_RECIPE_ID, recipeId)
         }
 
         return response.parseUser()
@@ -46,14 +48,14 @@ internal class CoreHandler {
         return response.parseUser()
     }
 
-    suspend fun SuperTokens.getUserByPhoneNumber(phoneNumber: String, recipeId: String = PasswordlessRecipe.ID): User {
+    suspend fun SuperTokens.getUserByPhoneNumber(phoneNumber: String): User {
 
         val response = client.get {
             url {
                 path(PATH_GET_USER)
                 parameters.append("phoneNumber", phoneNumber)
             }
-            header(Constants.HEADER_RECIPE_ID, recipeId)
+            header(Constants.HEADER_RECIPE_ID, PasswordlessRecipe.ID)
         }
 
         return response.parseUser()
@@ -86,35 +88,37 @@ internal class CoreHandler {
 
 }
 
-suspend fun SuperTokens.getUserById(userId: String): User = with(core) {
-    return getUserById(userId)
+suspend fun SuperTokens.getUserById(userId: String, recipeId: String = EmailPasswordRecipe.ID): User = with(core) {
+    return getUserById(userId, recipeId)
 }
 
-suspend fun SuperTokens.getUserByIdOrNull(userId: String): User? = with(core) {
-    return runCatching {
-        getUserById(userId)
-    }.getOrNull()
-}
+suspend fun SuperTokens.getUserByIdOrNull(userId: String): User? = runCatching {
+    getUserById(userId, EmailPasswordRecipe.ID)
+}.getOrNull() ?: runCatching {
+    getUserById(userId, ThirdPartyRecipe.ID)
+}.getOrNull() ?: runCatching {
+    getUserById(userId, PasswordlessRecipe.ID)
+}.getOrNull()
 
 suspend fun SuperTokens.getUserByEMail(email: String, recipeId: String = EmailPasswordRecipe.ID): User = with(core) {
     return getUserByEMail(email, recipeId)
 }
 
-suspend fun SuperTokens.getUserByEMailOrNull(email: String, recipeId: String = EmailPasswordRecipe.ID): User? = with(core) {
-    return runCatching {
-        getUserByEMail(email, recipeId)
-    }.getOrNull()
+suspend fun SuperTokens.getUserByEMailOrNull(email: String): User? = runCatching {
+    getUserByEMail(email, EmailPasswordRecipe.ID)
+}.getOrNull() ?: runCatching {
+    getUserByEMail(email, ThirdPartyRecipe.ID)
+}.getOrNull() ?: runCatching {
+    getUserByEMail(email, PasswordlessRecipe.ID)
+}.getOrNull()
+
+suspend fun SuperTokens.getUserByPhoneNumber(phoneNumber: String): User = with(core) {
+    return getUserByPhoneNumber(phoneNumber)
 }
 
-suspend fun SuperTokens.getUserByPhoneNumber(phoneNumber: String, recipeId: String = PasswordlessRecipe.ID): User = with(core) {
-    return getUserByPhoneNumber(phoneNumber, recipeId)
-}
-
-suspend fun SuperTokens.getUserByPhoneNumberOrNull(phoneNumber: String, recipeId: String = PasswordlessRecipe.ID): User? = with(core) {
-    return runCatching {
-        getUserByPhoneNumber(phoneNumber, recipeId)
-    }.getOrNull()
-}
+suspend fun SuperTokens.getUserByPhoneNumberOrNull(phoneNumber: String): User? = runCatching {
+    getUserByPhoneNumber(phoneNumber)
+}.getOrNull()
 
 suspend fun SuperTokens.deleteUser(userId: String): SuperTokensStatus = with(core) {
     return deleteUser(userId)
