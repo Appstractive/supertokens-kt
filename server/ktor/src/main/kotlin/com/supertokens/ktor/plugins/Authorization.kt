@@ -79,16 +79,16 @@ private fun Route.buildAuthorizedRoute(
 }
 
 fun Route.withRole(role: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = setOf(role), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
+    buildAuthorizedRoute(type = AuthType.ROLE, required = setOf(role), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
 
 fun Route.withRoles(vararg roles: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = roles.toSet(), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
+    buildAuthorizedRoute(type = AuthType.ROLE, required = roles.toSet(), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
 
 fun Route.withAnyRole(vararg roles: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = roles.toSet(), authCheckType = AuthCheckType.ANY, failStatusCode = failStatusCode, build = build)
+    buildAuthorizedRoute(type = AuthType.ROLE, required = roles.toSet(), authCheckType = AuthCheckType.ANY, failStatusCode = failStatusCode, build = build)
 
 fun Route.withoutRoles(vararg roles: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = roles.toSet(), authCheckType = AuthCheckType.NONE, failStatusCode = failStatusCode, build = build)
+    buildAuthorizedRoute(type = AuthType.ROLE, required = roles.toSet(), authCheckType = AuthCheckType.NONE, failStatusCode = failStatusCode, build = build)
 
 fun Route.withPermission(permission: Permission, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
     buildAuthorizedRoute(type = AuthType.PERMISSION, required = setOf(permission), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
