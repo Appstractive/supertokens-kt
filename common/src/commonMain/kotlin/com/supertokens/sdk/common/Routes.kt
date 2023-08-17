@@ -11,6 +11,7 @@ object Routes {
         const val SIGN_UP = "signup"
         const val PASSWORD_RESET_TOKEN = "user/password/reset/token"
         const val PASSWORD_RESET = "user/password/reset"
+        const val PASSWORD_CHANGE = "user/password/change"
 
     }
 

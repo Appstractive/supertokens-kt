@@ -1,29 +1,38 @@
 package com.supertokens.ktor.recipes.emailpassword
 
+import com.supertokens.ktor.plugins.AuthenticatedUser
+import com.supertokens.ktor.plugins.requirePrincipal
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.userHandler
+import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.fronend
-import com.supertokens.ktor.utils.getEmailFormField
+import com.supertokens.ktor.utils.getEmailField
 import com.supertokens.ktor.utils.getInvalidFormFields
-import com.supertokens.ktor.utils.getPasswordFormField
+import com.supertokens.ktor.utils.getNewPasswordField
+import com.supertokens.ktor.utils.getPasswordField
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.ServerConfig
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
+import com.supertokens.sdk.common.FORM_FIELD_NEW_PASSWORD_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.requests.FormField
 import com.supertokens.sdk.common.requests.FormFieldRequest
+import com.supertokens.sdk.common.requests.PasswordChangeRequest
 import com.supertokens.sdk.common.requests.PasswordResetRequest
 import com.supertokens.sdk.common.responses.FormFieldError
 import com.supertokens.sdk.common.responses.SignInResponse
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.common.responses.UserResponse
 import com.supertokens.sdk.core.getUserByEMail
+import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.emailpassword.models.EmailResetTemplate
+import com.supertokens.sdk.recipes.emailpassword.updatePassword
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
@@ -55,14 +64,14 @@ suspend fun ApplicationCall.validateFormFields(
         )
     }
 
-    val email: String = getEmailFormField(fields)?.value
+    val email: String = fields.getEmailField()?.value
         ?: return respond(
             HttpStatusCode.Unauthorized,
             SignInResponse(
                 status = SuperTokensStatus.WrongCredentialsError.value,
             )
         )
-    val password: String = getPasswordFormField(fields)?.value
+    val password: String = fields.getPasswordField()?.value
         ?: return respond(
             HttpStatusCode.Unauthorized,
             SignInResponse(
@@ -209,7 +218,7 @@ open class EmailPasswordHandler {
     open suspend fun PipelineContext<Unit, ApplicationCall>.passwordResetWithToken() {
         val body = call.receive<FormFieldRequest>()
 
-        val emailField = body.formFields.firstOrNull { it.id == FORM_FIELD_EMAIL_ID }
+        val emailField = body.formFields.getEmailField()
 
         emailField?.value?.let { email ->
             sendPasswordResetMail(email)
@@ -235,7 +244,7 @@ open class EmailPasswordHandler {
                     )
                 )
 
-                val password: String = body.formFields.firstOrNull { it.id == FORM_FIELD_PASSWORD_ID }?.value
+                val password: String = body.formFields.getPasswordField()?.value
                     ?: return call.respond(
                         SignInResponse(
                             status = SuperTokensStatus.FormFieldError.value,
@@ -255,6 +264,49 @@ open class EmailPasswordHandler {
 
             else -> call.respond(HttpStatusCode.BadRequest)
         }
+    }
+
+    open suspend fun PipelineContext<Unit, ApplicationCall>.changePassword() {
+        var user = superTokens.getUserById(call.requirePrincipal<AuthenticatedUser>().id)
+        val body = call.receive<PasswordChangeRequest>()
+
+        val currentPassword: String = body.formFields.getPasswordField()?.value
+            ?: return call.respond(
+                SignInResponse(
+                    status = SuperTokensStatus.FormFieldError.value,
+                    formFields = listOf(
+                        FormFieldError(
+                            id = FORM_FIELD_PASSWORD_ID,
+                            error = "Password missing",
+                        )
+                    )
+                )
+            )
+
+        val newPassword: String = body.formFields.getNewPasswordField()?.value
+            ?: return call.respond(
+                SignInResponse(
+                    status = SuperTokensStatus.FormFieldError.value,
+                    formFields = listOf(
+                        FormFieldError(
+                            id = FORM_FIELD_PASSWORD_ID,
+                            error = "New Password missing",
+                        )
+                    )
+                )
+            )
+
+        val email = user.email ?: throw SuperTokensStatusException(SuperTokensStatus.UnknownEMailError)
+        // will throw an exception if wrong
+        user = emailPassword.signIn(email, currentPassword)
+
+        val status = superTokens.updatePassword(user.id, newPassword)
+
+        if(status != SuperTokensStatus.OK) {
+            throw SuperTokensStatusException(status)
+        }
+
+        call.respond(StatusResponse())
     }
 
 }

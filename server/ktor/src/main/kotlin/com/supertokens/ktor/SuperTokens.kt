@@ -105,10 +105,6 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
 
             coreRoutes(config.coreHandler)
 
-            if (superTokens.hasRecipe<EmailPasswordRecipe>()) {
-                emailPasswordRoutes(config.emailPasswordHandler)
-            }
-
             if (superTokens.hasRecipe<SessionRecipe>()) {
 
                 application.install(Authentication) {
@@ -135,6 +131,10 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
                 }
 
                 sessionRoutes(config.sessionHandler)
+            }
+
+            if (superTokens.hasRecipe<EmailPasswordRecipe>()) {
+                emailPasswordRoutes(config.emailPasswordHandler)
             }
 
             if(superTokens.hasRecipe<ThirdPartyRecipe>()) {

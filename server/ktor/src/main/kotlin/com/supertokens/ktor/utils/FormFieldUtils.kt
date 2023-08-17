@@ -1,6 +1,7 @@
 package com.supertokens.ktor.utils
 
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
+import com.supertokens.sdk.common.FORM_FIELD_NEW_PASSWORD_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.common.requests.FormField as RequestFormField
@@ -18,5 +19,7 @@ fun getInvalidFormFields(requestFormFields: List<RequestFormField>, recipeFormFi
     return invalidFormFields
 }
 
-fun getEmailFormField(fields: List<RequestFormField>): RequestFormField? = fields.firstOrNull { it.id == FORM_FIELD_EMAIL_ID }
-fun getPasswordFormField(fields: List<RequestFormField>): RequestFormField? = fields.firstOrNull { it.id == FORM_FIELD_PASSWORD_ID }
+fun List<RequestFormField>.getField(id: String) = firstOrNull { it.id == id }
+fun List<RequestFormField>.getEmailField() = getField(FORM_FIELD_EMAIL_ID)
+fun List<RequestFormField>.getPasswordField() = getField(FORM_FIELD_PASSWORD_ID)
+fun List<RequestFormField>.getNewPasswordField() = getField(FORM_FIELD_NEW_PASSWORD_ID)

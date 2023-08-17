@@ -9,6 +9,7 @@ const val COOKIE_REFRESH_TOKEN = "sRefreshToken"
 
 const val FORM_FIELD_EMAIL_ID = "email"
 const val FORM_FIELD_PASSWORD_ID = "password"
+const val FORM_FIELD_NEW_PASSWORD_ID = "newPassword"
 
 
 object Claims {
