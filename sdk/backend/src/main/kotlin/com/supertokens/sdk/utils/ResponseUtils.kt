@@ -30,7 +30,7 @@ suspend inline fun <reified R: BaseResponse, T> HttpResponse.parse(convert: (R) 
 
 suspend fun HttpResponse.parse(): SuperTokensStatus {
     if(status != HttpStatusCode.OK) {
-        return bodyAsText().toStatus()
+        throw SuperTokensStatusException(bodyAsText().toStatus())
     }
 
     val body = body<StatusResponse>()

@@ -152,9 +152,7 @@ class EmailPasswordRecipe(
         }
 
         return response.parse().also {
-            if(it == SuperTokensStatus.OK) {
-                superTokens._events.tryEmit(SuperTokensEvent.UserEmailChanged(userId, email))
-            }
+            superTokens._events.tryEmit(SuperTokensEvent.UserEmailChanged(userId, email))
         }
     }
 
@@ -179,9 +177,7 @@ class EmailPasswordRecipe(
         }
 
         return response.parse().also {
-            if(it == SuperTokensStatus.OK) {
-                superTokens._events.tryEmit(SuperTokensEvent.UserPasswordChanged(userId))
-            }
+            superTokens._events.tryEmit(SuperTokensEvent.UserPasswordChanged(userId))
         }
     }
 
