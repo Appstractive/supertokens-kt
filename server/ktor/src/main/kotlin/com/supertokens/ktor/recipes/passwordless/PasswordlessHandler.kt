@@ -50,7 +50,7 @@ open class PasswordlessHandler {
     }
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(frontend: ServerConfig, codeData: PasswordlessCodeData): String =
-        "${frontend.fullUrl}/verify?preAuthSessionId=${codeData.preAuthSessionId}#${codeData.linkCode}"
+        "${frontend.fullUrl}verify?preAuthSessionId=${codeData.preAuthSessionId}#${codeData.linkCode}"
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginMail(email: String, codeData: PasswordlessCodeData): PasswordlessCodeData {
         val frontend = call.fronend

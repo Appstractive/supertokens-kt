@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 open class EmailVerificationHandler {
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(frontend: ServerConfig, token: String) =
-        "${frontend.fullUrl}/verify-email?token=$token"
+        "${frontend.fullUrl}verify-email?token=$token"
 
     /**
      * Override this to send localized mails

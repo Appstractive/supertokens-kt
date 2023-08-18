@@ -172,7 +172,7 @@ open class EmailPasswordHandler {
     }
 
     open suspend fun createPasswordResetLink(frontend: ServerConfig, token: String) =
-        "${frontend.fullUrl}/reset-password?token=$token"
+        "${frontend.fullUrl}reset-password?token=$token"
 
     /**
      * Override this to send localized mails
