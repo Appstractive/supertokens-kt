@@ -13,14 +13,16 @@ fun StatusPagesConfig.superTokens(catchGeneralError: Boolean = false) {
     exception<SuperTokensStatusException> { call, cause ->
         call.respond(
             status = HttpStatusCode.BadRequest,
-            message = StatusResponse(cause.status.value)
+            message = cause.message?.let {
+                ErrorResponse(status = cause.status.value, message = it)
+            } ?: StatusResponse(cause.status.value)
         )
     }
 
     exception<ResponseException> { call, cause ->
         call.respond(
             status = cause.status,
-            message = StatusResponse(SuperTokensStatus.UnknownError().value)
+            message = ErrorResponse(status = SuperTokensStatus.UnknownError.value, message = cause.message)
         )
     }
 

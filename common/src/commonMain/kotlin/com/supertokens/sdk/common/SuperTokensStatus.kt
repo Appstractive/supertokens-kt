@@ -13,8 +13,8 @@ sealed class SuperTokensStatus(
     object UnknownPhoneNumberError: SuperTokensStatus("UNKNOWN_PHONE_NUMBER_ERROR")
     object ResetPasswordInvalidTokenError: SuperTokensStatus("RESET_PASSWORD_INVALID_TOKEN_ERROR")
     object PasswordPolicyViolatedError: SuperTokensStatus("PASSWORD_POLICY_VIOLATED_ERROR")
-    object NotFoundError: SuperTokensStatus("Not Found")
-    object InvalidApiKeyError: SuperTokensStatus("Invalid API key")
+    object NotFoundError: SuperTokensStatus("NOT_FOUND")
+    object InvalidApiKeyError: SuperTokensStatus("INVALID_API_KEY")
     object UnauthorizedError: SuperTokensStatus("UNAUTHORISED")
     object TryRefreshTokenError: SuperTokensStatus("TRY_REFRESH_TOKEN")
     object FormFieldError: SuperTokensStatus("FIELD_ERROR")
@@ -29,7 +29,7 @@ sealed class SuperTokensStatus(
     object InvalidTotpCodeError: SuperTokensStatus("INVALID_TOTP_ERROR")
     object TotpLimitReachedError: SuperTokensStatus("LIMIT_REACHED_ERROR")
 
-    data class UnknownError(val message: String = "UNKNOWN_ERROR"): SuperTokensStatus(message)
+    object UnknownError: SuperTokensStatus("UNKNOWN_ERROR")
 
 }
 
@@ -58,6 +58,6 @@ fun String.toStatus(): SuperTokensStatus {
         SuperTokensStatus.TotpDeviceUnknownError.value -> SuperTokensStatus.TotpDeviceUnknownError
         SuperTokensStatus.InvalidTotpCodeError.value -> SuperTokensStatus.InvalidTotpCodeError
         SuperTokensStatus.TotpLimitReachedError.value -> SuperTokensStatus.TotpLimitReachedError
-        else -> SuperTokensStatus.UnknownError(this)
+        else -> SuperTokensStatus.UnknownError
     }
 }

@@ -57,27 +57,24 @@ suspend fun ApplicationCall.validateFormFields(
                 formFields = invalidFormFields.map {
                     FormFieldError(
                         id = it.id,
-                        error = "FormField '${it.id}' has invalid value: ${it.value}",
+                        error = "Invalid value: ${it.value}",
                     )
                 }
             )
         )
     }
 
-    val email: String = fields.getEmailField()?.value
-        ?: return respond(
+    val email = fields.getEmailField()?.value
+    val password = fields.getPasswordField()?.value
+
+    if(email == null || password == null) {
+        return respond(
             HttpStatusCode.Unauthorized,
             SignInResponse(
                 status = SuperTokensStatus.WrongCredentialsError.value,
             )
         )
-    val password: String = fields.getPasswordField()?.value
-        ?: return respond(
-            HttpStatusCode.Unauthorized,
-            SignInResponse(
-                status = SuperTokensStatus.WrongCredentialsError.value,
-            )
-        )
+    }
 
     success.invoke(email, password)
 }
@@ -91,36 +88,46 @@ open class EmailPasswordHandler {
     open suspend fun PipelineContext<Unit, ApplicationCall>.signIn() {
         val body = call.receive<FormFieldRequest>()
 
-        call.validateFormFields(body.formFields) { email, password ->
-            val user = emailPassword.signIn(email, password)
+        val email = body.formFields.getEmailField()?.value
+        val password = body.formFields.getPasswordField()?.value
 
-            with(userHandler) {
-                onUserSignedIn(user)
-            }
-
-            if (sessionsEnabled) {
-                val session = sessions.createSession(
-                    userId = user.id,
-                    userDataInJWT = sessions.getJwtData(user),
-                )
-
-                setSessionInResponse(
-                    accessToken = session.accessToken,
-                    refreshToken = session.refreshToken,
-                    antiCsrfToken = session.antiCsrfToken,
-                )
-            }
-
-            call.respond(
+        if(email == null || password == null) {
+            return call.respond(
+                HttpStatusCode.Unauthorized,
                 SignInResponse(
-                    user = UserResponse(
-                        id = user.id,
-                        email = user.email,
-                        timeJoined = user.timeJoined,
-                    )
+                    status = SuperTokensStatus.WrongCredentialsError.value,
                 )
             )
         }
+
+        val user = emailPassword.signIn(email, password)
+
+        with(userHandler) {
+            onUserSignedIn(user)
+        }
+
+        if (sessionsEnabled) {
+            val session = sessions.createSession(
+                userId = user.id,
+                userDataInJWT = sessions.getJwtData(user),
+            )
+
+            setSessionInResponse(
+                accessToken = session.accessToken,
+                refreshToken = session.refreshToken,
+                antiCsrfToken = session.antiCsrfToken,
+            )
+        }
+
+        call.respond(
+            SignInResponse(
+                user = UserResponse(
+                    id = user.id,
+                    email = user.email,
+                    timeJoined = user.timeJoined,
+                )
+            )
+        )
     }
 
     /**
