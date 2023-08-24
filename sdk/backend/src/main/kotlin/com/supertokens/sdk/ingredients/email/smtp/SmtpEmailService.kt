@@ -1,7 +1,9 @@
 package com.supertokens.sdk.ingredients.email.smtp
 
+import com.supertokens.sdk.ingredients.email.DEFAULT_EMAIL_TEMPLATE_LOADER
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
+import freemarker.cache.TemplateLoader
 import org.apache.commons.mail.HtmlEmail
 import java.util.Properties
 import javax.mail.Session
@@ -21,7 +23,12 @@ data class SmtpConfig(
 
 class SmtpEmailService(
     private val config: SmtpConfig,
-): EmailService() {
+    templateLoader: TemplateLoader = DEFAULT_EMAIL_TEMPLATE_LOADER,
+    localizedLookup: Boolean = false,
+): EmailService(
+    templateLoader = templateLoader,
+    localizedLookup = localizedLookup,
+) {
 
     private val transport: Transport by lazy {
         val props = Properties()

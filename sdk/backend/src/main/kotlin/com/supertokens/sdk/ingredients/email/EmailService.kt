@@ -4,6 +4,7 @@ import com.supertokens.sdk.recipes.passwordless.models.TemplateProvider
 import freemarker.cache.TemplateLoader
 import freemarker.cache.URLTemplateLoader
 import freemarker.template.Configuration
+import freemarker.template.Template
 import java.io.StringWriter
 import java.net.URL
 
@@ -16,6 +17,7 @@ data class EmailContent(
 
 abstract class EmailService(
     templateLoader: TemplateLoader = DEFAULT_EMAIL_TEMPLATE_LOADER,
+    localizedLookup: Boolean = false,
     val magicLinkLoginTemplateName: String = "magic-link-login.html",
     val magicLinkOtpLoginTemplateName: String = "magic-link-otp-login.html",
     val otpLoginTemplateName: String = "otp-login.html",
@@ -24,7 +26,7 @@ abstract class EmailService(
 ) {
 
     private val cfg = Configuration().apply {
-        localizedLookup = false
+        this.localizedLookup = localizedLookup
     }
 
     init {
@@ -33,7 +35,7 @@ abstract class EmailService(
 
     abstract suspend fun sendEmail(content: EmailContent)
 
-    open fun getTemplate(template: String) = cfg.getTemplate(template)
+    open fun getTemplate(template: String): Template = cfg.getTemplate(template)
 
     fun processTemplate(name: String, provider: TemplateProvider): String {
         val template = getTemplate(name)
