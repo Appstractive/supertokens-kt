@@ -58,8 +58,8 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
         call.response.cookies.append(
             Cookie(
                 name = COOKIE_ACCESS_TOKEN,
-                value = sessions.cookieDomain,
-                domain = frontend.host,
+                value = accessToken.token,
+                domain = sessions.cookieDomain,
                 httpOnly = true,
                 expires = GMTDate(accessToken.expiry),
                 path = "/",
