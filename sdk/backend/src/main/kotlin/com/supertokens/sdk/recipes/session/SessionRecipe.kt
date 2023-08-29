@@ -85,9 +85,7 @@ class SessionRecipe(
     val cookieSameSite by lazy {
         // will be 'none' if https is used and frontend and api are different hosts, else 'lax'
         if(
-            secureCookies &&
-            (superTokens.appConfig.frontends.size > 1 ||
-                    superTokens.appConfig.frontends.first().host != superTokens.appConfig.api.host)
+            secureCookies && cookieDomain != superTokens.appConfig.api.host
         ) {
             "none"
         } else {
