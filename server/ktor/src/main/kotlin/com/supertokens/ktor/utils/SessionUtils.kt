@@ -58,7 +58,7 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
         call.response.cookies.append(
             Cookie(
                 name = COOKIE_ACCESS_TOKEN,
-                value = accessToken.token,
+                value = sessions.cookieDomain,
                 domain = frontend.host,
                 httpOnly = true,
                 expires = GMTDate(accessToken.expiry),
@@ -75,7 +75,7 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
                 Cookie(
                     name = COOKIE_REFRESH_TOKEN,
                     value = it.token,
-                    domain = superTokens.appConfig.api.host,
+                    domain = sessions.cookieDomain,
                     httpOnly = true,
                     expires = GMTDate(it.expiry),
                     secure = sessions.secureCookies,

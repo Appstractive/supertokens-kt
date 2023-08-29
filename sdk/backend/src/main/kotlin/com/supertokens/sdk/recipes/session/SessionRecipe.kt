@@ -47,6 +47,8 @@ class SessionConfig: RecipeConfig {
 
     var verifySessionInCore: Boolean = false
 
+    var cookieDomain: String? = null
+
     // the JWT issuer to use
     var issuer: String? = null
 
@@ -74,6 +76,8 @@ class SessionRecipe(
     // if true, set tokens to cookies
     val cookieBasedSessions = config.cookieBasedSessions
 
+    val cookieDomain = config.cookieDomain ?: superTokens.appConfig.api.host
+
     val secureCookies by lazy {
         superTokens.appConfig.api.scheme == "https"
     }
@@ -84,10 +88,11 @@ class SessionRecipe(
             secureCookies &&
             (superTokens.appConfig.frontends.size > 1 ||
                     superTokens.appConfig.frontends.first().host != superTokens.appConfig.api.host)
-        )
+        ) {
             "none"
-        else
+        } else {
             "lax"
+        }
     }
 
     val enableAntiCsrfCheck = config.antiCsrfCheck
