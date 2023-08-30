@@ -14,6 +14,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.util.date.GMTDate
+import io.ktor.util.date.getTimeMillis
 import io.ktor.util.pipeline.PipelineContext
 
 fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
@@ -61,7 +62,11 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
                 value = accessToken.token,
                 domain = sessions.cookieDomain,
                 httpOnly = true,
-                expires = GMTDate(accessToken.expiry),
+                // We set the expiration to 1 year, because we can't really access the expiration of the refresh token everywhere we are setting it.
+                // This should be safe to do, since this is only the validity of the cookie (set here or on the frontend) but we check the expiration of the JWT anyway.
+                // Even if the token is expired the presence of the token indicates that the user could have a valid refresh token
+                // Setting them to infinity would require special case handling on the frontend and just adding a year seems enough.
+                expires = GMTDate(getTimeMillis() + 365L * 24 * 60 * 60 * 1000),
                 path = "/",
                 secure = sessions.secureCookies,
                 extensions = mapOf(
