@@ -28,7 +28,7 @@ plugins {
     id("io.ktor.plugin") version "2.3.1"
 }
 
-version = "1.0.4"
+version = "1.0.5"
 group = "com.appstractive"
 
 dependencies {

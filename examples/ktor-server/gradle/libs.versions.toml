@@ -14,7 +14,7 @@ slf4j = "1.6.1"
 mail = "1.5"
 freemarker = "2.3.14"
 
-supertokens = "1.2.2"
+supertokens = "1.2.5"
 
 [libraries]
 kotlinGradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
