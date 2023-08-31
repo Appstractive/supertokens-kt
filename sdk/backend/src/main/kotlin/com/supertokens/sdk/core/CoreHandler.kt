@@ -5,8 +5,11 @@ import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.common.toStatus
+import com.supertokens.sdk.core.requests.CreateJwtRequest
 import com.supertokens.sdk.core.requests.DeleteUserRequest
+import com.supertokens.sdk.core.responses.CreateJwtResponse
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.passwordless.PasswordlessRecipe
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
@@ -81,9 +84,32 @@ internal class CoreHandler {
         return response.body()
     }
 
+    suspend fun SuperTokens.createJwt(
+        issuer: String,
+        validityInSeconds: Long = 86400L,
+        useStaticSigningKey: Boolean = false,
+        payload: Map<String, Any?>? = null
+    ): String {
+        val response = client.post(PATH_CREATE_JWT) {
+            setBody(
+                CreateJwtRequest(
+                    jwksDomain = issuer,
+                    validity = validityInSeconds,
+                    useStaticSigningKey = useStaticSigningKey,
+                    payload = payload?.toJsonElement() ?: JsonObject(emptyMap())
+                )
+            )
+        }
+
+        return response.parse<CreateJwtResponse, String> {
+            checkNotNull(it.jwt)
+        }
+    }
+
     companion object {
         const val PATH_GET_USER = "/recipe/user"
         const val PATH_DELETE_USER = "/user/remove"
+        const val PATH_CREATE_JWT = "/recipe/jwt"
     }
 
 }
@@ -126,4 +152,18 @@ suspend fun SuperTokens.deleteUser(userId: String): SuperTokensStatus = with(cor
 
 suspend fun SuperTokens.getJwks(): JsonObject = with(core) {
     return getJwks()
+}
+
+suspend fun SuperTokens.createJwt(
+    issuer: String,
+    validityInSeconds: Long = 86400L,
+    useStaticSigningKey: Boolean = false,
+    payload: Map<String, Any?>? = null
+): String = with(core) {
+    return createJwt(
+        issuer = issuer,
+        validityInSeconds = validityInSeconds,
+        useStaticSigningKey = useStaticSigningKey,
+        payload = payload,
+    )
 }

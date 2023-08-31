@@ -34,7 +34,7 @@ fun List<*>.toJsonElement(): JsonElement {
     return JsonArray(list)
 }
 
-fun Map<*, *>.toJsonElement(): JsonElement {
+fun Map<*, *>.toJsonElement(): JsonObject {
     val map = this.mapValues { (_, value) ->
         when (value) {
             null -> JsonNull
