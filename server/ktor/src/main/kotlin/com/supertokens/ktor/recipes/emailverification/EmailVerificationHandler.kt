@@ -29,7 +29,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-open class EmailVerificationHandler {
+open class EmailVerificationHandler(
+    protected val scope: CoroutineScope,
+) {
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(frontend: ServerConfig, token: String) =
         "${frontend.fullUrl}verify-email?token=$token"
@@ -44,7 +46,7 @@ open class EmailVerificationHandler {
         val frontend = call.fronend
         emailVerification.emailService?.let {
             // launch the email sending in another scope, so the call is not blocked
-            CoroutineScope(Dispatchers.IO).launch {
+            scope.launch {
                 runCatching {
                     val user = superTokens.getUserByEMail(email)
                     val token = emailVerification.createVerificationToken(user.id, email)

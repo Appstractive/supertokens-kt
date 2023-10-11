@@ -21,8 +21,11 @@ import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.CoroutineScope
 
-open class ThirdPartyHandler {
+open class ThirdPartyHandler(
+    protected val scope: CoroutineScope,
+) {
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.handleMissingEmail(provider: Provider<*>, userInfo: ThirdPartyUserInfo): String {
         return "${userInfo.id}@${provider.id}.temp"

@@ -40,6 +40,9 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import java.net.URL
 
@@ -51,25 +54,27 @@ class SuperTokensConfig {
     // The SuperTokens instance to use (required)
     var superTokens: SuperTokens? = null
 
-    // Handler for core APIs
-    var coreHandler: CoreHandler = CoreHandler()
+    var scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    var userHandler: UserHandler = UserHandler()
+    // Handler for core APIs
+    var coreHandler: CoreHandler = CoreHandler(scope = scope)
+
+    var userHandler: UserHandler = UserHandler(scope = scope)
 
     // Handler for EmailPassword APIs
-    var emailPasswordHandler: EmailPasswordHandler = EmailPasswordHandler()
+    var emailPasswordHandler: EmailPasswordHandler = EmailPasswordHandler(scope = scope)
 
     // Handler for Session APIs
-    var sessionHandler: SessionHandler = SessionHandler()
+    var sessionHandler: SessionHandler = SessionHandler(scope = scope)
 
     // Handler for ThirdParty APIs
-    var thirdPartyHandler: ThirdPartyHandler = ThirdPartyHandler()
+    var thirdPartyHandler: ThirdPartyHandler = ThirdPartyHandler(scope = scope)
 
     // Handler for EmailVerification APIs
-    var emailVerificationHandler: EmailVerificationHandler = EmailVerificationHandler()
+    var emailVerificationHandler: EmailVerificationHandler = EmailVerificationHandler(scope = scope)
 
     // Handler for Passwordless APIs
-    var passwordlessHandler: PasswordlessHandler = PasswordlessHandler()
+    var passwordlessHandler: PasswordlessHandler = PasswordlessHandler(scope = scope)
 
     // Allows you to perform additional validations on the JWT payload.
     var jwtValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = TokenValidator

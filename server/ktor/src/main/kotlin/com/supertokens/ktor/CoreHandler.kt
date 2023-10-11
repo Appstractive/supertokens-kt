@@ -8,8 +8,11 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.CoroutineScope
 
-open class CoreHandler {
+open class CoreHandler(
+    protected val scope: CoroutineScope,
+) {
 
     /**
      * A call to GET /signup/email/exists

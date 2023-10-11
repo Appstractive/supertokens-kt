@@ -79,7 +79,9 @@ suspend fun ApplicationCall.validateFormFields(
     success.invoke(email, password)
 }
 
-open class EmailPasswordHandler {
+open class EmailPasswordHandler(
+    protected val scope: CoroutineScope,
+) {
 
     /**
      * A call to POST /signin
@@ -191,7 +193,7 @@ open class EmailPasswordHandler {
         val frontend = call.fronend
         emailPassword.emailService?.let {
             // launch the email sending in another scope, so the call is not blocked
-            CoroutineScope(Dispatchers.IO).launch {
+            scope.launch {
                 runCatching {
                     val user = superTokens.getUserByEMail(email)
                     val token = emailPassword.createResetPasswordToken(user.id)

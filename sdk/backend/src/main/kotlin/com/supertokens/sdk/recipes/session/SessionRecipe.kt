@@ -442,14 +442,14 @@ suspend fun SuperTokens.regenerateSession(
  * Change session data
  */
 suspend fun SuperTokens.updateSessionData(
-    accessToken: String,
+    sessionHandle: String,
     userDataInDatabase: Map<String, Any?>,
-) = getRecipe<SessionRecipe>().updateSessionData(accessToken, userDataInDatabase)
+) = getRecipe<SessionRecipe>().updateSessionData(sessionHandle, userDataInDatabase)
 
 /**
  * Change JWT data for a session
  */
 suspend fun SuperTokens.updateJwtData(
-    accessToken: String,
+    sessionHandle: String,
     userDataInJWT: Map<String, Any?>,
-) = getRecipe<SessionRecipe>().updateJwtData(accessToken, userDataInJWT)
+) = getRecipe<SessionRecipe>().updateJwtData(sessionHandle, userDataInJWT)

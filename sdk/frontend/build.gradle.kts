@@ -20,7 +20,7 @@ val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
 }
 
 kotlin {
-    android {
+    androidTarget {
         publishLibraryVariants("release", "debug")
     }
     jvm("jvm") {
@@ -90,7 +90,7 @@ kotlin {
     }
 
     val publicationsFromMainHost = listOf(
-        android(),
+        androidTarget(),
         jvm("jvm").name,
         "kotlinMultiplatform",
     )

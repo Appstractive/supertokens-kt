@@ -14,8 +14,11 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.CoroutineScope
 
-open class SessionHandler {
+open class SessionHandler(
+    protected val scope: CoroutineScope,
+) {
 
     /**
      * A call to POST /signout

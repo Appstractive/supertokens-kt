@@ -20,7 +20,7 @@ val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
 }
 
 kotlin {
-    android()
+    androidTarget()
     jvm("jvm") {
         compilations.all {
             kotlinOptions.jvmTarget = "17"

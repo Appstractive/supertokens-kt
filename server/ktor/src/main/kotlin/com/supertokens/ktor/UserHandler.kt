@@ -8,8 +8,11 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.application
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.CoroutineScope
 
-open class UserHandler {
+open class UserHandler(
+    protected val scope: CoroutineScope,
+) {
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.onUserSignedUp(user: User) {
         setDefaultRoles(user)

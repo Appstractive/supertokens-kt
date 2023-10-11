@@ -3,8 +3,11 @@ package com.appstractive
 import com.supertokens.ktor.recipes.emailpassword.EmailPasswordHandler
 import io.ktor.server.application.ApplicationCall
 import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.CoroutineScope
 
-class CustomEmailPasswordHandler: EmailPasswordHandler() {
+class CustomEmailPasswordHandler(
+    scope: CoroutineScope,
+): EmailPasswordHandler() {
 
     private val defaultEmailPasswordHandler = EmailPasswordHandler()
 

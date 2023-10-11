@@ -33,7 +33,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-open class PasswordlessHandler {
+open class PasswordlessHandler(
+    protected val scope: CoroutineScope,
+) {
 
     /**
      * Override this to convert to localized duration
@@ -56,7 +58,7 @@ open class PasswordlessHandler {
         val frontend = call.fronend
         passwordless.emailService?.let {
             // launch the email sending in another scope, so the call is not blocked
-            CoroutineScope(Dispatchers.IO).launch {
+            scope.launch {
                 val appConfig = superTokens.appConfig
 
                 val body: String = when (passwordless.flowType) {
