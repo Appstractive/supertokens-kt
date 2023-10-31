@@ -10,6 +10,7 @@ import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.fronend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.ServerConfig
+import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.VerifyEmailTokenRequest
@@ -22,6 +23,7 @@ import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.emailverification.models.EmailVerificationTemplate
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
+import io.ktor.server.request.header
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
@@ -95,11 +97,28 @@ open class EmailVerificationHandler(
 
         when (body.method) {
             "token" -> {
-                emailVerification.verifyToken(body.token)
+                val data = emailVerification.verifyToken(body.token)
+
+                // update token if present and from same user
+                runCatching {
+                    call.request.header(HEADER_ACCESS_TOKEN)?.let { token ->
+                        val session = sessions.verifySession(token, checkDatabase = true)
+
+                        if(session.session.userId == data.userId) {
+                            val jwtData = sessions.getJwtData(superTokens.getUserById(data.userId))
+                            val newSession = sessions.regenerateSession(token, jwtData)
+
+                            setSessionInResponse(
+                                accessToken = newSession.accessToken,
+                            )
+                        }
+                    }
+                }
+
                 call.respond(StatusResponse())
             }
 
-            else -> throw BadRequestException("Invalid verification meth ${body.method}")
+            else -> throw BadRequestException("Invalid verification method ${body.method}")
         }
 
     }

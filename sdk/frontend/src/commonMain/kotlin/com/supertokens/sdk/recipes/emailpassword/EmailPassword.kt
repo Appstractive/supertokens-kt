@@ -15,14 +15,14 @@ import com.supertokens.sdk.handlers.FormFieldException
 import com.supertokens.sdk.handlers.SignInProvider
 import com.supertokens.sdk.handlers.SignInProviderConfig
 import com.supertokens.sdk.handlers.SignUpProvider
-import com.supertokens.sdk.handlers.SignupProviderConfig
+import com.supertokens.sdk.handlers.SignUpProviderConfig
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
 object EmailPassword : SignInProvider<EmailPassword.Config, User>, SignUpProvider<EmailPassword.Config, User> {
 
-    data class Config(var email: String = "", var password: String = "") : SignInProviderConfig, SignupProviderConfig
+    data class Config(var email: String = "", var password: String = "") : SignInProviderConfig, SignUpProviderConfig
 
     override suspend fun signIn(superTokensClient: SuperTokensClient, configure: Config.() -> Unit): User {
         val config = Config().apply(configure)

@@ -5,9 +5,9 @@ import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.responses.FormFieldError
 
-interface SignupProviderConfig
+interface SignUpProviderConfig
 
-interface SignUpProvider<C: SignupProviderConfig, R> {
+interface SignUpProvider<C: SignUpProviderConfig, R> {
 
     suspend fun signUp(superTokensClient: SuperTokensClient, configure: (C.() -> Unit)): R
 

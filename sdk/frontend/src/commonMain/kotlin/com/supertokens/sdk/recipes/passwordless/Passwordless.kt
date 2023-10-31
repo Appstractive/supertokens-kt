@@ -13,7 +13,7 @@ import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.handlers.SignInProvider
 import com.supertokens.sdk.handlers.SignInProviderConfig
 import com.supertokens.sdk.handlers.SignUpProvider
-import com.supertokens.sdk.handlers.SignupProviderConfig
+import com.supertokens.sdk.handlers.SignUpProviderConfig
 import com.supertokens.sdk.models.SignInData
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -30,7 +30,7 @@ object Passwordless : SignUpProvider<Passwordless.SignUpConfig, PasswordlessSign
     data class SignUpConfig(
         var email: String? = null,
         var phoneNumber: String? = null
-    ) : SignupProviderConfig
+    ) : SignUpProviderConfig
 
     override suspend fun signUp(superTokensClient: SuperTokensClient, configure: SignUpConfig.() -> Unit): PasswordlessSignUpData {
         val config = SignUpConfig().apply(configure)
