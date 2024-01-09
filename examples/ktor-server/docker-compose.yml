@@ -28,7 +28,7 @@ services:
       - app_network
     restart: unless-stopped
   supertokens:
-    image: registry.supertokens.io/supertokens/supertokens-postgresql:6.0
+    image: registry.supertokens.io/supertokens/supertokens-postgresql:7.0
     depends_on:
       db:
         condition: service_healthy
@@ -46,7 +46,7 @@ services:
       timeout: 5s
       retries: 5
   supertokens-server:
-    image: supertokens-ktor-example:1.0.3
+    image: supertokens-ktor-example:1.0.6
     environment:
       SUPERTOKENS_URL: "http://supertokens:3567"
       SUPERTOKENS_FRONTEND_SCHEME: "http"
