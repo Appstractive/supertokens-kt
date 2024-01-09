@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.jwt)
 
     testImplementation(libs.test.kotlin)
+    testImplementation(libs.test.totp)
 }
 
 publishing {

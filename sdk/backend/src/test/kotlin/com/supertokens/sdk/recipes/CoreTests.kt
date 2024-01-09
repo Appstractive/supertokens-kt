@@ -4,12 +4,13 @@ import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.core.createJwt
 import com.supertokens.sdk.core.deleteUser
-import com.supertokens.sdk.core.getUserByEMail
+import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.core.getUserById
-import com.supertokens.sdk.core.getUserByPhoneNumber
+import com.supertokens.sdk.core.getUsersByPhoneNumber
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignUp
+import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.passwordless.consumePasswordlessUserInputCode
 import com.supertokens.sdk.recipes.passwordless.createPasswordlessPhoneNumberCode
 import com.supertokens.sdk.superTokens
@@ -20,12 +21,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
-import org.junit.Ignore
 import org.junit.Test
+import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@Ignore("Only for DEV purposes")
 class CoreTests {
 
     private val superTokens = superTokens(
@@ -35,11 +35,12 @@ class CoreTests {
         ),
     ) {
         recipe(EmailPassword)
+        recipe(Passwordless)
     }
 
     @Test
     fun testGetUserById() = runBlocking {
-        val user = superTokens.getUserByEMail("test@test.de")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val getResponse = superTokens.getUserById(user.id)
 
@@ -48,9 +49,9 @@ class CoreTests {
 
     @Test
     fun testGetUserByMail() = runBlocking {
-        val user = superTokens.getUserByEMail("test@test.de")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
-        assertEquals("test@test.de", user.email)
+        assertEquals(TEST_USER, user.email)
     }
 
     @Test
@@ -59,14 +60,15 @@ class CoreTests {
         assertTrue(code.codeId.isNotEmpty())
 
         val response = superTokens.consumePasswordlessUserInputCode(code.preAuthSessionId, code.deviceId, code.userInputCode)
-        val user = superTokens.getUserByPhoneNumber("+491601234567")
+        val user = superTokens.getUsersByPhoneNumber("+491601234567").first()
 
         assertEquals("+491601234567", user.phoneNumber)
     }
 
     @Test
     fun testDeleteUser() = runBlocking {
-        val user = superTokens.emailPasswordSignUp("test42@test.de", "a1234567")
+        val email = "${Instant.now().epochSecond}@test.de"
+        val user = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
 
         val response = superTokens.deleteUser(user.id)
         assertEquals(SuperTokensStatus.OK, response)
@@ -106,6 +108,9 @@ class CoreTests {
     )
 
     companion object {
+        const val TEST_USER = "test@test.de"
+        const val TEST_PASSWORD = "a1234567"
+        
         private val jsonEncoder = Json { encodeDefaults = true }
 
         val jwtData: Map<String, Any?> = mapOf(

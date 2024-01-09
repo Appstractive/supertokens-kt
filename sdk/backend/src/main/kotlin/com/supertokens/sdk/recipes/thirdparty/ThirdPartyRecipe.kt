@@ -14,6 +14,7 @@ import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartySignInUpRequest
 import com.supertokens.sdk.common.responses.SignInUpResponse
 import com.supertokens.sdk.models.SuperTokensEvent
+import com.supertokens.sdk.post
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -47,10 +48,11 @@ class ThirdPartyRecipe(
     suspend fun signInUp(
         thirdPartyId: String,
         thirdPartyUserId: String,
-        email: String
+        email: String,
+        isVerified: Boolean,
     ): SignInUpData {
         Result
-        val response = superTokens.client.post(PATH_SIGN_IN_UP) {
+        val response = superTokens.post(PATH_SIGN_IN_UP) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -60,6 +62,7 @@ class ThirdPartyRecipe(
                     thirdPartyUserId = thirdPartyUserId,
                     email = ThirdPartyEmail(
                         id = email,
+                        isVerified = isVerified,
                     ),
                 )
             )
@@ -119,4 +122,10 @@ suspend fun SuperTokens.thirdPartySignInUp(
     thirdPartyId: String,
     thirdPartyUserId: String,
     email: String,
-) = getRecipe<ThirdPartyRecipe>().signInUp(thirdPartyId, thirdPartyUserId, email)
+    isVerified: Boolean,
+) = getRecipe<ThirdPartyRecipe>().signInUp(
+    thirdPartyId = thirdPartyId,
+    thirdPartyUserId = thirdPartyUserId,
+    email = email,
+    isVerified = isVerified
+)

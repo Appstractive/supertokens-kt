@@ -28,12 +28,17 @@ sealed class SuperTokensStatus(
     object TotpDeviceUnknownError: SuperTokensStatus("UNKNOWN_DEVICE_ERROR")
     object InvalidTotpCodeError: SuperTokensStatus("INVALID_TOTP_ERROR")
     object TotpLimitReachedError: SuperTokensStatus("LIMIT_REACHED_ERROR")
+    class AppIdOrTenantIdNotFoundError(message: String): SuperTokensStatus(message)
 
     object UnknownError: SuperTokensStatus("UNKNOWN_ERROR")
 
 }
 
 fun String.toStatus(): SuperTokensStatus {
+    when {
+        startsWith("AppId or tenantId not found") -> return SuperTokensStatus.AppIdOrTenantIdNotFoundError(this)
+    }
+
     return when(this) {
         SuperTokensStatus.OK.value -> SuperTokensStatus.OK
         SuperTokensStatus.WrongCredentialsError.value -> SuperTokensStatus.WrongCredentialsError

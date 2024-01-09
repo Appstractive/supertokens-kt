@@ -55,6 +55,10 @@ class SuperTokensConfig(
 
     var apiKey: String? = null
 
+    var appId: String? = null
+
+    var tenantId: String? = null
+
     var recipes: List<BuildRecipe> = emptyList()
         private set
 
@@ -73,6 +77,9 @@ class SuperTokens(
     val appConfig: AppConfig = config.appConfig
 
     val jwksUrl: String = "${config.connectionUrl}/.well-known/jwks.json"
+
+    val appId by lazy { config.appId }
+    val tenantId by lazy { config.tenantId }
 
     internal val core: CoreHandler = CoreHandler()
 

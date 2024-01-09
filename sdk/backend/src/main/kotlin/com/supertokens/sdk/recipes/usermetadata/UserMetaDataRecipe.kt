@@ -7,6 +7,9 @@ import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.common.toStatus
+import com.supertokens.sdk.get
+import com.supertokens.sdk.post
+import com.supertokens.sdk.put
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -32,7 +35,7 @@ class UserMetaDataRecipe(
      * Gets the stored metadata object of the user
      */
     suspend fun getMetaData(userId: String): Map<String, Any?> {
-        val response = superTokens.client.get("$PATH_META_DATA?userId=$userId") {
+        val response = superTokens.get("$PATH_META_DATA?userId=$userId", includeTenantId = false) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
         }
@@ -50,7 +53,7 @@ class UserMetaDataRecipe(
      *  result: { "preferences": { "theme":"dark" }, "notifications": { "sms": true } }
      */
     suspend fun updateMetaData(userId: String, metaData: Map<String, Any?>): Map<String, Any?> {
-        val response = superTokens.client.put(PATH_META_DATA) {
+        val response = superTokens.put(PATH_META_DATA, includeTenantId = false) {
 
             header(Constants.HEADER_RECIPE_ID, SessionRecipe.ID)
 
@@ -71,7 +74,7 @@ class UserMetaDataRecipe(
      * Removes the entire metadata JSON stored about the user.
      */
     suspend fun deleteMetaData(userId: String): SuperTokensStatus {
-        val response = superTokens.client.post(PATH_META_DATA_REMOVE) {
+        val response = superTokens.post(PATH_META_DATA_REMOVE, includeTenantId = false) {
 
             header(Constants.HEADER_RECIPE_ID, SessionRecipe.ID)
 

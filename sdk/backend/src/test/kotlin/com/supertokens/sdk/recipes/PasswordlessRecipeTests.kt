@@ -21,13 +21,11 @@ import com.supertokens.sdk.recipes.passwordless.revokePasswordlessPhoneNumberCod
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertThrows
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-@Ignore("Only for DEV purposes")
 class PasswordlessRecipeTests {
 
     private val superTokens = superTokens(
@@ -48,19 +46,19 @@ class PasswordlessRecipeTests {
 
     @Test
     fun testCreateEmailCode() = runBlocking {
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
     }
 
     @Test
     fun testCreatePhoneNumberCode() = runBlocking {
-        val code = superTokens.createPasswordlessPhoneNumberCode("+491601234567")
+        val code = superTokens.createPasswordlessPhoneNumberCode(TEST_PHONE_NUMBER)
         assertTrue(code.codeId.isNotEmpty())
     }
 
     @Test
     fun testRecreateCode() = runBlocking {
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
         val newCode = superTokens.recreatePasswordlessCode(code.deviceId)
@@ -69,25 +67,25 @@ class PasswordlessRecipeTests {
 
     @Test
     fun testConsumeLinkCode() = runBlocking {
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
         val response = superTokens.consumePasswordlessLinkCode(code.preAuthSessionId, code.linkCode)
-        assertEquals("test@test.de", response.user.email)
+        assertEquals(TEST_USER, response.user.email)
     }
 
     @Test
     fun testConsumeUserInputCode() = runBlocking {
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
         val response = superTokens.consumePasswordlessUserInputCode(code.preAuthSessionId, code.deviceId, code.userInputCode)
-        assertEquals("test@test.de", response.user.email)
+        assertEquals(TEST_USER, response.user.email)
     }
 
     @Test
     fun testConsumeCodeFailed() = runBlocking {
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
         val exception = assertThrows(SuperTokensStatusException::class.java) {
@@ -101,7 +99,7 @@ class PasswordlessRecipeTests {
 
     @Test
     fun testRevokeCode() = runBlocking {
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
         val response = superTokens.revokePasswordlessCode(code.codeId)
@@ -110,47 +108,47 @@ class PasswordlessRecipeTests {
 
     @Test
     fun testRevokeAllCode() = runBlocking {
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
-        val response = superTokens.revokePasswordlessEmailCodes("test@test.de")
+        val response = superTokens.revokePasswordlessEmailCodes(TEST_USER)
         assertEquals(SuperTokensStatus.OK, response)
     }
 
     @Test
     fun testGetCodesByEmail() = runBlocking {
-        superTokens.revokePasswordlessEmailCodes("test@test.de")
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        superTokens.revokePasswordlessEmailCodes(TEST_USER)
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
-        val codes = superTokens.getPasswordlessCodesByEmail("test@test.de")
+        val codes = superTokens.getPasswordlessCodesByEmail(TEST_USER)
         assertTrue(codes.isNotEmpty())
         assertNotNull(codes.first().codes.firstOrNull {
             it.codeId == code.codeId
         })
 
-        assertEquals("test@test.de", codes.first().email)
+        assertEquals(TEST_USER, codes.first().email)
     }
 
     @Test
     fun testGetCodesByPhoneNumber() = runBlocking {
-        superTokens.revokePasswordlessPhoneNumberCodes("+491601234567")
-        val code = superTokens.createPasswordlessPhoneNumberCode("+491601234567")
+        superTokens.revokePasswordlessPhoneNumberCodes(TEST_PHONE_NUMBER)
+        val code = superTokens.createPasswordlessPhoneNumberCode(TEST_PHONE_NUMBER)
         assertTrue(code.codeId.isNotEmpty())
 
-        val codes = superTokens.getPasswordlessCodesByPhoneNumber("+491601234567")
+        val codes = superTokens.getPasswordlessCodesByPhoneNumber(TEST_PHONE_NUMBER)
         assertTrue(codes.isNotEmpty())
         assertNotNull(codes.first().codes.firstOrNull {
             it.codeId == code.codeId
         })
 
-        assertEquals("+491601234567", codes.first().phoneNumber)
+        assertEquals(TEST_PHONE_NUMBER, codes.first().phoneNumber)
     }
 
     @Test
     fun testGetCodesByDeviceId() = runBlocking {
-        superTokens.revokePasswordlessEmailCodes("test@test.de")
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        superTokens.revokePasswordlessEmailCodes(TEST_USER)
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
         val codes = superTokens.getPasswordlessCodesByDeviceId(code.deviceId)
@@ -159,13 +157,13 @@ class PasswordlessRecipeTests {
             it.codeId == code.codeId
         })
 
-        assertEquals("test@test.de", codes.first().email)
+        assertEquals(TEST_USER, codes.first().email)
     }
 
     @Test
     fun testGetCodesByPreAuthSessionId() = runBlocking {
-        superTokens.revokePasswordlessEmailCodes("test@test.de")
-        val code = superTokens.createPasswordlessEmailCode("test@test.de")
+        superTokens.revokePasswordlessEmailCodes(TEST_USER)
+        val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
         val codes = superTokens.getPasswordlessCodesByPreAuthSessionId(code.preAuthSessionId)
@@ -174,7 +172,12 @@ class PasswordlessRecipeTests {
             it.codeId == code.codeId
         })
 
-        assertEquals("test@test.de", codes.first().email)
+        assertEquals(TEST_USER, codes.first().email)
+    }
+
+    companion object {
+        const val TEST_USER = "test@test.de"
+        const val TEST_PHONE_NUMBER = "+491601234567"
     }
 
 }

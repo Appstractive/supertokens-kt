@@ -5,5 +5,5 @@ object Constants {
     const val HEADER_RECIPE_ID = "rid"
     const val HEADER_API_KEY = "api-key"
 
-    const val CDI_VERSION = "2.21"
+    const val CDI_VERSION = "4.0"
 }

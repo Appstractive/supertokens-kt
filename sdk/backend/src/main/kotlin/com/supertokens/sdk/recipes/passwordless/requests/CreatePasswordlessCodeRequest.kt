@@ -7,4 +7,5 @@ data class CreatePasswordlessCodeRequest(
     val email: String? = null,
     val phoneNumber: String? = null,
     val deviceId: String? = null,
+    val userInputCode: String? = null,
 )

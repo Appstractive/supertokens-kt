@@ -14,5 +14,5 @@ data class TotpDeviceReponse(
 @Serializable
 data class TotpDevicesResponse(
     override val status: String,
-    val devices: List<TotpDeviceReponse>,
+    val devices: List<TotpDeviceReponse>? = null,
 ): BaseResponse

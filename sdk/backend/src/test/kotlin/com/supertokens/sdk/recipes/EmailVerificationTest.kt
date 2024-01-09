@@ -2,9 +2,9 @@ package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
-import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignIn
 import com.supertokens.sdk.recipes.emailverification.EmailVerification
 import com.supertokens.sdk.recipes.emailverification.EmailVerificationRecipe
 import com.supertokens.sdk.recipes.emailverification.createEmailVerificationToken
@@ -14,12 +14,10 @@ import com.supertokens.sdk.recipes.emailverification.checkEmailVerified
 import com.supertokens.sdk.recipes.emailverification.verifyToken
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@Ignore("Only for DEV purposes")
 class EmailVerificationTest {
 
     private val superTokens = superTokens(
@@ -39,48 +37,54 @@ class EmailVerificationTest {
 
     @Test
     fun testCreateVerificationToken() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
-        val token = superTokens.createEmailVerificationToken(user.id, "test@test.de")
+        val token = superTokens.createEmailVerificationToken(user.id, TEST_USER)
         assertTrue(token.isNotEmpty())
     }
 
     @Test
     fun testRemoveAllVerificationTokens() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
-        val status = superTokens.removeAllVerificationTokens(user.id, "test@test.de")
+        val status = superTokens.removeAllVerificationTokens(user.id, TEST_USER)
         assertEquals(SuperTokensStatus.OK, status)
     }
 
     @Test
     fun testVerifyToken() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
+        superTokens.setUnverified(user.id, TEST_USER)
 
-        val token = superTokens.createEmailVerificationToken(user.id, "test@test.de")
+        val token = superTokens.createEmailVerificationToken(user.id, TEST_USER)
         val response = superTokens.verifyToken(token)
 
-        assertEquals("test@test.de", response.email)
+        assertEquals(TEST_USER, response.email)
         assertEquals(user.id, response.userId)
     }
 
     @Test
     fun testVerifyEmail() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
+        superTokens.setUnverified(user.id, TEST_USER)
 
-        val token = superTokens.createEmailVerificationToken(user.id, "test@test.de")
+        val token = superTokens.createEmailVerificationToken(user.id, TEST_USER)
         superTokens.verifyToken(token)
 
-        val isValid = superTokens.checkEmailVerified(user.id, "test@test.de")
+        val isValid = superTokens.checkEmailVerified(user.id, TEST_USER)
         assertEquals(true, isValid)
     }
 
     @Test
     fun testSetUnverified() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
-        val status = superTokens.setUnverified(user.id, "test@test.de")
+        val status = superTokens.setUnverified(user.id, TEST_USER)
         assertEquals(SuperTokensStatus.OK, status)
+    }
+
+    companion object {
+        const val TEST_USER = "test@test.de"
     }
 
 }

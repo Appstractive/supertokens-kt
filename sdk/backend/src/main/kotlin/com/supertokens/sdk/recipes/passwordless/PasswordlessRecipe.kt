@@ -2,6 +2,7 @@ package com.supertokens.sdk.recipes.passwordless
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.buildRequestPath
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.common.responses.StatusResponse
@@ -14,6 +15,10 @@ import com.supertokens.sdk.recipes.passwordless.models.PasswordlessCodeData
 import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequest
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.SuperTokensEvent
+import com.supertokens.sdk.post
+import com.supertokens.sdk.put
+import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
+import com.supertokens.sdk.recipes.emailpassword.requests.UpdateUserRequest
 import com.supertokens.sdk.recipes.passwordless.requests.CreatePasswordlessCodeRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokeAllPasswordlessCodesRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokePasswordlesCodeRequest
@@ -25,6 +30,7 @@ import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.path
 
@@ -49,7 +55,7 @@ class PasswordlessRecipe(
      * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
      */
     suspend fun createEmailCode(email: String): PasswordlessCodeData {
-        val response = superTokens.client.post(PATH_CREATE_CODE) {
+        val response = superTokens.post(PATH_CREATE_CODE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -77,7 +83,7 @@ class PasswordlessRecipe(
      * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
      */
     suspend fun createPhoneNumberCode(phoneNumber: String): PasswordlessCodeData {
-        val response = superTokens.client.post(PATH_CREATE_CODE) {
+        val response = superTokens.post(PATH_CREATE_CODE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -102,10 +108,39 @@ class PasswordlessRecipe(
     }
 
     /**
+     * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
+     */
+    suspend fun createDeviceIdCode(deviceId: String, userInputCode: String,): PasswordlessCodeData {
+        val response = superTokens.post(PATH_CREATE_CODE) {
+
+            header(Constants.HEADER_RECIPE_ID, ID)
+
+            setBody(
+                CreatePasswordlessCodeRequest(
+                    deviceId = deviceId,
+                    userInputCode = userInputCode,
+                )
+            )
+        }
+
+        return response.parse<PasswordlessCodeResponse, PasswordlessCodeData> {
+            PasswordlessCodeData(
+                preAuthSessionId = checkNotNull(it.preAuthSessionId),
+                codeId = checkNotNull(it.codeId),
+                deviceId = checkNotNull(it.deviceId),
+                userInputCode = checkNotNull(it.userInputCode),
+                linkCode = checkNotNull(it.linkCode),
+                timeCreated = checkNotNull(it.timeCreated),
+                codeLifetime = checkNotNull(it.codeLifetime),
+            )
+        }
+    }
+
+    /**
      * Restarts a sign in process the user can use to sign in.
      */
     suspend fun recreateCode(deviceId: String): PasswordlessCodeData {
-        val response = superTokens.client.post(PATH_CREATE_CODE) {
+        val response = superTokens.post(PATH_CREATE_CODE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -133,7 +168,7 @@ class PasswordlessRecipe(
      * Tries to consume the passed linkCode to sign the user in
      */
     suspend fun consumeLinkCode(preAuthSessionId: String, linkCode: String): SignInUpData {
-        val response = superTokens.client.post(PATH_CONSUME_CODE) {
+        val response = superTokens.post(PATH_CONSUME_CODE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -164,7 +199,7 @@ class PasswordlessRecipe(
      * Tries to consume the passed userInputCode+deviceId combo to sign the user in
      */
     suspend fun consumeUserInputCode(preAuthSessionId: String, deviceId: String, userInputCode: String): SignInUpData {
-        val response = superTokens.client.post(PATH_CONSUME_CODE) {
+        val response = superTokens.post(PATH_CONSUME_CODE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -189,7 +224,7 @@ class PasswordlessRecipe(
      * Revokes a code by id
      */
     suspend fun revokeCode(codeId: String): SuperTokensStatus {
-        val response = superTokens.client.post(PATH_REVOKE_CODE) {
+        val response = superTokens.post(PATH_REVOKE_CODE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -209,7 +244,7 @@ class PasswordlessRecipe(
      * Revokes all codes issued for the user
      */
     suspend fun revokeEmailCodes(email: String): SuperTokensStatus {
-        val response = superTokens.client.post(PATH_REVOKE_CODES) {
+        val response = superTokens.post(PATH_REVOKE_CODES) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -229,7 +264,7 @@ class PasswordlessRecipe(
      * Revokes all codes issued for the user
      */
     suspend fun revokePhoneNumberCodes(phoneNumber: String): SuperTokensStatus {
-        val response = superTokens.client.post(PATH_REVOKE_CODES) {
+        val response = superTokens.post(PATH_REVOKE_CODES) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -251,7 +286,7 @@ class PasswordlessRecipe(
     suspend fun getCodesByEmail(email: String): List<PasswordlessDevices> {
         val response = superTokens.client.get {
             url {
-                path(PATH_GET_CODES)
+                path(superTokens.buildRequestPath(PATH_GET_CODES))
                 parameters.append("email", email)
             }
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -268,7 +303,7 @@ class PasswordlessRecipe(
     suspend fun getCodesByDeviceId(deviceId: String): List<PasswordlessDevices> {
         val response = superTokens.client.get {
             url {
-                path(PATH_GET_CODES)
+                path(superTokens.buildRequestPath(PATH_GET_CODES))
                 parameters.append("deviceId", deviceId)
             }
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -285,7 +320,7 @@ class PasswordlessRecipe(
     suspend fun getCodesByPhoneNumber(phoneNumber: String): List<PasswordlessDevices> {
         val response = superTokens.client.get {
             url {
-                path(PATH_GET_CODES)
+                path(superTokens.buildRequestPath(PATH_GET_CODES))
                 parameters.append("phoneNumber", phoneNumber)
             }
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -302,7 +337,7 @@ class PasswordlessRecipe(
     suspend fun getCodesByPreAuthSessionId(preAuthSessionId: String): List<PasswordlessDevices> {
         val response = superTokens.client.get {
             url {
-                path(PATH_GET_CODES)
+                path(superTokens.buildRequestPath(PATH_GET_CODES))
                 parameters.append("preAuthSessionId", preAuthSessionId)
             }
             header(Constants.HEADER_RECIPE_ID, ID)
@@ -310,6 +345,29 @@ class PasswordlessRecipe(
 
         return response.parse<GetPasswordlessCodesResponse, List<PasswordlessDevices>> {
             it.devices
+        }
+    }
+
+    /**
+     * Update a user's phone number
+     */
+    suspend fun updatePhoneNumber(userId: String, phoneNumber: String): SuperTokensStatus {
+        val response = superTokens.put(PATH_UPDATE_USER) {
+            header(Constants.HEADER_RECIPE_ID, ID)
+
+            setBody(
+                UpdateUserRequest(
+                    recipeUserId = userId,
+                    phoneNumber = phoneNumber,
+                )
+            )
+        }
+
+        return response.parse().also {
+            superTokens._events.tryEmit(SuperTokensEvent.UserPhoneNumberChanged(
+                userId = userId,
+                phoneNumber = phoneNumber
+            ))
         }
     }
 
@@ -321,6 +379,7 @@ class PasswordlessRecipe(
         const val PATH_REVOKE_CODE = "/recipe/signinup/code/remove"
         const val PATH_REVOKE_CODES = "/recipe/signinup/codes/remove"
         const val PATH_GET_CODES = "/recipe/signinup/codes"
+        const val PATH_UPDATE_USER = "/recipe/user"
     }
 
 }
@@ -350,6 +409,17 @@ suspend fun SuperTokens.createPasswordlessEmailCode(
 suspend fun SuperTokens.createPasswordlessPhoneNumberCode(
     phoneNumber: String,
 ) = getRecipe<PasswordlessRecipe>().createPhoneNumberCode(phoneNumber)
+
+/**
+ * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
+ */
+suspend fun SuperTokens.createPasswordlessDeviceIdCode(
+    deviceId: String,
+    userInputCode: String,
+) = getRecipe<PasswordlessRecipe>().createDeviceIdCode(
+    deviceId = deviceId,
+    userInputCode = userInputCode,
+)
 
 /**
  * Restarts a sign in process the user can use to sign in.

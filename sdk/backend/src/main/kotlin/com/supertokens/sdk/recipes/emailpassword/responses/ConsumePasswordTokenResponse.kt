@@ -4,7 +4,8 @@ import com.supertokens.sdk.common.responses.BaseResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateResetPasswordTokenResponse(
+data class ConsumePasswordTokenResponse(
     override val status: String,
-    val token: String? = null,
+    val userId: String? = null,
+    val email: String? = null,
 ): BaseResponse

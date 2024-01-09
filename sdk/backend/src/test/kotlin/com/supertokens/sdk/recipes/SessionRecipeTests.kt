@@ -2,9 +2,9 @@ package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
-import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignIn
 import com.supertokens.sdk.recipes.session.SessionRecipe
 import com.supertokens.sdk.recipes.session.Sessions
 import com.supertokens.sdk.recipes.session.createSession
@@ -21,13 +21,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-@Ignore("Only for DEV purposes")
 class SessionRecipeTests {
 
     private val superTokens = superTokens(
@@ -47,7 +45,7 @@ class SessionRecipeTests {
 
     @Test
     fun testCreateSession() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val session = superTokens.createSession(userId = user.id, userDataInJWT = jwtData, userDataInDatabase = dbData)
         assertEquals(user.id, session.session.userId)
@@ -55,7 +53,7 @@ class SessionRecipeTests {
 
     @Test
     fun testGetSession() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val session = superTokens.createSession(userId = user.id, userDataInJWT = jwtData, userDataInDatabase = dbData)
 
@@ -65,7 +63,7 @@ class SessionRecipeTests {
 
     @Test
     fun testGetSessions() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val session = superTokens.createSession(user.id)
 
@@ -76,7 +74,7 @@ class SessionRecipeTests {
 
     @Test
     fun testRemoveSessions() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val session = superTokens.createSession(user.id)
 
@@ -87,7 +85,7 @@ class SessionRecipeTests {
 
     @Test
     fun testVerifySession() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val session = superTokens.createSession(user.id)
 
@@ -99,7 +97,7 @@ class SessionRecipeTests {
 
     @Test
     fun testRefreshSession() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val session = superTokens.createSession(user.id)
 
@@ -112,7 +110,7 @@ class SessionRecipeTests {
 
     @Test
     fun testRegenerateSession() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val session = superTokens.createSession(user.id)
 
@@ -127,7 +125,7 @@ class SessionRecipeTests {
 
     @Test
     fun testUpdateSessionData() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val session = superTokens.createSession(user.id)
 
@@ -140,7 +138,7 @@ class SessionRecipeTests {
 
     @Test
     fun testUpdateJwtData() = runBlocking {
-        val user = superTokens.emailPasswordSignIn("test@test.de", "a1234567")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         val session = superTokens.createSession(user.id)
 
@@ -166,6 +164,9 @@ class SessionRecipeTests {
     )
 
     companion object {
+
+        const val TEST_USER = "test@test.de"
+
         private val jsonEncoder = Json { encodeDefaults = true }
 
         val jwtData: Map<String, Any?> = mapOf(

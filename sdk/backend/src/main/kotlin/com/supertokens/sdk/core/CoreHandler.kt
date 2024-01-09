@@ -1,7 +1,7 @@
 package com.supertokens.sdk.core
 
-import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.buildRequestPath
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.common.responses.StatusResponse
@@ -10,6 +10,9 @@ import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.core.requests.CreateJwtRequest
 import com.supertokens.sdk.core.requests.DeleteUserRequest
 import com.supertokens.sdk.core.responses.CreateJwtResponse
+import com.supertokens.sdk.core.responses.GetUsersResponse
+import com.supertokens.sdk.get
+import com.supertokens.sdk.post
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.passwordless.PasswordlessRecipe
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
@@ -17,7 +20,6 @@ import com.supertokens.sdk.utils.parse
 import com.supertokens.sdk.utils.parseUser
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.path
@@ -25,47 +27,62 @@ import kotlinx.serialization.json.JsonObject
 
 internal class CoreHandler {
 
-    suspend fun SuperTokens.getUserById(userId: String, recipeId: String = EmailPasswordRecipe.ID): User {
-
+    suspend fun SuperTokens.getUserById(userId: String): User {
         val response = client.get {
             url {
-                path(PATH_GET_USER)
+                path(buildRequestPath(path = PATH_GET_USER_BY_ID, includeTenantId = false))
                 parameters.append("userId", userId)
             }
-            header(Constants.HEADER_RECIPE_ID, recipeId)
         }
 
         return response.parseUser()
     }
 
-    suspend fun SuperTokens.getUserByEMail(email: String, recipeId: String = EmailPasswordRecipe.ID): User {
-
+    suspend fun SuperTokens.getUsersByEMail(email: String, doUnionOfAccountInfo: Boolean = true): List<User> {
         val response = client.get {
             url {
-                path(PATH_GET_USER)
+                path(buildRequestPath(path = PATH_GET_USER_BY_ACCOUNT_INFO))
                 parameters.append("email", email)
+                parameters.append("doUnionOfAccountInfo", doUnionOfAccountInfo.toString())
             }
-            header(Constants.HEADER_RECIPE_ID, recipeId)
         }
 
-        return response.parseUser()
+        return response.parse<GetUsersResponse, List<User>> {
+            requireNotNull(it.users)
+        }
     }
 
-    suspend fun SuperTokens.getUserByPhoneNumber(phoneNumber: String): User {
-
+    suspend fun SuperTokens.getUsersByPhoneNumber(phoneNumber: String, doUnionOfAccountInfo: Boolean = true): List<User> {
         val response = client.get {
             url {
-                path(PATH_GET_USER)
+                path(buildRequestPath(path = PATH_GET_USER_BY_ACCOUNT_INFO))
                 parameters.append("phoneNumber", phoneNumber)
+                parameters.append("doUnionOfAccountInfo", doUnionOfAccountInfo.toString())
             }
-            header(Constants.HEADER_RECIPE_ID, PasswordlessRecipe.ID)
         }
 
-        return response.parseUser()
+        return response.parse<GetUsersResponse, List<User>> {
+            requireNotNull(it.users)
+        }
+    }
+
+    suspend fun SuperTokens.getUsersByThirdParty(thirdPartyId: String, thirdPartyUserId: String, doUnionOfAccountInfo: Boolean = true): List<User> {
+        val response = client.get {
+            url {
+                path(buildRequestPath(path = PATH_GET_USER_BY_ACCOUNT_INFO))
+                parameters.append("thirdPartyId", thirdPartyId)
+                parameters.append("thirdPartyUserId", thirdPartyUserId)
+                parameters.append("doUnionOfAccountInfo", doUnionOfAccountInfo.toString())
+            }
+        }
+
+        return response.parse<GetUsersResponse, List<User>> {
+            requireNotNull(it.users)
+        }
     }
 
     suspend fun SuperTokens.deleteUser(userId: String): SuperTokensStatus {
-        val response = client.post(PATH_DELETE_USER) {
+        val response = post(PATH_DELETE_USER, includeTenantId = false) {
             setBody(
                 DeleteUserRequest(
                     userId = userId,
@@ -79,7 +96,7 @@ internal class CoreHandler {
     }
 
     suspend fun SuperTokens.getJwks(): JsonObject {
-        val response = client.get("/.well-known/jwks.json")
+        val response = get("/.well-known/jwks.json", includeTenantId = false)
 
         return response.body()
     }
@@ -90,7 +107,7 @@ internal class CoreHandler {
         useStaticSigningKey: Boolean = false,
         payload: Map<String, Any?>? = null
     ): String {
-        val response = client.post(PATH_CREATE_JWT) {
+        val response = post(PATH_CREATE_JWT, includeTenantId = false) {
             setBody(
                 CreateJwtRequest(
                     jwksDomain = issuer,
@@ -107,43 +124,61 @@ internal class CoreHandler {
     }
 
     companion object {
-        const val PATH_GET_USER = "/recipe/user"
+        const val PATH_GET_USER_BY_ID = "/user/id"
+        const val PATH_GET_USER_BY_ACCOUNT_INFO = "/users/by-accountinfo"
         const val PATH_DELETE_USER = "/user/remove"
         const val PATH_CREATE_JWT = "/recipe/jwt"
     }
 
 }
 
-suspend fun SuperTokens.getUserById(userId: String, recipeId: String = EmailPasswordRecipe.ID): User = with(core) {
-    return getUserById(userId, recipeId)
+suspend fun SuperTokens.getUserById(userId: String): User = with(core) {
+    return getUserById(userId = userId)
 }
 
 suspend fun SuperTokens.getUserByIdOrNull(userId: String): User? = runCatching {
-    getUserById(userId, EmailPasswordRecipe.ID)
-}.getOrNull() ?: runCatching {
-    getUserById(userId, ThirdPartyRecipe.ID)
-}.getOrNull() ?: runCatching {
-    getUserById(userId, PasswordlessRecipe.ID)
+    getUserById(userId = userId)
 }.getOrNull()
 
-suspend fun SuperTokens.getUserByEMail(email: String, recipeId: String = EmailPasswordRecipe.ID): User = with(core) {
-    return getUserByEMail(email, recipeId)
+suspend fun SuperTokens.getUsersByEMail(email: String, doUnionOfAccountInfo: Boolean = true) = with(core) {
+    getUsersByEMail(
+        email = email,
+        doUnionOfAccountInfo = doUnionOfAccountInfo,
+    )
 }
 
 suspend fun SuperTokens.getUserByEMailOrNull(email: String): User? = runCatching {
-    getUserByEMail(email, EmailPasswordRecipe.ID)
-}.getOrNull() ?: runCatching {
-    getUserByEMail(email, ThirdPartyRecipe.ID)
-}.getOrNull() ?: runCatching {
-    getUserByEMail(email, PasswordlessRecipe.ID)
+    getUsersByEMail(
+        email = email,
+        doUnionOfAccountInfo = true,
+    ).firstOrNull()
 }.getOrNull()
 
-suspend fun SuperTokens.getUserByPhoneNumber(phoneNumber: String): User = with(core) {
-    return getUserByPhoneNumber(phoneNumber)
+suspend fun SuperTokens.getUsersByPhoneNumber(phoneNumber: String, doUnionOfAccountInfo: Boolean = true) = with(core) {
+    getUsersByPhoneNumber(
+        phoneNumber = phoneNumber,
+        doUnionOfAccountInfo = doUnionOfAccountInfo,
+    )
 }
 
+suspend fun SuperTokens.getUsersByThirdParty(thirdPartyId: String, thirdPartyUserId: String, doUnionOfAccountInfo: Boolean = true) = with(core) {
+    getUsersByThirdParty(
+        thirdPartyId = thirdPartyId,
+        thirdPartyUserId = thirdPartyUserId,
+        doUnionOfAccountInfo = doUnionOfAccountInfo,
+    )
+}
+
+suspend fun SuperTokens.getUsersByThirdPartyOrNull(thirdPartyId: String, thirdPartyUserId: String): User? = runCatching {
+    getUsersByThirdParty(
+        thirdPartyId = thirdPartyId,
+        thirdPartyUserId = thirdPartyUserId,
+        doUnionOfAccountInfo = true,
+    ).firstOrNull()
+}.getOrNull()
+
 suspend fun SuperTokens.getUserByPhoneNumberOrNull(phoneNumber: String): User? = runCatching {
-    getUserByPhoneNumber(phoneNumber)
+    getUsersByPhoneNumber(phoneNumber, true).firstOrNull()
 }.getOrNull()
 
 suspend fun SuperTokens.deleteUser(userId: String): SuperTokensStatus = with(core) {

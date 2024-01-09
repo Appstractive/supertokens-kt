@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ThirdPartyEmail(
     val id: String,
+    val isVerified: Boolean,
 )
 
 @Serializable

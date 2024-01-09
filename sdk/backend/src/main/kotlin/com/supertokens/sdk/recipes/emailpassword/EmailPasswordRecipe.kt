@@ -9,18 +9,23 @@ import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.models.SuperTokensEvent
+import com.supertokens.sdk.post
+import com.supertokens.sdk.put
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
 import com.supertokens.sdk.recipes.common.models.FormField
 import com.supertokens.sdk.recipes.common.models.Validate
+import com.supertokens.sdk.recipes.emailpassword.models.ImportUserData
 import com.supertokens.sdk.recipes.emailpassword.requests.CreateResetPasswordTokenRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignInRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignUpRequest
-import com.supertokens.sdk.recipes.emailpassword.requests.ResetPasswordWithTokenRequest
+import com.supertokens.sdk.recipes.emailpassword.requests.ConsumePasswordTokenRequest
+import com.supertokens.sdk.recipes.emailpassword.requests.ImportUserRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.UpdateUserRequest
 import com.supertokens.sdk.recipes.emailpassword.responses.CreateResetPasswordTokenResponse
-import com.supertokens.sdk.recipes.emailpassword.responses.ResetPasswordWithTokenResponse
+import com.supertokens.sdk.recipes.emailpassword.responses.ConsumePasswordTokenResponse
+import com.supertokens.sdk.recipes.emailpassword.responses.ImportUserResponse
 import com.supertokens.sdk.utils.parse
 import com.supertokens.sdk.utils.parseUser
 import io.ktor.client.request.header
@@ -54,7 +59,7 @@ class EmailPasswordRecipe(
      * Signup a user with email ID and password
      */
     suspend fun signUp(email: String, password: String): User {
-        val response = superTokens.client.post(PATH_SIGNUP) {
+        val response = superTokens.post(PATH_SIGNUP) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -75,7 +80,7 @@ class EmailPasswordRecipe(
      * Signin a user with email ID and password
      */
     suspend fun signIn(email: String, password: String): User {
-        val response = superTokens.client.post(PATH_SIGNIN) {
+        val response = superTokens.post(PATH_SIGNIN) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -95,13 +100,14 @@ class EmailPasswordRecipe(
     /**
      * Generate a new reset password token for this user
      */
-    suspend fun createResetPasswordToken(userId: String): String {
-        val response = superTokens.client.post(PATH_PASSWORD_RESET_TOKEN) {
+    suspend fun createResetPasswordToken(userId: String, email: String): String {
+        val response = superTokens.post(PATH_CREATE_PASSWORD_RESET_TOKEN) {
             header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 CreateResetPasswordTokenRequest(
                     userId = userId,
+                    email = email,
                 )
             )
         }
@@ -120,32 +126,38 @@ class EmailPasswordRecipe(
             throw SuperTokensStatusException(SuperTokensStatus.PasswordPolicyViolatedError)
         }
 
-        val response = superTokens.client.post(PATH_PASSWORD_RESET) {
+        val response = superTokens.post(PATH_CONSUME_PASSWORD_RESET_TOKEN) {
             header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
-                ResetPasswordWithTokenRequest(
+                ConsumePasswordTokenRequest(
                     token = token,
-                    newPassword = newPassword,
                 )
             )
         }
 
-        return response.parse<ResetPasswordWithTokenResponse, String> {
+        val userId = response.parse<ConsumePasswordTokenResponse, String> {
             checkNotNull(it.userId)
         }
+
+        updatePassword(
+            userId = userId,
+            password = newPassword,
+        )
+
+        return userId
     }
 
     /**
      * Update a user's email
      */
     suspend fun updateEmail(userId: String, email: String): SuperTokensStatus {
-        val response = superTokens.client.put(PATH_UPDATE_USER) {
+        val response = superTokens.put(PATH_UPDATE_USER) {
             header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 UpdateUserRequest(
-                    userId = userId,
+                    recipeUserId = userId,
                     email = email,
                 )
             )
@@ -165,12 +177,12 @@ class EmailPasswordRecipe(
             return SuperTokensStatus.PasswordPolicyViolatedError
         }
 
-        val response = superTokens.client.put(PATH_UPDATE_USER) {
+        val response = superTokens.put(PATH_UPDATE_USER) {
             header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 UpdateUserRequest(
-                    userId = userId,
+                    recipeUserId = userId,
                     password = password,
                 )
             )
@@ -178,6 +190,30 @@ class EmailPasswordRecipe(
 
         return response.parse().also {
             superTokens._events.tryEmit(SuperTokensEvent.UserPasswordChanged(userId))
+        }
+    }
+
+    /**
+     * Import a user with email ID and password hash
+     */
+    suspend fun importUser(email: String, passwordHash: String, hashingAlgorithm: String): ImportUserData {
+        val response = superTokens.post(PATH_UPDATE_USER) {
+            header(Constants.HEADER_RECIPE_ID, ID)
+
+            setBody(
+                ImportUserRequest(
+                    email = email,
+                    passwordHash = passwordHash,
+                    hashingAlgorithm = hashingAlgorithm,
+                )
+            )
+        }
+
+        return response.parse<ImportUserResponse, ImportUserData> {
+            ImportUserData(
+                user = requireNotNull(it.user),
+                didUserAlreadyExist = requireNotNull(it.didUserAlreadyExist),
+            )
         }
     }
 
@@ -200,10 +236,9 @@ class EmailPasswordRecipe(
         const val PATH_SIGNIN = "/recipe/signin"
         const val PATH_SIGNUP = "/recipe/signup"
         const val PATH_UPDATE_USER = "/recipe/user"
-        const val PATH_PASSWORD_RESET_TOKEN = "/recipe/user/password/reset/token"
-        const val PATH_PASSWORD_RESET = "/recipe/user/password/reset"
-
-
+        const val PATH_CREATE_PASSWORD_RESET_TOKEN = "/recipe/user/password/reset/token"
+        const val PATH_CONSUME_PASSWORD_RESET_TOKEN = "/recipe/user/password/reset/token/consume"
+        const val PATH_IMPORT_USER = "/recipe/user/passwordhash/import"
 
         private val DEFAULT_PASSWORD_REGEXP = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")
         private val DEFAULT_PASSWORD_VALIDATOR: Validate = {
@@ -247,34 +282,62 @@ val EmailPassword = object: RecipeBuilder<EmailPasswordConfig, EmailPasswordReci
  * Signup a user with email ID and password
  */
 suspend fun SuperTokens.emailPasswordSignUp(email: String, password: String) =
-    getRecipe<EmailPasswordRecipe>().signUp(email, password)
+    getRecipe<EmailPasswordRecipe>().signUp(
+        email = email,
+        password = password,
+    )
 
 /**
  * Signin a user with email ID and password
  */
 suspend fun SuperTokens.emailPasswordSignIn(email: String, password: String) =
-    getRecipe<EmailPasswordRecipe>().signIn(email, password)
+    getRecipe<EmailPasswordRecipe>().signIn(
+        email = email,
+        password = password,
+    )
 
 /**
  * Generate a new reset password token for this user
  */
-suspend fun SuperTokens.createResetPasswordToken(userId: String) =
-    getRecipe<EmailPasswordRecipe>().createResetPasswordToken(userId)
+suspend fun SuperTokens.createResetPasswordToken(userId: String, email: String) =
+    getRecipe<EmailPasswordRecipe>().createResetPasswordToken(
+        userId = userId,
+        email = email,
+    )
 
 /**
  * Reset a password using password reset token
  */
 suspend fun SuperTokens.resetPasswordWithToken(token: String, newPassword: String) =
-    getRecipe<EmailPasswordRecipe>().resetPasswordWithToken(token, newPassword)
+    getRecipe<EmailPasswordRecipe>().resetPasswordWithToken(
+        token = token,
+        newPassword = newPassword,
+    )
 
 /**
  * Update a user's email
  */
 suspend fun SuperTokens.updateEmail(userId: String, email: String) =
-    getRecipe<EmailPasswordRecipe>().updateEmail(userId, email)
+    getRecipe<EmailPasswordRecipe>().updateEmail(
+        userId = userId,
+        email = email,
+    )
 
 /**
  * Update a user's password
  */
 suspend fun SuperTokens.updatePassword(userId: String, password: String) =
-    getRecipe<EmailPasswordRecipe>().updatePassword(userId, password)
+    getRecipe<EmailPasswordRecipe>().updatePassword(
+        userId = userId,
+        password = password,
+    )
+
+/**
+ * Import a user with email ID and password hash
+ */
+suspend fun SuperTokens.importUser(email: String, passwordHash: String, hashingAlgorithm: String) =
+    getRecipe<EmailPasswordRecipe>().importUser(
+        email = email,
+        passwordHash = passwordHash,
+        hashingAlgorithm = hashingAlgorithm,
+    )

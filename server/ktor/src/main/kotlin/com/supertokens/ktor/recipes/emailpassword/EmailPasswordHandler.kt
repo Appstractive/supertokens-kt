@@ -6,7 +6,6 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.userHandler
-import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.fronend
 import com.supertokens.ktor.utils.getEmailField
 import com.supertokens.ktor.utils.getInvalidFormFields
@@ -15,7 +14,6 @@ import com.supertokens.ktor.utils.getPasswordField
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.ServerConfig
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
-import com.supertokens.sdk.common.FORM_FIELD_NEW_PASSWORD_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
@@ -27,7 +25,8 @@ import com.supertokens.sdk.common.responses.FormFieldError
 import com.supertokens.sdk.common.responses.SignInResponse
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.common.responses.UserResponse
-import com.supertokens.sdk.core.getUserByEMail
+import com.supertokens.sdk.core.getUserByEMailOrNull
+import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
@@ -40,7 +39,6 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 suspend fun ApplicationCall.validateFormFields(
@@ -195,8 +193,11 @@ open class EmailPasswordHandler(
             // launch the email sending in another scope, so the call is not blocked
             scope.launch {
                 runCatching {
-                    val user = superTokens.getUserByEMail(email)
-                    val token = emailPassword.createResetPasswordToken(user.id)
+                    val user = superTokens.getUserByEMailOrNull(email) ?: return@launch
+                    val token = emailPassword.createResetPasswordToken(
+                        userId = user.id,
+                        email = email,
+                    )
 
                     val body = it.processTemplate(
                         getResetPasswordTemplateName(it),

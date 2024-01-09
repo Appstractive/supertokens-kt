@@ -16,11 +16,12 @@ import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.VerifyEmailTokenRequest
 import com.supertokens.sdk.common.responses.StatusResponse
 import com.supertokens.sdk.common.responses.VerifyEmailResponse
-import com.supertokens.sdk.core.getUserByEMail
+import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.emailverification.models.EmailVerificationTemplate
+import com.supertokens.sdk.recipes.session.getSessions
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.request.header
@@ -28,7 +29,6 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 open class EmailVerificationHandler(
@@ -50,7 +50,7 @@ open class EmailVerificationHandler(
             // launch the email sending in another scope, so the call is not blocked
             scope.launch {
                 runCatching {
-                    val user = superTokens.getUserByEMail(email)
+                    val user = superTokens.getUsersByEMail(email)
                     val token = emailVerification.createVerificationToken(user.id, email)
 
                     val body = it.processTemplate(
@@ -99,13 +99,21 @@ open class EmailVerificationHandler(
             "token" -> {
                 val data = emailVerification.verifyToken(body.token)
 
+                // update email verification state in existing sessions
+                val jwtData = sessions.getJwtData(superTokens.getUserById(data.userId))
+
+                val userSessions = superTokens.getSessions(data.userId)
+                userSessions.forEach {
+                    sessions.updateJwtData(it, jwtData)
+                }
+
                 // update token if present and from same user
                 runCatching {
                     call.request.header(HEADER_ACCESS_TOKEN)?.let { token ->
                         val session = sessions.verifySession(token, checkDatabase = true)
 
                         if(session.session.userId == data.userId) {
-                            val jwtData = sessions.getJwtData(superTokens.getUserById(data.userId))
+
                             val newSession = sessions.regenerateSession(token, jwtData)
 
                             setSessionInResponse(

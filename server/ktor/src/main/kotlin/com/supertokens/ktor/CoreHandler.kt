@@ -1,8 +1,8 @@
 package com.supertokens.ktor
 
 import com.supertokens.sdk.common.responses.ExistsResponse
-import com.supertokens.sdk.core.getUserByEMail
-import com.supertokens.sdk.core.getUserByPhoneNumber
+import com.supertokens.sdk.core.getUsersByEMail
+import com.supertokens.sdk.core.getUsersByPhoneNumber
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
@@ -22,7 +22,7 @@ open class CoreHandler(
         val email = call.parameters["email"] ?: return call.respond(HttpStatusCode.NotFound)
 
         val response = runCatching {
-            call.superTokens.getUserByEMail(email)
+            call.superTokens.getUsersByEMail(email)
         }
 
         call.respond(
@@ -40,7 +40,7 @@ open class CoreHandler(
         val phoneNumber = call.parameters["phoneNumber"] ?: return call.respond(HttpStatusCode.NotFound)
 
         val response = runCatching {
-            call.superTokens.getUserByPhoneNumber(phoneNumber)
+            call.superTokens.getUsersByPhoneNumber(phoneNumber)
         }
 
         call.respond(

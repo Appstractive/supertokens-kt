@@ -22,6 +22,8 @@ freemarker = "2.3.32"
 
 settings = "1.1.1"
 
+totp = "2.4.0"
+
 [libraries]
 androidGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kotlinGradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -60,5 +62,6 @@ jwt = {module = "io.fusionauth:fusionauth-jwt", version.ref = "jwt"}
 slf4j = {module = "org.slf4j:slf4j-simple", version.ref = "slf4j"}
 
 test-kotlin = {module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin"}
+test-totp = {module = "dev.turingcomplete:kotlin-onetimepassword", version.ref = "totp"}
 
 junit = "junit:junit:4.13.2"

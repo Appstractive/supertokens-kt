@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.AppConfig
-import com.supertokens.sdk.core.getUserByEMail
+import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.roles.Roles
 import com.supertokens.sdk.recipes.roles.RolesRecipe
@@ -16,12 +16,10 @@ import com.supertokens.sdk.recipes.roles.removeUserRole
 import com.supertokens.sdk.recipes.roles.setUserRole
 import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@Ignore("Only for DEV purposes")
 class RolesTests {
 
     private val superTokens = superTokens(
@@ -80,7 +78,7 @@ class RolesTests {
 
     @Test
     fun testSetUserRole() = runBlocking {
-        val user = superTokens.getUserByEMail("test@test.de")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
 
@@ -92,7 +90,7 @@ class RolesTests {
 
     @Test
     fun testRemoveUserRole() = runBlocking {
-        val user = superTokens.getUserByEMail("test@test.de")
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
 
         superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
 
@@ -105,6 +103,10 @@ class RolesTests {
 
         roles = superTokens.getUserRoles(user.id)
         assertFalse(roles.contains("Everyone"))
+    }
+
+    companion object {
+        const val TEST_USER = "test@test.de"
     }
 
 }

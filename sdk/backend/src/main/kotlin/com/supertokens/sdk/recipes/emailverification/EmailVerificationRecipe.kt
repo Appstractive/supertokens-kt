@@ -16,8 +16,10 @@ import com.supertokens.sdk.recipes.emailverification.models.VerifyEmailTokenData
 import com.supertokens.sdk.recipes.emailverification.responses.CreateEmailVerificationTokenResponse
 import com.supertokens.sdk.common.responses.VerifyEmailResponse
 import com.supertokens.sdk.common.models.User
+import com.supertokens.sdk.get
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.SuperTokensEvent
+import com.supertokens.sdk.post
 import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailTokenResponse
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.get
@@ -72,7 +74,7 @@ class EmailVerificationRecipe(
      * Generate a new email verification token for this user
      */
     suspend fun createVerificationToken(userId: String, email: String): String {
-        val response = superTokens.client.post(PATH_CREATE_TOKEN) {
+        val response = superTokens.post(PATH_CREATE_TOKEN) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -93,7 +95,7 @@ class EmailVerificationRecipe(
      * Remove all unused email verification tokens for this user
      */
     suspend fun removeAllVerificationTokens(userId: String, email: String): SuperTokensStatus {
-        val response = superTokens.client.post(PATH_DELETE_TOKENS) {
+        val response = superTokens.post(PATH_DELETE_TOKENS) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -114,7 +116,7 @@ class EmailVerificationRecipe(
      * Verify an email
      */
     suspend fun verifyToken(token: String): VerifyEmailTokenData {
-        val response = superTokens.client.post(PATH_VERIFY) {
+        val response = superTokens.post(PATH_VERIFY) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -139,7 +141,7 @@ class EmailVerificationRecipe(
      * Check if an email is verified
      */
     suspend fun checkEmailVerified(userId: String, email: String): Boolean {
-        val response = superTokens.client.get("$PATH_VERIFY?userId=$userId&email=$email") {
+        val response = superTokens.get("$PATH_VERIFY?userId=$userId&email=$email", includeTenantId = false) {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -152,7 +154,7 @@ class EmailVerificationRecipe(
      * Unverify an email
      */
     suspend fun setUnverified(userId: String, email: String): SuperTokensStatus {
-        val response = superTokens.client.post(PATH_VERIFY_REMOVE) {
+        val response = superTokens.post(PATH_VERIFY_REMOVE, includeTenantId = false) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 

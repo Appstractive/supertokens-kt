@@ -12,21 +12,17 @@ import com.supertokens.sdk.recipes.thirdparty.providers.bitbucket.Bitbucket
 import com.supertokens.sdk.recipes.thirdparty.providers.facebook.Facebook
 import com.supertokens.sdk.recipes.thirdparty.providers.github.Github
 import com.supertokens.sdk.recipes.thirdparty.providers.gitlab.GitLab
-import com.supertokens.sdk.recipes.thirdparty.providers.gitlab.GitLabProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.google.Google
-import com.supertokens.sdk.recipes.thirdparty.providers.google.GoogleProvider
 import com.supertokens.sdk.recipes.thirdparty.thirdPartySignInUp
 import com.supertokens.sdk.superTokens
 import io.fusionauth.jwt.Verifier
 import io.fusionauth.jwt.domain.Algorithm
 import io.fusionauth.jwt.domain.JWT
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@Ignore("Only for DEV purposes")
 class ThirdPartyRecipeTests {
 
     private val superTokens = superTokens(
@@ -180,12 +176,14 @@ class ThirdPartyRecipeTests {
 
     @Test
     fun testSignInUp() = runBlocking {
-        val response = superTokens.thirdPartySignInUp("google", "12345678", "test@test.de")
+        val response = superTokens.thirdPartySignInUp("google", "12345678", TEST_USER, true)
 
         val thirdParty = assertNotNull(response.user.thirdParty)
     }
 
     companion object {
+        const val TEST_USER = "test@test.de"
+        
         const val privateKey = "-----BEGIN EC PRIVATE KEY-----\n" +
                 "MHcCAQEEIA15hjyZS/pWzMgI4SOlwKbbG4/c+3vQcFCfQaRhoFbzoAoGCCqGSM49\n" +
                 "AwEHoUQDQgAEkrYPIhuxDLQg8QKQnnto8JUFb13yWpY+venFhEzjhBwMgFl3oueT\n" +

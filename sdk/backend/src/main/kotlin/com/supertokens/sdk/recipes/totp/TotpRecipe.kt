@@ -101,7 +101,7 @@ class TotpRecipe(
         }
 
         return response.parse<TotpDevicesResponse, List<TotpDevice>> {
-            it.devices.map { device ->
+            requireNotNull(it.devices).map { device ->
                 TotpDevice(
                     name = device.name,
                     period = device.period,

@@ -9,6 +9,9 @@ import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.models.CreateSessionData
 import com.supertokens.sdk.models.RegenerateSessionData
 import com.supertokens.sdk.common.models.User
+import com.supertokens.sdk.get
+import com.supertokens.sdk.post
+import com.supertokens.sdk.put
 import com.supertokens.sdk.recipes.CustomJwtData
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
@@ -18,6 +21,7 @@ import com.supertokens.sdk.recipes.session.models.VerifySessionData
 import com.supertokens.sdk.recipes.session.requests.CreateSessionRequest
 import com.supertokens.sdk.recipes.session.requests.RefreshSessionRequest
 import com.supertokens.sdk.recipes.session.requests.RegenerateSessionRequest
+import com.supertokens.sdk.recipes.session.requests.RemoveSessionsForUserRequest
 import com.supertokens.sdk.recipes.session.requests.RemoveSessionsRequest
 import com.supertokens.sdk.recipes.session.requests.UpdateJwtDataRequest
 import com.supertokens.sdk.recipes.session.requests.UpdateSessionDataRequest
@@ -37,7 +41,7 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
 
-class SessionConfig: RecipeConfig {
+class SessionConfig : RecipeConfig {
 
     // if true, attach tokens to response headers
     var headerBasedSessions: Boolean = true
@@ -71,12 +75,18 @@ class SessionRecipe(
 ) : Recipe<SessionConfig> {
 
     // if true, attach tokens to response headers
-    val headerBasedSessions = config.headerBasedSessions
+    val headerBasedSessions by lazy {
+        config.headerBasedSessions
+    }
 
     // if true, set tokens to cookies
-    val cookieBasedSessions = config.cookieBasedSessions
+    val cookieBasedSessions by lazy {
+        config.cookieBasedSessions
+    }
 
-    val cookieDomain = config.cookieDomain ?: superTokens.appConfig.api.host
+    val cookieDomain by lazy {
+        config.cookieDomain ?: superTokens.appConfig.api.host
+    }
 
     val secureCookies by lazy {
         superTokens.appConfig.api.scheme == "https"
@@ -84,7 +94,7 @@ class SessionRecipe(
 
     val cookieSameSite by lazy {
         // will be 'none' if https is used and frontend and api are different hosts, else 'lax'
-        if(
+        if (
             secureCookies && cookieDomain != superTokens.appConfig.api.host
         ) {
             "none"
@@ -138,7 +148,7 @@ class SessionRecipe(
         userDataInJWT: Map<String, Any?> = emptyMap(),
         userDataInDatabase: Map<String, Any?> = emptyMap(),
     ): CreateSessionData {
-        val response = superTokens.client.post(PATH_SESSION) {
+        val response = superTokens.post(PATH_SESSION) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -167,7 +177,7 @@ class SessionRecipe(
      * Get user and session information for a given session handle
      */
     suspend fun getSession(sessionHandle: String): GetSessionData {
-        val response = superTokens.client.get("$PATH_SESSION?sessionHandle=$sessionHandle") {
+        val response = superTokens.get("$PATH_SESSION?sessionHandle=$sessionHandle", includeTenantId = false) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
         }
@@ -191,8 +201,8 @@ class SessionRecipe(
     /**
      * Get session handles for a user
      */
-    suspend fun getSessions(userId: String): List<String> {
-        val response = superTokens.client.get("$PATH_SESSIONS?userId=$userId") {
+    suspend fun getSessions(userId: String, fetchAcrossAllTenants: Boolean = true): List<String> {
+        val response = superTokens.get("$PATH_SESSIONS?userId=$userId&fetchAcrossAllTenants=${fetchAcrossAllTenants}") {
 
             header(Constants.HEADER_RECIPE_ID, ID)
         }
@@ -203,20 +213,41 @@ class SessionRecipe(
     }
 
     /**
-     * Delete a sesion
+     * Delete sessions
      */
     suspend fun removeSessions(sessionHandles: List<String>): List<String> {
         if (sessionHandles.isEmpty()) {
             return emptyList()
         }
 
-        val response = superTokens.client.post(PATH_SESSION_REMOVE) {
+        val response = superTokens.post(PATH_SESSION_REMOVE) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 RemoveSessionsRequest(
                     sessionHandles = sessionHandles,
+                )
+            )
+        }
+
+        return response.parse<RemoveSessionsResponse, List<String>> {
+            it.sessionHandlesRevoked
+        }
+    }
+
+    /**
+     * Delete sessions for a user
+     */
+    suspend fun removeSessionsForUser(userId: String, revokeAcrossAllTenants: Boolean = true): List<String> {
+        val response = superTokens.post(PATH_SESSION_REMOVE) {
+
+            header(Constants.HEADER_RECIPE_ID, ID)
+
+            setBody(
+                RemoveSessionsForUserRequest(
+                    userId = userId,
+                    revokeAcrossAllTenants = revokeAcrossAllTenants,
                 )
             )
         }
@@ -236,7 +267,7 @@ class SessionRecipe(
         antiCsrfToken: String? = null,
     ): VerifySessionData {
 
-        val response = superTokens.client.post(PATH_SESSION_VERIFY) {
+        val response = superTokens.post(PATH_SESSION_VERIFY, includeTenantId = false) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -266,7 +297,7 @@ class SessionRecipe(
         refreshToken: String,
         antiCsrfToken: String? = null,
     ): CreateSessionData {
-        val response = superTokens.client.post(PATH_SESSION_REFRESH) {
+        val response = superTokens.post(PATH_SESSION_REFRESH, includeTenantId = false) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -297,7 +328,7 @@ class SessionRecipe(
         userDataInJWT: Map<String, Any?>? = null,
     ): RegenerateSessionData {
 
-        val response = superTokens.client.post(PATH_SESSION_REGENERATE) {
+        val response = superTokens.post(PATH_SESSION_REGENERATE, includeTenantId = false) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -321,7 +352,7 @@ class SessionRecipe(
      * Change session data
      */
     suspend fun updateSessionData(sessionHandle: String, userDataInDatabase: Map<String, Any?>): SuperTokensStatus {
-        val response = superTokens.client.put(PATH_SESSION_DATA) {
+        val response = superTokens.put(PATH_SESSION_DATA, includeTenantId = false) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -340,7 +371,7 @@ class SessionRecipe(
      * Change JWT data for a session
      */
     suspend fun updateJwtData(sessionHandle: String, userDataInJWT: Map<String, Any?>): SuperTokensStatus {
-        val response = superTokens.client.put(PATH_JWT_DATA) {
+        val response = superTokens.put(PATH_JWT_DATA) {
 
             header("rid", ID)
 
@@ -370,7 +401,7 @@ class SessionRecipe(
 
 }
 
-val Sessions = object: RecipeBuilder<SessionConfig, SessionRecipe>() {
+val Sessions = object : RecipeBuilder<SessionConfig, SessionRecipe>() {
 
     override fun install(configure: SessionConfig.() -> Unit): (SuperTokens) -> SessionRecipe {
         val config = SessionConfig().apply(configure)
@@ -403,7 +434,11 @@ suspend fun SuperTokens.getSession(
  */
 suspend fun SuperTokens.getSessions(
     userId: String,
-) = getRecipe<SessionRecipe>().getSessions(userId)
+    fetchAcrossAllTenants: Boolean = true,
+) = getRecipe<SessionRecipe>().getSessions(
+    userId = userId,
+    fetchAcrossAllTenants = fetchAcrossAllTenants,
+)
 
 /**
  * Delete a sesion

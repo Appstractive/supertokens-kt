@@ -8,6 +8,7 @@ sealed class SuperTokensEvent {
     class UserSignIn(val user: User): SuperTokensEvent()
     class UserPasswordChanged(val userId: String): SuperTokensEvent()
     class UserEmailChanged(val userId: String, val email: String): SuperTokensEvent()
+    class UserPhoneNumberChanged(val userId: String, val phoneNumber: String): SuperTokensEvent()
     class UserEmailVerified(val userId: String, val email: String): SuperTokensEvent()
     class UserEmailUnVerified(val userId: String, val email: String): SuperTokensEvent()
 
