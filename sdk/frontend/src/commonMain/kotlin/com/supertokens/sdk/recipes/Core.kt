@@ -4,11 +4,10 @@ import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.responses.ExistsResponse
+import com.supertokens.sdk.common.responses.ExistsResponseDTO
 import com.supertokens.sdk.common.toStatus
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.http.parameters
 import io.ktor.http.path
 
 suspend fun SuperTokensClient.checkEmailExists(email: String): Boolean {
@@ -19,7 +18,7 @@ suspend fun SuperTokensClient.checkEmailExists(email: String): Boolean {
         }
     }
 
-    val body = response.body<ExistsResponse>()
+    val body = response.body<ExistsResponseDTO>()
 
     return when(body.status) {
         SuperTokensStatus.OK.value -> body.exists
@@ -35,7 +34,7 @@ suspend fun SuperTokensClient.checkPhoneNumberExists(phoneNumber: String): Boole
         }
     }
 
-    val body = response.body<ExistsResponse>()
+    val body = response.body<ExistsResponseDTO>()
 
     return when(body.status) {
         SuperTokensStatus.OK.value -> body.exists

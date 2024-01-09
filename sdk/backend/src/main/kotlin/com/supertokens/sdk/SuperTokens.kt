@@ -28,6 +28,8 @@ data class ServerConfig(
 ) {
 
     val fullUrl = "$scheme://$host$path"
+    val basePath: String
+        get() = if(path.endsWith("/")) path else "${path}/"
 
 }
 

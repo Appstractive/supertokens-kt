@@ -7,9 +7,9 @@ import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.models.User
-import com.supertokens.sdk.common.requests.FormField
-import com.supertokens.sdk.common.requests.FormFieldRequest
-import com.supertokens.sdk.common.responses.SignInResponse
+import com.supertokens.sdk.common.requests.FormFieldDTO
+import com.supertokens.sdk.common.requests.FormFieldRequestDTO
+import com.supertokens.sdk.common.responses.SignInResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.handlers.FormFieldException
 import com.supertokens.sdk.handlers.SignInProvider
@@ -29,13 +29,13 @@ object EmailPassword : SignInProvider<EmailPassword.Config, User>, SignUpProvide
 
         val response = superTokensClient.apiClient.post(Routes.EmailPassword.SIGN_IN) {
             setBody(
-                FormFieldRequest(
+                FormFieldRequestDTO(
                     formFields = listOf(
-                        FormField(
+                        FormFieldDTO(
                             id = FORM_FIELD_EMAIL_ID,
                             value = config.email,
                         ),
-                        FormField(
+                        FormFieldDTO(
                             id = FORM_FIELD_PASSWORD_ID,
                             value = config.password,
                         ),
@@ -44,17 +44,10 @@ object EmailPassword : SignInProvider<EmailPassword.Config, User>, SignUpProvide
             )
         }
 
-        val body = response.body<SignInResponse>()
+        val body = response.body<SignInResponseDTO>()
 
-        return when(body.status) {
-            SuperTokensStatus.OK.value -> checkNotNull(body.user).let {
-                User(
-                    id = it.id,
-                    email = it.email,
-                    phoneNumber = it.phoneNumber,
-                    timeJoined = it.timeJoined,
-                )
-            }
+        return when (body.status) {
+            SuperTokensStatus.OK.value -> checkNotNull(body.user)
             else -> throw SuperTokensStatusException(body.status.toStatus())
         }
     }
@@ -64,13 +57,13 @@ object EmailPassword : SignInProvider<EmailPassword.Config, User>, SignUpProvide
 
         val response = superTokensClient.apiClient.post(Routes.EmailPassword.SIGN_UP) {
             setBody(
-                FormFieldRequest(
+                FormFieldRequestDTO(
                     formFields = listOf(
-                        FormField(
+                        FormFieldDTO(
                             id = FORM_FIELD_EMAIL_ID,
                             value = config.email,
                         ),
-                        FormField(
+                        FormFieldDTO(
                             id = FORM_FIELD_PASSWORD_ID,
                             value = config.password,
                         ),
@@ -79,20 +72,14 @@ object EmailPassword : SignInProvider<EmailPassword.Config, User>, SignUpProvide
             )
         }
 
-        val body = response.body<SignInResponse>()
+        val body = response.body<SignInResponseDTO>()
 
-        return when(body.status) {
-            SuperTokensStatus.OK.value -> checkNotNull(body.user).let {
-                User(
-                    id = it.id,
-                    email = it.email,
-                    phoneNumber = it.phoneNumber,
-                    timeJoined = it.timeJoined,
-                )
-            }
+        return when (body.status) {
+            SuperTokensStatus.OK.value -> checkNotNull(body.user)
             SuperTokensStatus.FormFieldError.value -> throw FormFieldException(
                 errors = checkNotNull(body.formFields)
             )
+
             else -> throw SuperTokensStatusException(body.status.toStatus())
         }
     }

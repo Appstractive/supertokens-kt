@@ -1,6 +1,7 @@
 package com.appstractive.screens.home
 
 import androidx.compose.runtime.mutableStateOf
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.appstractive.ViewModel
 import com.appstractive.dependencies
 import com.supertokens.sdk.SuperTokensClient
@@ -10,19 +11,19 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HomeViewModel(
-    scope: CoroutineScope,
     private val client: SuperTokensClient = dependencies.superTokensClient,
-): ViewModel(scope) {
+): ViewModel() {
 
     val userId = mutableStateOf("")
     val privateResponse = mutableStateOf<String?>(null)
 
     init {
-        scope.launch {
+        screenModelScope.launch {
             userId.value = client.getUserId() ?: "UNKNOWN"
 
             val response = client.apiClient.get("/private")

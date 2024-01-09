@@ -3,7 +3,7 @@ package com.supertokens.sdk.recipes.totp
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
-import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.get
 import com.supertokens.sdk.post
@@ -17,14 +17,12 @@ import com.supertokens.sdk.recipes.totp.requests.ChangeTotpDeviceNameRequest
 import com.supertokens.sdk.recipes.totp.requests.RemoveTotpDeviceRequest
 import com.supertokens.sdk.recipes.totp.requests.VerifyTotpCodeRequest
 import com.supertokens.sdk.recipes.totp.requests.VerifyTotpDeviceRequest
-import com.supertokens.sdk.recipes.totp.responses.AddTotpDeviceResponse
-import com.supertokens.sdk.recipes.totp.responses.RemoveTotpDeviceResponse
-import com.supertokens.sdk.recipes.totp.responses.TotpDevicesResponse
-import com.supertokens.sdk.recipes.totp.responses.VerifyTotpDeviceResponse
+import com.supertokens.sdk.recipes.totp.responses.AddTotpDeviceResponseDTO
+import com.supertokens.sdk.recipes.totp.responses.RemoveTotpDeviceResponseDTO
+import com.supertokens.sdk.recipes.totp.responses.TotpDevicesResponseDTO
+import com.supertokens.sdk.recipes.totp.responses.VerifyTotpDeviceResponseDTO
 import com.supertokens.sdk.utils.parse
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
 class TotpRecipeConfig: RecipeConfig {
@@ -66,7 +64,7 @@ class TotpRecipe(
             )
         }
 
-        return response.parse<AddTotpDeviceResponse, String> {
+        return response.parse<AddTotpDeviceResponseDTO, String> {
             checkNotNull(it.secret)
         }
     }
@@ -88,7 +86,7 @@ class TotpRecipe(
             )
         }
 
-        return response.parse<StatusResponse, SuperTokensStatus> {
+        return response.parse<StatusResponseDTO, SuperTokensStatus> {
             it.status.toStatus()
         }
     }
@@ -108,7 +106,7 @@ class TotpRecipe(
             header(Constants.HEADER_RECIPE_ID, SessionRecipe.ID)
         }
 
-        return response.parse<TotpDevicesResponse, List<TotpDevice>> {
+        return response.parse<TotpDevicesResponseDTO, List<TotpDevice>> {
             requireNotNull(it.devices).map { device ->
                 TotpDevice(
                     name = device.name,
@@ -138,7 +136,7 @@ class TotpRecipe(
             )
         }
 
-        return response.parse<RemoveTotpDeviceResponse, Boolean> {
+        return response.parse<RemoveTotpDeviceResponseDTO, Boolean> {
             it.didDeviceExist == true
         }
     }
@@ -159,7 +157,7 @@ class TotpRecipe(
             )
         }
 
-        return response.parse<StatusResponse, Boolean> {
+        return response.parse<StatusResponseDTO, Boolean> {
             it.status == SuperTokensStatus.OK.value
         }
     }
@@ -183,7 +181,7 @@ class TotpRecipe(
             )
         }
 
-        return response.parse<VerifyTotpDeviceResponse, Boolean> {
+        return response.parse<VerifyTotpDeviceResponseDTO, Boolean> {
             it.wasAlreadyVerified == true
         }
     }

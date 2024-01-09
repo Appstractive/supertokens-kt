@@ -7,15 +7,17 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.BadRequestException
-import com.supertokens.ktor.utils.fronend
+import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.ServerConfig
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
-import com.supertokens.sdk.common.requests.VerifyEmailTokenRequest
-import com.supertokens.sdk.common.responses.StatusResponse
-import com.supertokens.sdk.common.responses.VerifyEmailResponse
+import com.supertokens.sdk.common.requests.VerifyEmailTokenRequestDTO
+import com.supertokens.sdk.common.responses.StatusResponseDTO
+import com.supertokens.sdk.common.responses.VerifyEmailResponseDTO
+import com.supertokens.sdk.core.getUserByEMailOrNull
 import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.ingredients.email.EmailContent
@@ -45,13 +47,18 @@ open class EmailVerificationHandler(
         emailService.emailVerificationTemplateName
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendVerificationMail(email: String) {
-        val frontend = call.fronend
+        val frontend = call.frontend
+
         emailVerification.emailService?.let {
             // launch the email sending in another scope, so the call is not blocked
             scope.launch {
                 runCatching {
-                    val user = superTokens.getUsersByEMail(email)
-                    val token = emailVerification.createVerificationToken(user.id, email)
+                    val user = superTokens.getUserByEMailOrNull(email) ?: return@launch
+                    val token = emailVerification.createVerificationToken(
+                        userId = user.id,
+                        email = email,
+                        tenantId = call.tenantId,
+                    )
 
                     val body = it.processTemplate(
                         getResetPasswordTemplateName(it),
@@ -85,7 +92,7 @@ open class EmailVerificationHandler(
 
         sendVerificationMail(email)
 
-        call.respond(StatusResponse())
+        call.respond(StatusResponseDTO())
     }
 
     /**
@@ -93,18 +100,26 @@ open class EmailVerificationHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailVerification%20Recipe/verifyEmail">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.verifyEmail() {
-        val body = call.receive<VerifyEmailTokenRequest>()
+        val body = call.receive<VerifyEmailTokenRequestDTO>()
+        val tenantId = call.tenantId
 
         when (body.method) {
             "token" -> {
                 val data = emailVerification.verifyToken(body.token)
 
                 // update email verification state in existing sessions
-                val jwtData = sessions.getJwtData(superTokens.getUserById(data.userId))
+                val jwtData = sessions.getJwtData(
+                    user = superTokens.getUserById(data.userId),
+                    tenantId = tenantId
+                )
 
                 val userSessions = superTokens.getSessions(data.userId)
                 userSessions.forEach {
-                    sessions.updateJwtData(it, jwtData)
+                    sessions.updateJwtData(
+                        sessionHandle = it,
+                        userDataInJWT = jwtData,
+                        tenantId = tenantId
+                    )
                 }
 
                 // update token if present and from same user
@@ -123,7 +138,7 @@ open class EmailVerificationHandler(
                     }
                 }
 
-                call.respond(StatusResponse())
+                call.respond(StatusResponseDTO())
             }
 
             else -> throw BadRequestException("Invalid verification method ${body.method}")
@@ -143,7 +158,10 @@ open class EmailVerificationHandler(
         if (sessionsEnabled && isVerified) {
             val session = sessions.regenerateSession(
                 accessToken = call.accessToken,
-                userDataInJWT = sessions.getJwtData(superTokens.getUserById(user.id)),
+                userDataInJWT = sessions.getJwtData(
+                    user = superTokens.getUserById(user.id),
+                    tenantId = call.tenantId
+                ),
             )
             setSessionInResponse(
                 accessToken = session.accessToken,
@@ -151,7 +169,7 @@ open class EmailVerificationHandler(
         }
 
         call.respond(
-            VerifyEmailResponse(
+            VerifyEmailResponseDTO(
                 isVerified = isVerified,
             )
         )

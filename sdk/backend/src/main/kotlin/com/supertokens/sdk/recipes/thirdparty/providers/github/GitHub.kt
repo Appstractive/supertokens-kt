@@ -4,7 +4,7 @@ import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.ThirdPartyProvider
-import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
+import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProviderConfig
@@ -36,7 +36,7 @@ class GitHubProvider(
         "user:email",
     )
 
-    override suspend fun getUserInfo(tokenResponse: ThirdPartyTokenResponse): ThirdPartyUserInfo {
+    override suspend fun getUserInfo(tokenResponse: ThirdPartyTokensDTO): ThirdPartyUserInfo {
         val response = superTokens.client.get(USER_URL) {
             bearerAuth(tokenResponse.accessToken)
             contentType(HEADER_CONTENT_TYPE)

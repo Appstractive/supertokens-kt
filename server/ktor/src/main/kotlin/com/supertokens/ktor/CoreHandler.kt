@@ -1,6 +1,6 @@
 package com.supertokens.ktor
 
-import com.supertokens.sdk.common.responses.ExistsResponse
+import com.supertokens.sdk.common.responses.ExistsResponseDTO
 import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.core.getUsersByPhoneNumber
 import io.ktor.http.HttpStatusCode
@@ -26,7 +26,7 @@ open class CoreHandler(
         }
 
         call.respond(
-            ExistsResponse(
+            ExistsResponseDTO(
                 exists = response.isSuccess,
             )
         )
@@ -44,7 +44,7 @@ open class CoreHandler(
         }
 
         call.respond(
-            ExistsResponse(
+            ExistsResponseDTO(
                 exists = response.isSuccess,
             )
         )

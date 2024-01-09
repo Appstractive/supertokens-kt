@@ -4,10 +4,11 @@ import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequest
-import com.supertokens.sdk.common.responses.AuthorizationUrlResponse
-import com.supertokens.sdk.common.responses.SignInUpResponse
-import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
+import com.supertokens.sdk.common.requests.RedirectUriInfoDTO
+import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequestDTO
+import com.supertokens.sdk.common.responses.AuthorizationUrlResponseDTO
+import com.supertokens.sdk.common.responses.SignInUpResponseDTO
+import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.handlers.SignInProvider
 import com.supertokens.sdk.handlers.SignInProviderConfig
@@ -23,7 +24,7 @@ abstract class ThirdParty<C : SignInProviderConfig>: SignInProvider<C, SignInDat
 
     internal abstract val config: () -> C
 
-    internal abstract val request: (C) -> ThirdPartySignInUpRequest
+    internal abstract val request: (C) -> ThirdPartySignInUpRequestDTO
 
     override suspend fun signIn(superTokensClient: SuperTokensClient, configure: C.() -> Unit): SignInData {
         val config = config.invoke().apply(configure)
@@ -32,7 +33,7 @@ abstract class ThirdParty<C : SignInProviderConfig>: SignInProvider<C, SignInDat
             setBody(request.invoke(config))
         }
 
-        val body = response.body<SignInUpResponse>()
+        val body = response.body<SignInUpResponseDTO>()
 
         return when(val status = body.status.toStatus()) {
             SuperTokensStatus.OK -> {
@@ -56,18 +57,22 @@ abstract class ThirdPartyAuthCode(
     }
 
     override val request = { config: Config ->
-        ThirdPartySignInUpRequest(
-            redirectURI = config.redirectURI,
-            code = config.code,
+        ThirdPartySignInUpRequestDTO(
             thirdPartyId = providerId,
-            clientId = config.clientId,
+            redirectURIInfo = RedirectUriInfoDTO(
+                redirectURIOnProviderDashboard = config.redirectURI,
+                redirectURIQueryParams = config.redirectURIQueryParams ?: emptyMap(),
+                pkceCodeVerifier = config.pkceCodeVerifier,
+            ),
+            clientType = config.clientType,
         )
     }
 
     data class Config(
-        var redirectURI: String? = null,
-        var code: String = "",
-        var clientId: String? = null,
+        var pkceCodeVerifier: String = "",
+        var redirectURI: String = "",
+        var redirectURIQueryParams: Map<String, String>? = null,
+        var clientType: String? = null,
     ) : SignInProviderConfig
 
 }
@@ -81,22 +86,20 @@ abstract class ThirdPartyTokens(
     }
 
     override val request = { config: Config ->
-        ThirdPartySignInUpRequest(
-            redirectURI = config.redirectURI,
-            authCodeResponse = ThirdPartyTokenResponse(
+        ThirdPartySignInUpRequestDTO(
+            oAuthTokens = ThirdPartyTokensDTO(
                 accessToken = config.accessToken,
                 idToken = config.idToken,
             ),
             thirdPartyId = providerId,
-            clientId = config.clientId,
+            clientType = config.clientType,
         )
     }
 
     data class Config(
-        var redirectURI: String? = null,
         var accessToken: String = "",
         var idToken: String? = null,
-        var clientId: String? = null,
+        var clientType: String? = null,
     ) : SignInProviderConfig
 
 }
@@ -104,10 +107,10 @@ abstract class ThirdPartyTokens(
 suspend fun SuperTokensClient.getThirdPartyAuthorizationUrl(provider: Provider): String {
     val response = apiClient.get("${Routes.ThirdParty.AUTH_URL}?thirdPartyId=${provider.id}")
 
-    val body = response.body<AuthorizationUrlResponse>()
+    val body = response.body<AuthorizationUrlResponseDTO>()
 
     return when(body.status) {
-        SuperTokensStatus.OK.value -> checkNotNull(body.url)
+        SuperTokensStatus.OK.value -> checkNotNull(body.urlWithQueryParams)
         else -> throw SuperTokensStatusException(body.status.toStatus())
     }
 }

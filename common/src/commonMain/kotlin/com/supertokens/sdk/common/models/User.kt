@@ -24,8 +24,8 @@ data class LoginMethod(
 data class User(
     val id: String,
     val tenantIds: List<String>? = null,
-    val emails: List<String>?,
-    val phoneNumbers: List<String>?,
+    val emails: List<String>? = null,
+    val phoneNumbers: List<String>? = null,
     val timeJoined: Long,
     val thirdParty: List<ThirdParty>? = null,
     val loginMethods: List<LoginMethod>? = null,

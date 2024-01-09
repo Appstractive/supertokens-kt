@@ -6,27 +6,27 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.userHandler
-import com.supertokens.ktor.utils.fronend
+import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.getEmailField
 import com.supertokens.ktor.utils.getInvalidFormFields
 import com.supertokens.ktor.utils.getNewPasswordField
 import com.supertokens.ktor.utils.getPasswordField
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.ServerConfig
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.requests.FormField
-import com.supertokens.sdk.common.requests.FormFieldRequest
-import com.supertokens.sdk.common.requests.PasswordChangeRequest
-import com.supertokens.sdk.common.requests.PasswordResetRequest
-import com.supertokens.sdk.common.responses.FormFieldError
-import com.supertokens.sdk.common.responses.SignInResponse
-import com.supertokens.sdk.common.responses.StatusResponse
-import com.supertokens.sdk.common.responses.UserResponse
+import com.supertokens.sdk.common.models.User
+import com.supertokens.sdk.common.requests.FormFieldDTO
+import com.supertokens.sdk.common.requests.FormFieldRequestDTO
+import com.supertokens.sdk.common.requests.PasswordChangeRequestDTO
+import com.supertokens.sdk.common.requests.PasswordResetRequestDTO
+import com.supertokens.sdk.common.responses.FormFieldErrorDTO
+import com.supertokens.sdk.common.responses.SignInResponseDTO
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.core.getUserByEMailOrNull
-import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
@@ -42,7 +42,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 suspend fun ApplicationCall.validateFormFields(
-    fields: List<FormField>,
+    fields: List<FormFieldDTO>,
     success: suspend (email: String, password: String) -> Unit,
 ) {
     val invalidFormFields = getInvalidFormFields(fields, emailPassword.formFields)
@@ -50,10 +50,10 @@ suspend fun ApplicationCall.validateFormFields(
     if (invalidFormFields.isNotEmpty()) {
         return respond(
             HttpStatusCode.BadRequest,
-            SignInResponse(
+            SignInResponseDTO(
                 status = SuperTokensStatus.FormFieldError.value,
                 formFields = invalidFormFields.map {
-                    FormFieldError(
+                    FormFieldErrorDTO(
                         id = it.id,
                         error = "Invalid value: ${it.value}",
                     )
@@ -68,7 +68,7 @@ suspend fun ApplicationCall.validateFormFields(
     if(email == null || password == null) {
         return respond(
             HttpStatusCode.Unauthorized,
-            SignInResponse(
+            SignInResponseDTO(
                 status = SuperTokensStatus.WrongCredentialsError.value,
             )
         )
@@ -86,7 +86,8 @@ open class EmailPasswordHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/signIn">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.signIn() {
-        val body = call.receive<FormFieldRequest>()
+        val body = call.receive<FormFieldRequestDTO>()
+        val tenantId = call.tenantId
 
         val email = body.formFields.getEmailField()?.value
         val password = body.formFields.getPasswordField()?.value
@@ -94,13 +95,13 @@ open class EmailPasswordHandler(
         if(email == null || password == null) {
             return call.respond(
                 HttpStatusCode.Unauthorized,
-                SignInResponse(
+                SignInResponseDTO(
                     status = SuperTokensStatus.WrongCredentialsError.value,
                 )
             )
         }
 
-        val user = emailPassword.signIn(email, password)
+        val user = emailPassword.signIn(email, password, tenantId)
 
         with(userHandler) {
             onUserSignedIn(user)
@@ -109,7 +110,8 @@ open class EmailPasswordHandler(
         if (sessionsEnabled) {
             val session = sessions.createSession(
                 userId = user.id,
-                userDataInJWT = sessions.getJwtData(user),
+                userDataInJWT = sessions.getJwtData(user, tenantId),
+                tenantId = tenantId,
             )
 
             setSessionInResponse(
@@ -120,10 +122,10 @@ open class EmailPasswordHandler(
         }
 
         call.respond(
-            SignInResponse(
-                user = UserResponse(
+            SignInResponseDTO(
+                user = User(
                     id = user.id,
-                    email = user.email,
+                    emails = user.emails,
                     timeJoined = user.timeJoined,
                 )
             )
@@ -135,10 +137,11 @@ open class EmailPasswordHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/signUp">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.signUp() {
-        val body = call.receive<FormFieldRequest>()
+        val body = call.receive<FormFieldRequestDTO>()
+        val tenantId = call.tenantId
 
         call.validateFormFields(body.formFields) { email, password ->
-            val user = emailPassword.signUp(email, password)
+            val user = emailPassword.signUp(email, password, tenantId)
 
             with(userHandler) {
                 onUserSignedUp(user)
@@ -151,12 +154,13 @@ open class EmailPasswordHandler(
 
                 val session = sessions.createSession(
                     userId = user.id,
-                    userDataInJWT = sessions.getJwtData(user),
+                    userDataInJWT = sessions.getJwtData(user, tenantId),
                     userDataInDatabase = buildMap {
                         additionalFormField.forEach {
                             set(it.id, it.value)
                         }
                     },
+                    tenantId = tenantId,
                 )
 
                 setSessionInResponse(
@@ -167,10 +171,10 @@ open class EmailPasswordHandler(
             }
 
             call.respond(
-                SignInResponse(
-                    user = UserResponse(
+                SignInResponseDTO(
+                    user = User(
                         id = user.id,
-                        email = user.email,
+                        emails = user.emails,
                         timeJoined = user.timeJoined,
                     )
                 )
@@ -188,7 +192,8 @@ open class EmailPasswordHandler(
         emailService.passwordResetTemplateName
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendPasswordResetMail(email: String) {
-        val frontend = call.fronend
+        val frontend = call.frontend
+
         emailPassword.emailService?.let {
             // launch the email sending in another scope, so the call is not blocked
             scope.launch {
@@ -197,6 +202,7 @@ open class EmailPasswordHandler(
                     val token = emailPassword.createResetPasswordToken(
                         userId = user.id,
                         email = email,
+                        tenantId =  call.tenantId,
                     )
 
                     val body = it.processTemplate(
@@ -226,7 +232,7 @@ open class EmailPasswordHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/passwordResetToken">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.passwordResetWithToken() {
-        val body = call.receive<FormFieldRequest>()
+        val body = call.receive<FormFieldRequestDTO>()
 
         val emailField = body.formFields.getEmailField()
 
@@ -235,7 +241,7 @@ open class EmailPasswordHandler(
         }
 
         call.respond(
-            StatusResponse()
+            StatusResponseDTO()
         )
     }
 
@@ -244,22 +250,22 @@ open class EmailPasswordHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/passwordReset">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.resetPassword() {
-        val body = call.receive<PasswordResetRequest>()
+        val body = call.receive<PasswordResetRequestDTO>()
 
         when (body.method) {
             "token" -> {
                 val token = body.token ?: return call.respond(
-                    StatusResponse(
+                    StatusResponseDTO(
                         status = SuperTokensStatus.ResetPasswordInvalidTokenError.value,
                     )
                 )
 
                 val password: String = body.formFields.getPasswordField()?.value
                     ?: return call.respond(
-                        SignInResponse(
+                        SignInResponseDTO(
                             status = SuperTokensStatus.FormFieldError.value,
                             formFields = listOf(
-                                FormFieldError(
+                                FormFieldErrorDTO(
                                     id = FORM_FIELD_PASSWORD_ID,
                                     error = "Password missing",
                                 )
@@ -267,9 +273,13 @@ open class EmailPasswordHandler(
                         )
                     )
 
-                emailPassword.resetPasswordWithToken(token, password)
+                emailPassword.resetPasswordWithToken(
+                    token = token,
+                    newPassword = password,
+                    tenantId = call.tenantId
+                )
 
-                call.respond(StatusResponse())
+                call.respond(StatusResponseDTO())
             }
 
             else -> call.respond(HttpStatusCode.BadRequest)
@@ -278,14 +288,14 @@ open class EmailPasswordHandler(
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.changePassword() {
         var user = superTokens.getUserById(call.requirePrincipal<AuthenticatedUser>().id)
-        val body = call.receive<PasswordChangeRequest>()
+        val body = call.receive<PasswordChangeRequestDTO>()
 
         val currentPassword: String = body.formFields.getPasswordField()?.value
             ?: return call.respond(
-                SignInResponse(
+                SignInResponseDTO(
                     status = SuperTokensStatus.FormFieldError.value,
                     formFields = listOf(
-                        FormFieldError(
+                        FormFieldErrorDTO(
                             id = FORM_FIELD_PASSWORD_ID,
                             error = "Password missing",
                         )
@@ -295,10 +305,10 @@ open class EmailPasswordHandler(
 
         val newPassword: String = body.formFields.getNewPasswordField()?.value
             ?: return call.respond(
-                SignInResponse(
+                SignInResponseDTO(
                     status = SuperTokensStatus.FormFieldError.value,
                     formFields = listOf(
-                        FormFieldError(
+                        FormFieldErrorDTO(
                             id = FORM_FIELD_PASSWORD_ID,
                             error = "New Password missing",
                         )
@@ -308,7 +318,11 @@ open class EmailPasswordHandler(
 
         val email = user.email ?: throw SuperTokensStatusException(SuperTokensStatus.UnknownEMailError)
         // will throw an exception if wrong
-        user = emailPassword.signIn(email, currentPassword)
+        user = emailPassword.signIn(
+            email = email,
+            password = currentPassword,
+            tenantId = call.tenantId
+        )
 
         val status = superTokens.updatePassword(user.id, newPassword)
 
@@ -316,7 +330,7 @@ open class EmailPasswordHandler(
             throw SuperTokensStatusException(status)
         }
 
-        call.respond(StatusResponse())
+        call.respond(StatusResponseDTO())
     }
 
 }

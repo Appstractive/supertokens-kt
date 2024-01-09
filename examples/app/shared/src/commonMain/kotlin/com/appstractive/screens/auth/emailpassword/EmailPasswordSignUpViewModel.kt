@@ -11,9 +11,8 @@ import com.supertokens.sdk.recipes.emailverification.sendVerificationEmail
 import kotlinx.coroutines.CoroutineScope
 
 class EmailPasswordSignUpViewModel(
-    scope: CoroutineScope,
     private val client: SuperTokensClient = dependencies.superTokensClient
-): ViewModel(scope) {
+): ViewModel() {
 
     val email = mutableStateOf(TextFieldValue("test@test.de"))
     val password = mutableStateOf(TextFieldValue("a1234567"))

@@ -23,14 +23,12 @@ import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignUpReq
 import com.supertokens.sdk.recipes.emailpassword.requests.ConsumePasswordTokenRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.ImportUserRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.UpdateUserRequest
-import com.supertokens.sdk.recipes.emailpassword.responses.CreateResetPasswordTokenResponse
-import com.supertokens.sdk.recipes.emailpassword.responses.ConsumePasswordTokenResponse
-import com.supertokens.sdk.recipes.emailpassword.responses.ImportUserResponse
+import com.supertokens.sdk.recipes.emailpassword.responses.CreateResetPasswordTokenResponseDTO
+import com.supertokens.sdk.recipes.emailpassword.responses.ConsumePasswordTokenResponseDTO
+import com.supertokens.sdk.recipes.emailpassword.responses.ImportUserResponseDTO
 import com.supertokens.sdk.utils.parse
 import com.supertokens.sdk.utils.parseUser
 import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
 class EmailPasswordConfig: RecipeConfig {
@@ -112,7 +110,7 @@ class EmailPasswordRecipe(
             )
         }
 
-        return response.parse<CreateResetPasswordTokenResponse, String> {
+        return response.parse<CreateResetPasswordTokenResponseDTO, String> {
             checkNotNull(it.token)
         }
     }
@@ -136,7 +134,7 @@ class EmailPasswordRecipe(
             )
         }
 
-        val userId = response.parse<ConsumePasswordTokenResponse, String> {
+        val userId = response.parse<ConsumePasswordTokenResponseDTO, String> {
             checkNotNull(it.userId)
         }
 
@@ -210,7 +208,7 @@ class EmailPasswordRecipe(
             )
         }
 
-        return response.parse<ImportUserResponse, ImportUserData> {
+        return response.parse<ImportUserResponseDTO, ImportUserData> {
             ImportUserData(
                 user = requireNotNull(it.user),
                 didUserAlreadyExist = requireNotNull(it.didUserAlreadyExist),

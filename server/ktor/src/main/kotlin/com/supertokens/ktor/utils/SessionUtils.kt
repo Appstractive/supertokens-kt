@@ -1,7 +1,6 @@
 package com.supertokens.ktor.utils
 
 import com.supertokens.ktor.recipes.session.sessions
-import com.supertokens.ktor.superTokens
 import com.supertokens.sdk.common.COOKIE_ACCESS_TOKEN
 import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
@@ -55,7 +54,7 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
     }
 
     if (sessions.cookieBasedSessions) {
-        val frontend = call.fronend
+        val frontend = call.frontend
         call.response.cookies.append(
             Cookie(
                 name = COOKIE_ACCESS_TOKEN,

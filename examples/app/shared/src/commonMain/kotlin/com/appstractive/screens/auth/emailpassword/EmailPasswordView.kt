@@ -44,7 +44,7 @@ fun EmailPassword() {
 @Composable
 fun SignIn() {
     val scope = rememberCoroutineScope()
-    val viewModel = remember { EmailPasswordSignInViewModel(scope) }
+    val viewModel = remember { EmailPasswordSignInViewModel() }
     val navigator = LocalNavigator.currentOrThrow
 
     Text(
@@ -99,7 +99,7 @@ fun SignIn() {
 @Composable
 fun SignUp() {
     val scope = rememberCoroutineScope()
-    val viewModel = remember { EmailPasswordSignUpViewModel(scope) }
+    val viewModel = remember { EmailPasswordSignUpViewModel() }
     val navigator = LocalNavigator.currentOrThrow
 
     Text(

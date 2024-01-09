@@ -2,38 +2,32 @@ package com.supertokens.sdk.recipes.passwordless
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.buildRequestPath
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.PasswordlessMode
-import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
 import com.supertokens.sdk.recipes.common.models.SignInUpData
 import com.supertokens.sdk.recipes.passwordless.models.PasswordlessCodeData
-import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequest
+import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequestDTO
 import com.supertokens.sdk.get
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.post
 import com.supertokens.sdk.put
-import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.emailpassword.requests.UpdateUserRequest
 import com.supertokens.sdk.recipes.passwordless.requests.CreatePasswordlessCodeRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokeAllPasswordlessCodesRequest
 import com.supertokens.sdk.recipes.passwordless.requests.RevokePasswordlesCodeRequest
-import com.supertokens.sdk.recipes.passwordless.responses.ConsumePasswordlessCodeResponse
-import com.supertokens.sdk.recipes.passwordless.responses.GetPasswordlessCodesResponse
-import com.supertokens.sdk.recipes.passwordless.responses.PasswordlessCodeResponse
+import com.supertokens.sdk.recipes.passwordless.responses.ConsumePasswordlessCodeResponseDTO
+import com.supertokens.sdk.recipes.passwordless.responses.GetPasswordlessCodesResponseDTO
+import com.supertokens.sdk.recipes.passwordless.responses.PasswordlessCodeResponseDTO
 import com.supertokens.sdk.recipes.passwordless.responses.PasswordlessDevices
 import com.supertokens.sdk.utils.parse
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
-import io.ktor.http.path
 
 class PasswordlessRecipeConfig : RecipeConfig {
 
@@ -67,7 +61,7 @@ class PasswordlessRecipe(
             )
         }
 
-        return response.parse<PasswordlessCodeResponse, PasswordlessCodeData> {
+        return response.parse<PasswordlessCodeResponseDTO, PasswordlessCodeData> {
             PasswordlessCodeData(
                 preAuthSessionId = checkNotNull(it.preAuthSessionId),
                 codeId = checkNotNull(it.codeId),
@@ -95,7 +89,7 @@ class PasswordlessRecipe(
             )
         }
 
-        return response.parse<PasswordlessCodeResponse, PasswordlessCodeData> {
+        return response.parse<PasswordlessCodeResponseDTO, PasswordlessCodeData> {
             PasswordlessCodeData(
                 preAuthSessionId = checkNotNull(it.preAuthSessionId),
                 codeId = checkNotNull(it.codeId),
@@ -124,7 +118,7 @@ class PasswordlessRecipe(
             )
         }
 
-        return response.parse<PasswordlessCodeResponse, PasswordlessCodeData> {
+        return response.parse<PasswordlessCodeResponseDTO, PasswordlessCodeData> {
             PasswordlessCodeData(
                 preAuthSessionId = checkNotNull(it.preAuthSessionId),
                 codeId = checkNotNull(it.codeId),
@@ -152,7 +146,7 @@ class PasswordlessRecipe(
             )
         }
 
-        return response.parse<PasswordlessCodeResponse, PasswordlessCodeData> {
+        return response.parse<PasswordlessCodeResponseDTO, PasswordlessCodeData> {
             PasswordlessCodeData(
                 preAuthSessionId = checkNotNull(it.preAuthSessionId),
                 codeId = checkNotNull(it.codeId),
@@ -174,14 +168,14 @@ class PasswordlessRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
-                ConsumePasswordlessCodeRequest(
+                ConsumePasswordlessCodeRequestDTO(
                     preAuthSessionId = preAuthSessionId,
                     linkCode = linkCode,
                 )
             )
         }
 
-        return response.parse<ConsumePasswordlessCodeResponse, SignInUpData> {
+        return response.parse<ConsumePasswordlessCodeResponseDTO, SignInUpData> {
             SignInUpData(
                 user = checkNotNull(it.user),
                 createdNewUser = checkNotNull(it.createdNewUser),
@@ -205,7 +199,7 @@ class PasswordlessRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
-                ConsumePasswordlessCodeRequest(
+                ConsumePasswordlessCodeRequestDTO(
                     preAuthSessionId = preAuthSessionId,
                     deviceId = deviceId,
                     userInputCode = userInputCode,
@@ -213,7 +207,7 @@ class PasswordlessRecipe(
             )
         }
 
-        return response.parse<ConsumePasswordlessCodeResponse, SignInUpData> {
+        return response.parse<ConsumePasswordlessCodeResponseDTO, SignInUpData> {
             SignInUpData(
                 user = it.user ?: throw RuntimeException("OK StatusResponse without user"),
                 createdNewUser = it.createdNewUser ?: throw RuntimeException("OK StatusResponse without createdNewUser"),
@@ -236,7 +230,7 @@ class PasswordlessRecipe(
             )
         }
 
-        return response.parse<StatusResponse, SuperTokensStatus> {
+        return response.parse<StatusResponseDTO, SuperTokensStatus> {
             it.status.toStatus()
         }
     }
@@ -256,7 +250,7 @@ class PasswordlessRecipe(
             )
         }
 
-        return response.parse<StatusResponse, SuperTokensStatus> {
+        return response.parse<StatusResponseDTO, SuperTokensStatus> {
             it.status.toStatus()
         }
     }
@@ -276,7 +270,7 @@ class PasswordlessRecipe(
             )
         }
 
-        return response.parse<StatusResponse, SuperTokensStatus> {
+        return response.parse<StatusResponseDTO, SuperTokensStatus> {
             it.status.toStatus()
         }
     }
@@ -295,7 +289,7 @@ class PasswordlessRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetPasswordlessCodesResponse, List<PasswordlessDevices>> {
+        return response.parse<GetPasswordlessCodesResponseDTO, List<PasswordlessDevices>> {
             it.devices
         }
     }
@@ -314,7 +308,7 @@ class PasswordlessRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetPasswordlessCodesResponse, List<PasswordlessDevices>> {
+        return response.parse<GetPasswordlessCodesResponseDTO, List<PasswordlessDevices>> {
             it.devices
         }
     }
@@ -333,7 +327,7 @@ class PasswordlessRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetPasswordlessCodesResponse, List<PasswordlessDevices>> {
+        return response.parse<GetPasswordlessCodesResponseDTO, List<PasswordlessDevices>> {
             it.devices
         }
     }
@@ -352,7 +346,7 @@ class PasswordlessRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetPasswordlessCodesResponse, List<PasswordlessDevices>> {
+        return response.parse<GetPasswordlessCodesResponseDTO, List<PasswordlessDevices>> {
             it.devices
         }
     }

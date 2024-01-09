@@ -4,7 +4,7 @@ import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.User
-import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.get
 import com.supertokens.sdk.post
@@ -16,18 +16,15 @@ import com.supertokens.sdk.recipes.roles.requests.CreateOrUpdateRoleRequest
 import com.supertokens.sdk.recipes.roles.requests.DeleteRoleRequest
 import com.supertokens.sdk.recipes.roles.requests.RemoveRolePermissionsRequest
 import com.supertokens.sdk.recipes.roles.requests.UserRoleRequest
-import com.supertokens.sdk.recipes.roles.responses.CreateOrUpdateRoleResponse
-import com.supertokens.sdk.recipes.roles.responses.DeleteRoleResponse
-import com.supertokens.sdk.recipes.roles.responses.GetRolePermissionsResponse
-import com.supertokens.sdk.recipes.roles.responses.GetRoleUsersResponse
-import com.supertokens.sdk.recipes.roles.responses.GetRolesResponse
-import com.supertokens.sdk.recipes.roles.responses.RemoveUserRoleResponse
-import com.supertokens.sdk.recipes.roles.responses.SetUserRoleResponse
+import com.supertokens.sdk.recipes.roles.responses.CreateOrUpdateRoleResponseDTO
+import com.supertokens.sdk.recipes.roles.responses.DeleteRoleResponseDTO
+import com.supertokens.sdk.recipes.roles.responses.GetRolePermissionsResponseDTO
+import com.supertokens.sdk.recipes.roles.responses.GetRoleUsersResponseDTO
+import com.supertokens.sdk.recipes.roles.responses.GetRolesResponseDTO
+import com.supertokens.sdk.recipes.roles.responses.RemoveUserRoleResponseDTO
+import com.supertokens.sdk.recipes.roles.responses.SetUserRoleResponseDTO
 import com.supertokens.sdk.utils.parse
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
 class RolesRecipeConfig : RecipeConfig {
@@ -95,7 +92,7 @@ class RolesRecipe(
             )
         }
 
-        return response.parse<CreateOrUpdateRoleResponse, Boolean> {
+        return response.parse<CreateOrUpdateRoleResponseDTO, Boolean> {
             it.createdNewRole
         }
     }
@@ -117,7 +114,7 @@ class RolesRecipe(
             )
         }
 
-        return response.parse<DeleteRoleResponse, Boolean> {
+        return response.parse<DeleteRoleResponseDTO, Boolean> {
             it.didRoleExist
         }
     }
@@ -130,7 +127,7 @@ class RolesRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetRolesResponse, List<String>> {
+        return response.parse<GetRolesResponseDTO, List<String>> {
             it.roles
         }
     }
@@ -149,7 +146,7 @@ class RolesRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetRolePermissionsResponse, List<String>> {
+        return response.parse<GetRolePermissionsResponseDTO, List<String>> {
             it.permissions
         }
     }
@@ -168,7 +165,7 @@ class RolesRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetRoleUsersResponse, List<String>> {
+        return response.parse<GetRoleUsersResponseDTO, List<String>> {
             it.users
         }
     }
@@ -189,7 +186,7 @@ class RolesRecipe(
             )
         }
 
-        return response.parse<StatusResponse, SuperTokensStatus> {
+        return response.parse<StatusResponseDTO, SuperTokensStatus> {
             it.status.toStatus()
         }
     }
@@ -208,7 +205,7 @@ class RolesRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetRolesResponse, List<String>> {
+        return response.parse<GetRolesResponseDTO, List<String>> {
             it.roles
         }
     }
@@ -231,7 +228,7 @@ class RolesRecipe(
             )
         }
 
-        return response.parse<SetUserRoleResponse, Boolean> {
+        return response.parse<SetUserRoleResponseDTO, Boolean> {
             it.didUserAlreadyHaveRole
         }
     }
@@ -254,7 +251,7 @@ class RolesRecipe(
             )
         }
 
-        return response.parse<RemoveUserRoleResponse, Boolean> {
+        return response.parse<RemoveUserRoleResponseDTO, Boolean> {
             it.didUserHaveRole
         }
     }
@@ -273,7 +270,7 @@ class RolesRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetRolesResponse, List<String>> {
+        return response.parse<GetRolesResponseDTO, List<String>> {
             it.roles
         }
     }

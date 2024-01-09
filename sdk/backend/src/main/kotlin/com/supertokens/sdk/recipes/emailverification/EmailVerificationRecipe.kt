@@ -5,26 +5,24 @@ import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.Claims
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
-import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
 import com.supertokens.sdk.recipes.emailverification.requests.EmailVerificationRequest
-import com.supertokens.sdk.common.requests.VerifyEmailTokenRequest
+import com.supertokens.sdk.common.requests.VerifyEmailTokenRequestDTO
 import com.supertokens.sdk.recipes.emailverification.models.VerifyEmailTokenData
-import com.supertokens.sdk.recipes.emailverification.responses.CreateEmailVerificationTokenResponse
-import com.supertokens.sdk.common.responses.VerifyEmailResponse
+import com.supertokens.sdk.recipes.emailverification.responses.CreateEmailVerificationTokenResponseDTO
+import com.supertokens.sdk.common.responses.VerifyEmailResponseDTO
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.get
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.post
-import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailTokenResponse
+import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailTokenResponseDTO
 import com.supertokens.sdk.utils.parse
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
 class EmailVerificationRecipeConfig: RecipeConfig {
@@ -86,7 +84,7 @@ class EmailVerificationRecipe(
             )
         }
 
-        return response.parse<CreateEmailVerificationTokenResponse, String> {
+        return response.parse<CreateEmailVerificationTokenResponseDTO, String> {
             it.token ?: throw SuperTokensStatusException(SuperTokensStatus.EmailAlreadyVerifiedError)
         }
     }
@@ -107,7 +105,7 @@ class EmailVerificationRecipe(
             )
         }
 
-        return response.parse<StatusResponse, SuperTokensStatus> {
+        return response.parse<StatusResponseDTO, SuperTokensStatus> {
             it.status.toStatus()
         }
     }
@@ -121,13 +119,13 @@ class EmailVerificationRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
-                VerifyEmailTokenRequest(
+                VerifyEmailTokenRequestDTO(
                     token = token,
                 )
             )
         }
 
-        return response.parse<VerifyEmailTokenResponse, VerifyEmailTokenData> {
+        return response.parse<VerifyEmailTokenResponseDTO, VerifyEmailTokenData> {
             VerifyEmailTokenData(
                 userId = checkNotNull(it.userId),
                 email = checkNotNull(it.email),
@@ -152,7 +150,7 @@ class EmailVerificationRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<VerifyEmailResponse, Boolean> {
+        return response.parse<VerifyEmailResponseDTO, Boolean> {
             it.isVerified == true
         }
     }
@@ -173,7 +171,7 @@ class EmailVerificationRecipe(
             )
         }
 
-        return response.parse<StatusResponse, SuperTokensStatus> {
+        return response.parse<StatusResponseDTO, SuperTokensStatus> {
             it.status.toStatus()
         }.also {
             superTokens._events.tryEmit(SuperTokensEvent.UserEmailUnVerified(userId, email))

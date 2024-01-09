@@ -3,8 +3,7 @@ package com.supertokens.ktor.utils
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
 import com.supertokens.sdk.common.FORM_FIELD_NEW_PASSWORD_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
-import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
-import com.supertokens.sdk.common.requests.FormField as RequestFormField
+import com.supertokens.sdk.common.requests.FormFieldDTO as RequestFormField
 import com.supertokens.sdk.recipes.common.models.FormField as RecipeFormField
 
 fun getInvalidFormFields(requestFormFields: List<RequestFormField>, recipeFormFields: List<RecipeFormField>): List<RequestFormField> {

@@ -3,7 +3,7 @@ package com.supertokens.sdk.recipes.thirdparty.providers
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
+import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -58,22 +58,24 @@ abstract class OAuthProvider<out C: OAuthProviderConfig>(
         }
     )
 
-    override fun getAuthorizationEndpoint() = ProviderEndpoint(
+    override fun getAuthorizationEndpoint(redirectUrl: String): ProviderEndpoint = ProviderEndpoint(
         url = authUrl,
         params = buildMap {
             set("scope", scopes.joinToString(" "))
             set("client_id", clientId)
+            set("redirect_uri", redirectUrl)
             authParams?.forEach { (key, value) -> set(key, value) }
         }
     )
 
-    open suspend fun convertTokenResponse(jsonObject: JsonObject): ThirdPartyTokenResponse = ThirdPartyTokenResponse(
+    open suspend fun convertTokenResponse(jsonObject: JsonObject): ThirdPartyTokensDTO = ThirdPartyTokensDTO(
         accessToken = jsonObject["access_token"]?.jsonPrimitive?.content ?: throw RuntimeException("'access_token' not in response for ${this::class.simpleName}"),
         idToken = jsonObject["id_token"]?.jsonPrimitive?.content,
     )
 
-    override suspend fun getTokens(authCode: String, redirectUrl: String?): ThirdPartyTokenResponse {
-        val response = superTokens.client.get(getAccessTokenEndpoint(authCode, redirectUrl).fullUrl)
+    override suspend fun getTokens(parameters: Map<String, String>, pkceCodeVerifier: String?, redirectUrl: String?): ThirdPartyTokensDTO {
+        val code = parameters["code"] ?: throw RuntimeException("'code' not in parameters for ${this::class.simpleName}")
+        val response = superTokens.client.get(getAccessTokenEndpoint(code, redirectUrl).fullUrl)
 
         if (response.status != HttpStatusCode.OK) {
             throw SuperTokensStatusException(SuperTokensStatus.WrongCredentialsError, response.bodyAsText())

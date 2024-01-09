@@ -9,12 +9,12 @@ import com.supertokens.sdk.handlers.signInWith
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 class EmailPasswordSignInViewModel(
-    scope: CoroutineScope,
     private val client: SuperTokensClient = dependencies.superTokensClient,
-): ViewModel(scope) {
+): ViewModel() {
 
     val email = mutableStateOf(TextFieldValue("test@test.de"))
     val password = mutableStateOf(TextFieldValue("a1234567"))

@@ -5,10 +5,11 @@ import com.supertokens.ktor.plugins.requirePrincipal
 import com.supertokens.ktor.utils.UnauthorizedException
 import com.supertokens.ktor.utils.clearSessionInResponse
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
 import com.supertokens.sdk.common.HEADER_ANTI_CSRF
 import com.supertokens.sdk.common.HEADER_REFRESH_TOKEN
-import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
@@ -27,9 +28,12 @@ open class SessionHandler(
     open suspend fun PipelineContext<Unit, ApplicationCall>.signOut() {
         val user =  call.requirePrincipal<AuthenticatedUser>()
         val session = sessions.getSession(user.sessionHandle)
-        sessions.removeSessions(listOf(session.sessionHandle))
+        sessions.removeSessions(
+            sessionHandles = listOf(session.sessionHandle),
+            tenantId = call.tenantId,
+        )
         clearSessionInResponse()
-        call.respond(StatusResponse())
+        call.respond(StatusResponseDTO())
     }
 
     /**
@@ -55,7 +59,7 @@ open class SessionHandler(
             antiCsrfToken = session.antiCsrfToken,
         )
 
-        call.respond(StatusResponse())
+        call.respond(StatusResponseDTO())
     }
 
 }

@@ -25,8 +25,12 @@ class ThirdPartyTests {
     @Test
     fun testAppleAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(Apple.AuthCode) {
-            code = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
+            pkceCodeVerifier = "wsgewhekjdrtkjt"
+            redirectURI = "https://auth.appstractive.com/callback"
+            redirectURIQueryParams = mapOf(
+                "code" to "123456",
+                "state" to "signup"
+            )
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -37,7 +41,6 @@ class ThirdPartyTests {
         val response = client.signInWith(Apple.Tokens) {
             accessToken = "123456"
             idToken = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -52,8 +55,12 @@ class ThirdPartyTests {
     @Test
     fun testBitbucketAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(Bitbucket.AuthCode) {
-            code = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
+            pkceCodeVerifier = "wsgewhekjdrtkjt"
+            redirectURI = "https://auth.appstractive.com/callback"
+            redirectURIQueryParams = mapOf(
+                "code" to "123456",
+                "state" to "signup"
+            )
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -63,7 +70,6 @@ class ThirdPartyTests {
     fun testBitbucketTokenSignIn() = runBlocking {
         val response = client.signInWith(Bitbucket.Tokens) {
             accessToken = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -78,8 +84,12 @@ class ThirdPartyTests {
     @Test
     fun testFacebookAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(Facebook.AuthCode) {
-            code = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
+            pkceCodeVerifier = "wsgewhekjdrtkjt"
+            redirectURI = "https://auth.appstractive.com/callback"
+            redirectURIQueryParams = mapOf(
+                "code" to "123456",
+                "state" to "signup"
+            )
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -89,7 +99,6 @@ class ThirdPartyTests {
     fun testFacebookTokenSignIn() = runBlocking {
         val response = client.signInWith(Facebook.Tokens) {
             accessToken = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -104,8 +113,12 @@ class ThirdPartyTests {
     @Test
     fun testGitHubAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(GitHub.AuthCode) {
-            code = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
+            pkceCodeVerifier = "wsgewhekjdrtkjt"
+            redirectURI = "https://auth.appstractive.com/callback"
+            redirectURIQueryParams = mapOf(
+                "code" to "123456",
+                "state" to "signup"
+            )
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -115,7 +128,6 @@ class ThirdPartyTests {
     fun testGitHubTokenSignIn() = runBlocking {
         val response = client.signInWith(GitHub.Tokens) {
             accessToken = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -130,8 +142,12 @@ class ThirdPartyTests {
     @Test
     fun testGitLabAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(GitLab.AuthCode) {
-            code = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
+            pkceCodeVerifier = "wsgewhekjdrtkjt"
+            redirectURI = "https://auth.appstractive.com/callback"
+            redirectURIQueryParams = mapOf(
+                "code" to "123456",
+                "state" to "signup"
+            )
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -141,7 +157,6 @@ class ThirdPartyTests {
     fun testGitLabTokenSignIn() = runBlocking {
         val response = client.signInWith(GitLab.Tokens) {
             accessToken = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -156,8 +171,12 @@ class ThirdPartyTests {
     @Test
     fun testGoogleAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(Google.AuthCode) {
-            code = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
+            pkceCodeVerifier = "wsgewhekjdrtkjt"
+            redirectURI = "https://auth.appstractive.com/callback"
+            redirectURIQueryParams = mapOf(
+                "code" to "123456",
+                "state" to "signup"
+            )
         }
 
         assertEquals("test@test.de", response.user.email)
@@ -167,7 +186,6 @@ class ThirdPartyTests {
     fun testGoogleTokenSignIn() = runBlocking {
         val response = client.signInWith(Google.Tokens) {
             accessToken = "123456"
-            clientId = "shbesrhrdjntjhntrzsjd"
         }
 
         assertEquals("test@test.de", response.user.email)

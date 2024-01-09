@@ -6,18 +6,19 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.userHandler
-import com.supertokens.ktor.utils.fronend
+import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.ServerConfig
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.PasswordlessMode
-import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequest
-import com.supertokens.sdk.common.requests.ResendPasswordlessCodeRequest
-import com.supertokens.sdk.common.requests.StartPasswordlessSignInUpRequest
-import com.supertokens.sdk.common.responses.SignInUpResponse
-import com.supertokens.sdk.common.responses.StartPasswordlessSignInUpResponse
-import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequestDTO
+import com.supertokens.sdk.common.requests.ResendPasswordlessCodeRequestDTO
+import com.supertokens.sdk.common.requests.StartPasswordlessSignInUpRequestDTO
+import com.supertokens.sdk.common.responses.SignInUpResponseDTO
+import com.supertokens.sdk.common.responses.StartPasswordlessSignInUpResponseDTO
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.passwordless.models.LoginMagicLinkOtpTemplate
@@ -30,7 +31,6 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 open class PasswordlessHandler(
@@ -55,7 +55,7 @@ open class PasswordlessHandler(
         "${frontend.fullUrl}verify?preAuthSessionId=${codeData.preAuthSessionId}#${codeData.linkCode}"
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginMail(email: String, codeData: PasswordlessCodeData): PasswordlessCodeData {
-        val frontend = call.fronend
+        val frontend = call.frontend
         passwordless.emailService?.let {
             // launch the email sending in another scope, so the call is not blocked
             scope.launch {
@@ -124,18 +124,19 @@ open class PasswordlessHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessSignInUpStart">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.startSignInUp() {
-        val body = call.receive<StartPasswordlessSignInUpRequest>()
+        val body = call.receive<StartPasswordlessSignInUpRequestDTO>()
+        val tenantId = call.tenantId
 
         val codeData = body.email?.let {
-            val data = passwordless.createEmailCode(it)
+            val data = passwordless.createEmailCode(it, tenantId)
             sendLoginMail(it, data)
         } ?: body.phoneNumber?.let {
-            val data = passwordless.createPhoneNumberCode(it)
+            val data = passwordless.createPhoneNumberCode(it, tenantId)
             sendLoginSms(it, data)
         } ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError)
 
         call.respond(
-            StartPasswordlessSignInUpResponse(
+            StartPasswordlessSignInUpResponseDTO(
                 deviceId = codeData.deviceId,
                 preAuthSessionId = codeData.preAuthSessionId,
                 flowType = passwordless.flowType,
@@ -148,19 +149,21 @@ open class PasswordlessHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessSignInUpResend">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.resendCode() {
-        val body = call.receive<ResendPasswordlessCodeRequest>()
-        val session = passwordless.getCodesByPreAuthSessionId(body.preAuthSessionId).firstOrNull {
+        val body = call.receive<ResendPasswordlessCodeRequestDTO>()
+        val tenantId = call.tenantId
+
+        val session = passwordless.getCodesByPreAuthSessionId(body.preAuthSessionId, tenantId).firstOrNull {
             it.preAuthSessionId == body.preAuthSessionId
         } ?: throw SuperTokensStatusException(SuperTokensStatus.PasswordlessRestartFlowError)
 
-        val data = passwordless.recreateCode(body.deviceId)
+        val data = passwordless.recreateCode(body.deviceId, tenantId)
         session.email?.let {
             sendLoginMail(it, data)
         } ?: session.phoneNumber?.let {
             sendLoginSms(it, data)
         }
 
-        call.respond(StatusResponse())
+        call.respond(StatusResponseDTO())
     }
 
     /**
@@ -168,17 +171,21 @@ open class PasswordlessHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessSignInUpConsume">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.consumeCode() {
-        val body = call.receive<ConsumePasswordlessCodeRequest>()
+        val body = call.receive<ConsumePasswordlessCodeRequestDTO>()
+        val tenantId = call.tenantId
+
         val response = when (passwordless.flowType) {
             PasswordlessMode.MAGIC_LINK -> passwordless.consumeLinkCode(
-                body.preAuthSessionId,
-                body.linkCode ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
+                preAuthSessionId = body.preAuthSessionId,
+                linkCode = body.linkCode ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
+                tenantId = tenantId,
             )
 
             PasswordlessMode.USER_INPUT_CODE -> passwordless.consumeUserInputCode(
                 preAuthSessionId = body.preAuthSessionId,
                 deviceId = body.deviceId ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
                 userInputCode = body.userInputCode ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
+                tenantId = tenantId,
             )
 
             PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK -> {
@@ -188,14 +195,16 @@ open class PasswordlessHandler(
 
                 if (linkCode != null) {
                     passwordless.consumeLinkCode(
-                        body.preAuthSessionId,
-                        linkCode,
+                        preAuthSessionId = body.preAuthSessionId,
+                        linkCode = linkCode,
+                        tenantId = tenantId,
                     )
                 } else if (deviceId != null && userInputCode != null) {
                     passwordless.consumeUserInputCode(
                         preAuthSessionId = body.preAuthSessionId,
                         deviceId = deviceId,
                         userInputCode = userInputCode,
+                        tenantId = tenantId,
                     )
                 } else {
                     throw SuperTokensStatusException(SuperTokensStatus.FormFieldError)
@@ -204,10 +213,17 @@ open class PasswordlessHandler(
         }
 
         if (emailVerificationEnabled) {
-            val codeData = passwordless.getCodesByPreAuthSessionId(body.preAuthSessionId)
+            val codeData = passwordless.getCodesByPreAuthSessionId(
+                preAuthSessionId = body.preAuthSessionId,
+                tenantId = tenantId
+            )
             codeData.forEach {
                 it.email?.let { email ->
-                    emailVerification.setVerified(response.user.id, email)
+                    emailVerification.setVerified(
+                        userId = response.user.id,
+                        email = email,
+                        tenantId = tenantId,
+                    )
                 }
             }
         }
@@ -224,7 +240,11 @@ open class PasswordlessHandler(
         if (sessionsEnabled) {
             val session = sessions.createSession(
                 userId = response.user.id,
-                userDataInJWT = sessions.getJwtData(response.user),
+                userDataInJWT = sessions.getJwtData(
+                    user = response.user,
+                    tenantId = tenantId
+                ),
+                tenantId = tenantId,
             )
             setSessionInResponse(
                 accessToken = session.accessToken,
@@ -234,7 +254,7 @@ open class PasswordlessHandler(
         }
 
         call.respond(
-            SignInUpResponse(
+            SignInUpResponseDTO(
                 createdNewUser = response.createdNewUser,
                 user = response.user,
             )

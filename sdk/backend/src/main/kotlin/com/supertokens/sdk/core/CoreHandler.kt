@@ -1,28 +1,21 @@
 package com.supertokens.sdk.core
 
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.buildRequestPath
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.User
-import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.core.requests.CreateJwtRequest
 import com.supertokens.sdk.core.requests.DeleteUserRequest
-import com.supertokens.sdk.core.responses.CreateJwtResponse
-import com.supertokens.sdk.core.responses.GetUsersResponse
+import com.supertokens.sdk.core.responses.CreateJwtResponseDTO
+import com.supertokens.sdk.core.responses.GetUsersResponseDTO
 import com.supertokens.sdk.get
 import com.supertokens.sdk.post
-import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
-import com.supertokens.sdk.recipes.passwordless.PasswordlessRecipe
-import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.utils.parse
 import com.supertokens.sdk.utils.parseUser
 import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.http.path
 import kotlinx.serialization.json.JsonObject
 
 internal class CoreHandler {
@@ -49,7 +42,7 @@ internal class CoreHandler {
             )
         )
 
-        return response.parse<GetUsersResponse, List<User>> {
+        return response.parse<GetUsersResponseDTO, List<User>> {
             requireNotNull(it.users)
         }
     }
@@ -64,7 +57,7 @@ internal class CoreHandler {
             ),
         )
 
-        return response.parse<GetUsersResponse, List<User>> {
+        return response.parse<GetUsersResponseDTO, List<User>> {
             requireNotNull(it.users)
         }
     }
@@ -80,7 +73,7 @@ internal class CoreHandler {
             ),
         )
 
-        return response.parse<GetUsersResponse, List<User>> {
+        return response.parse<GetUsersResponseDTO, List<User>> {
             requireNotNull(it.users)
         }
     }
@@ -95,7 +88,7 @@ internal class CoreHandler {
             )
         }
 
-        return response.parse<StatusResponse, SuperTokensStatus> {
+        return response.parse<StatusResponseDTO, SuperTokensStatus> {
             it.status.toStatus()
         }
     }
@@ -123,7 +116,7 @@ internal class CoreHandler {
             )
         }
 
-        return response.parse<CreateJwtResponse, String> {
+        return response.parse<CreateJwtResponseDTO, String> {
             checkNotNull(it.jwt)
         }
     }

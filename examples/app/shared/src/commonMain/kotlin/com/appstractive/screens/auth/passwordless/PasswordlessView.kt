@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.appstractive.screens.home.HomeScreen
@@ -31,7 +32,7 @@ fun Passwordless() {
         modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val scope = rememberCoroutineScope()
-        val viewModel = remember { PasswordlessViewModel(scope) }
+        val viewModel = remember { PasswordlessViewModel() }
 
         Text(
             text = "Passwordless",
@@ -82,7 +83,7 @@ private fun EmailOrPhone(viewModel: PasswordlessViewModel) {
         Button(
             enabled = !viewModel.isLoading.value,
             onClick = {
-                viewModel.scope.launch {
+                viewModel.screenModelScope.launch {
                     viewModel.send()
                 }
             },
@@ -110,7 +111,7 @@ private fun CodeInput(viewModel: PasswordlessViewModel) {
         Button(
             enabled = !viewModel.isLoading.value,
             onClick = {
-                viewModel.scope.launch {
+                viewModel.screenModelScope.launch {
                     if(viewModel.confirm()) {
                         // need parent navigator, because current navigator is a tab navigator
                         navigator.parent?.replace(HomeScreen)
@@ -129,7 +130,7 @@ private fun CodeInput(viewModel: PasswordlessViewModel) {
         Button(
             enabled = !viewModel.isLoading.value,
             onClick = {
-                viewModel.scope.launch {
+                viewModel.screenModelScope.launch {
                     viewModel.cancel()
                 }
             },

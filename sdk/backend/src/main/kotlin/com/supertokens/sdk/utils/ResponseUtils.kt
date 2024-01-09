@@ -4,9 +4,9 @@ import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.models.User
-import com.supertokens.sdk.common.responses.BaseResponse
-import com.supertokens.sdk.common.responses.StatusResponse
-import com.supertokens.sdk.recipes.common.responses.UserResponse
+import com.supertokens.sdk.common.responses.BaseResponseDTO
+import com.supertokens.sdk.common.responses.StatusResponseDTO
+import com.supertokens.sdk.recipes.common.responses.UserResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.models.SessionData
 import com.supertokens.sdk.recipes.session.responses.SessionResponse
@@ -15,7 +15,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 
-suspend inline fun <reified R: BaseResponse, T> HttpResponse.parse(convert: (R) -> T): T {
+suspend inline fun <reified R: BaseResponseDTO, T> HttpResponse.parse(convert: (R) -> T): T {
     if (status != HttpStatusCode.OK) {
         throw SuperTokensStatusException(bodyAsText().toStatus())
     }
@@ -33,7 +33,7 @@ suspend fun HttpResponse.parse(): SuperTokensStatus {
         throw SuperTokensStatusException(bodyAsText().toStatus())
     }
 
-    val body = body<StatusResponse>()
+    val body = body<StatusResponseDTO>()
 
     return body.status.toStatus()
 }
@@ -43,7 +43,7 @@ suspend fun HttpResponse.parseUser(): User {
         throw SuperTokensStatusException(bodyAsText().toStatus())
     }
 
-    val body = body<UserResponse>()
+    val body = body<UserResponseDTO>()
 
     return body.user ?: throw SuperTokensStatusException(body.status.toStatus())
 }

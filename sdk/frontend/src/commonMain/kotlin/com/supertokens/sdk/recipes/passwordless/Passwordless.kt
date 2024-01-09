@@ -5,10 +5,10 @@ import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.models.PasswordlessMode
-import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequest
-import com.supertokens.sdk.common.requests.StartPasswordlessSignInUpRequest
-import com.supertokens.sdk.common.responses.SignInUpResponse
-import com.supertokens.sdk.common.responses.StartPasswordlessSignInUpResponse
+import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequestDTO
+import com.supertokens.sdk.common.requests.StartPasswordlessSignInUpRequestDTO
+import com.supertokens.sdk.common.responses.SignInUpResponseDTO
+import com.supertokens.sdk.common.responses.StartPasswordlessSignInUpResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.handlers.SignInProvider
 import com.supertokens.sdk.handlers.SignInProviderConfig
@@ -37,14 +37,14 @@ object Passwordless : SignUpProvider<Passwordless.SignUpConfig, PasswordlessSign
 
         val response = superTokensClient.apiClient.post(Routes.Passwordless.SIGNUP_CODE) {
             setBody(
-                StartPasswordlessSignInUpRequest(
+                StartPasswordlessSignInUpRequestDTO(
                     email = config.email,
                     phoneNumber = config.phoneNumber,
                 )
             )
         }
 
-        val body = response.body<StartPasswordlessSignInUpResponse>()
+        val body = response.body<StartPasswordlessSignInUpResponseDTO>()
 
         return when(val status = body.status.toStatus()) {
             SuperTokensStatus.OK -> {
@@ -72,14 +72,14 @@ object PasswordlessLinkCode : SignInProvider<PasswordlessLinkCode.SignInConfig, 
 
         val response = superTokensClient.apiClient.post(Routes.Passwordless.SIGNUP_CODE_CONSUME) {
             setBody(
-                ConsumePasswordlessCodeRequest(
+                ConsumePasswordlessCodeRequestDTO(
                     preAuthSessionId = config.preAuthSessionId,
                     linkCode = config.linkCode,
                 )
             )
         }
 
-        val body = response.body<SignInUpResponse>()
+        val body = response.body<SignInUpResponseDTO>()
 
         return when(val status = body.status.toStatus()) {
             SuperTokensStatus.OK -> {
@@ -107,7 +107,7 @@ object PasswordlessInputCode : SignInProvider<PasswordlessInputCode.SignInConfig
 
         val response = superTokensClient.apiClient.post(Routes.Passwordless.SIGNUP_CODE_CONSUME) {
             setBody(
-                ConsumePasswordlessCodeRequest(
+                ConsumePasswordlessCodeRequestDTO(
                     preAuthSessionId = config.preAuthSessionId,
                     deviceId = config.deviceId,
                     userInputCode = config.userInputCode,
@@ -115,7 +115,7 @@ object PasswordlessInputCode : SignInProvider<PasswordlessInputCode.SignInConfig
             )
         }
 
-        val body = response.body<SignInUpResponse>()
+        val body = response.body<SignInUpResponseDTO>()
 
         return when(val status = body.status.toStatus()) {
             SuperTokensStatus.OK -> {

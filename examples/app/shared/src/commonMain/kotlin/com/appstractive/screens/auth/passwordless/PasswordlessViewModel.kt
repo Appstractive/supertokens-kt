@@ -18,9 +18,8 @@ enum class InputState {
 }
 
 class PasswordlessViewModel(
-    scope: CoroutineScope,
     private val client: SuperTokensClient = dependencies.superTokensClient,
-) : ViewModel(scope) {
+) : ViewModel() {
 
     val inputState = mutableStateOf(InputState.EMAIL_OR_PHONE)
 

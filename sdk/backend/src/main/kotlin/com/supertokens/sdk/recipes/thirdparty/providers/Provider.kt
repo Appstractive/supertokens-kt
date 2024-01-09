@@ -2,7 +2,7 @@ package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.SuperTokensProviderDslMarker
-import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
+import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import java.net.URLEncoder
 
@@ -38,9 +38,9 @@ abstract class Provider<out C: ProviderConfig> {
     abstract val isDefault: Boolean
 
     abstract fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?): ProviderEndpoint
-    abstract fun getAuthorizationEndpoint(): ProviderEndpoint
-    abstract suspend fun getTokens(authCode: String, redirectUrl: String?): ThirdPartyTokenResponse
-    abstract suspend fun getUserInfo(tokenResponse: ThirdPartyTokenResponse): ThirdPartyUserInfo
+    abstract fun getAuthorizationEndpoint(redirectUrl: String): ProviderEndpoint
+    abstract suspend fun getTokens(parameters: Map<String, String>, pkceCodeVerifier: String?, redirectUrl: String?): ThirdPartyTokensDTO
+    abstract suspend fun getUserInfo(tokenResponse: ThirdPartyTokensDTO): ThirdPartyUserInfo
 
 }
 

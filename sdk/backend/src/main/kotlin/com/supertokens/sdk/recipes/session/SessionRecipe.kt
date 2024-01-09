@@ -26,18 +26,15 @@ import com.supertokens.sdk.recipes.session.requests.RemoveSessionsRequest
 import com.supertokens.sdk.recipes.session.requests.UpdateJwtDataRequest
 import com.supertokens.sdk.recipes.session.requests.UpdateSessionDataRequest
 import com.supertokens.sdk.recipes.session.requests.VerifySessionRequest
-import com.supertokens.sdk.recipes.session.responses.CreateSessionResponse
-import com.supertokens.sdk.recipes.session.responses.GetSessionResponse
-import com.supertokens.sdk.recipes.session.responses.GetSessionsResponse
-import com.supertokens.sdk.recipes.session.responses.RegenerateSessionResponse
-import com.supertokens.sdk.recipes.session.responses.RemoveSessionsResponse
-import com.supertokens.sdk.recipes.session.responses.VerifySessionResponse
+import com.supertokens.sdk.recipes.session.responses.CreateSessionResponseDTO
+import com.supertokens.sdk.recipes.session.responses.GetSessionResponseDTO
+import com.supertokens.sdk.recipes.session.responses.GetSessionsResponseDTO
+import com.supertokens.sdk.recipes.session.responses.RegenerateSessionResponseDTO
+import com.supertokens.sdk.recipes.session.responses.RemoveSessionsResponseDTO
+import com.supertokens.sdk.recipes.session.responses.VerifySessionResponseDTO
 import com.supertokens.sdk.utils.parse
 import com.supertokens.sdk.utils.toData
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
 
@@ -164,7 +161,7 @@ class SessionRecipe(
             )
         }
 
-        return response.parse<CreateSessionResponse, CreateSessionData> {
+        return response.parse<CreateSessionResponseDTO, CreateSessionData> {
             CreateSessionData(
                 session = checkNotNull(it.session).toData(),
                 accessToken = checkNotNull(it.accessToken),
@@ -189,7 +186,7 @@ class SessionRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetSessionResponse, GetSessionData> {
+        return response.parse<GetSessionResponseDTO, GetSessionData> {
             GetSessionData(
                 userId = checkNotNull(it.userId),
                 expiry = checkNotNull(it.expiry),
@@ -221,7 +218,7 @@ class SessionRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<GetSessionsResponse, List<String>> {
+        return response.parse<GetSessionsResponseDTO, List<String>> {
             it.sessionHandles
         }
     }
@@ -245,7 +242,7 @@ class SessionRecipe(
             )
         }
 
-        return response.parse<RemoveSessionsResponse, List<String>> {
+        return response.parse<RemoveSessionsResponseDTO, List<String>> {
             it.sessionHandlesRevoked
         }
     }
@@ -266,7 +263,7 @@ class SessionRecipe(
             )
         }
 
-        return response.parse<RemoveSessionsResponse, List<String>> {
+        return response.parse<RemoveSessionsResponseDTO, List<String>> {
             it.sessionHandlesRevoked
         }
     }
@@ -296,7 +293,7 @@ class SessionRecipe(
             )
         }
 
-        return response.parse<VerifySessionResponse, VerifySessionData> {
+        return response.parse<VerifySessionResponseDTO, VerifySessionData> {
             VerifySessionData(
                 session = checkNotNull(it.session?.toData()),
                 accessToken = it.accessToken,
@@ -324,7 +321,7 @@ class SessionRecipe(
             )
         }
 
-        return response.parse<CreateSessionResponse, CreateSessionData> {
+        return response.parse<CreateSessionResponseDTO, CreateSessionData> {
             CreateSessionData(
                 session = checkNotNull(it.session).toData(),
                 accessToken = checkNotNull(it.accessToken),
@@ -354,7 +351,7 @@ class SessionRecipe(
             )
         }
 
-        return response.parse<RegenerateSessionResponse, RegenerateSessionData> {
+        return response.parse<RegenerateSessionResponseDTO, RegenerateSessionData> {
             RegenerateSessionData(
                 session = it.session?.toData() ?: throw RuntimeException("RegenerateSession returned OK but no session"),
                 accessToken = it.accessToken ?: throw RuntimeException("RegenerateSession returned OK but no accessToken"),

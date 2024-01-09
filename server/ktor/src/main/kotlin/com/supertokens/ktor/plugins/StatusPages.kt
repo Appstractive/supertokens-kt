@@ -3,7 +3,7 @@ package com.supertokens.ktor.plugins
 import com.supertokens.ktor.utils.ResponseException
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
-import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.statuspages.StatusPagesConfig
 import io.ktor.server.response.respond
@@ -12,14 +12,14 @@ fun StatusPagesConfig.superTokens(catchGeneralError: Boolean = false) {
     exception<SuperTokensStatusException> { call, cause ->
         call.respond(
             status = HttpStatusCode.BadRequest,
-            message = StatusResponse(status = cause.status.value, message = cause.message)
+            message = StatusResponseDTO(status = cause.status.value, message = cause.message)
         )
     }
 
     exception<ResponseException> { call, cause ->
         call.respond(
             status = cause.status,
-            message = StatusResponse(status = SuperTokensStatus.UnknownError.value, message = cause.message)
+            message = StatusResponseDTO(status = SuperTokensStatus.UnknownError.value, message = cause.message)
         )
     }
 
@@ -27,7 +27,7 @@ fun StatusPagesConfig.superTokens(catchGeneralError: Boolean = false) {
         exception<Exception> { call, cause ->
             call.respond(
                 status = HttpStatusCode.InternalServerError,
-                message = StatusResponse(
+                message = StatusResponseDTO(
                     status = SuperTokensStatus.UnknownError.value,
                     message = cause.message ?: "Unknown Error"
                 )

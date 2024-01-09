@@ -4,7 +4,7 @@ import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.extractedContent
-import com.supertokens.sdk.common.responses.StatusResponse
+import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.get
@@ -16,12 +16,9 @@ import com.supertokens.sdk.recipes.RecipeConfig
 import com.supertokens.sdk.recipes.session.SessionRecipe
 import com.supertokens.sdk.recipes.usermetadata.requests.DeleteUserMetaDataRequest
 import com.supertokens.sdk.recipes.usermetadata.requests.UpdateUserMetaDataRequest
-import com.supertokens.sdk.recipes.usermetadata.responses.UserMetaDataResponse
+import com.supertokens.sdk.recipes.usermetadata.responses.UserMetaDataResponseDTO
 import com.supertokens.sdk.utils.parse
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
 class UserMetaDataRecipeConfig: RecipeConfig
@@ -46,7 +43,7 @@ class UserMetaDataRecipe(
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
-        return response.parse<UserMetaDataResponse, Map<String, Any?>> {
+        return response.parse<UserMetaDataResponseDTO, Map<String, Any?>> {
             it.metadata?.extractedContent ?: emptyMap()
         }
     }
@@ -71,7 +68,7 @@ class UserMetaDataRecipe(
             )
         }
 
-        return response.parse<UserMetaDataResponse, Map<String, Any?>> {
+        return response.parse<UserMetaDataResponseDTO, Map<String, Any?>> {
             it.metadata?.extractedContent ?: emptyMap()
         }
     }
@@ -91,7 +88,7 @@ class UserMetaDataRecipe(
             )
         }
 
-        return response.parse<StatusResponse, SuperTokensStatus> {
+        return response.parse<StatusResponseDTO, SuperTokensStatus> {
             it.status.toStatus()
         }
     }

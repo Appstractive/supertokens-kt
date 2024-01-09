@@ -99,7 +99,7 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
 
     application.routing {
 
-        route(superTokens.appConfig.api.path) {
+        route("${superTokens.appConfig.api.basePath}{tenantId?}/") {
 
             install(ContentNegotiation) {
                 json(Json {

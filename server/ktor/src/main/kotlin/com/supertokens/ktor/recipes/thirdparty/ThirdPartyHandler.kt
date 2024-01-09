@@ -5,12 +5,12 @@ import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.userHandler
 import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.NotFoundException
-import com.supertokens.ktor.utils.fronend
+import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.sdk.common.ThirdPartyProvider
-import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequest
-import com.supertokens.sdk.common.responses.AuthorizationUrlResponse
-import com.supertokens.sdk.common.responses.SignInUpResponse
+import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequestDTO
+import com.supertokens.sdk.common.responses.AuthorizationUrlResponseDTO
+import com.supertokens.sdk.common.responses.SignInUpResponseDTO
 import com.supertokens.sdk.recipes.thirdparty.providers.Provider
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
 import io.ktor.http.URLProtocol
@@ -36,18 +36,27 @@ open class ThirdPartyHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/ThirdParty%20Recipe/signInUp">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.signInUp() {
-        val body = call.receive<ThirdPartySignInUpRequest>()
-        val provider = body.clientId?.let { thirdParty.getProviderByClientId(it) }
-            ?: thirdParty.getProviderById(body.thirdPartyId)
+        val body = call.receive<ThirdPartySignInUpRequestDTO>()
+        val provider = thirdParty.getProviderById(body.thirdPartyId)
             ?: throw NotFoundException()
 
-        val tokens = body.code?.let {
-            provider.getTokens(it, body.redirectURI)
-        } ?: body.authCodeResponse ?: throw BadRequestException()
+        val tokens = body.redirectURIInfo?.let {
+            provider.getTokens(
+                parameters = it.redirectURIQueryParams,
+                pkceCodeVerifier = it.pkceCodeVerifier,
+                redirectUrl = it.redirectURIOnProviderDashboard
+            )
+        } ?: body.oAuthTokens ?: throw BadRequestException()
 
         val userInfo = provider.getUserInfo(tokens)
 
-        val response = thirdParty.signInUp(body.thirdPartyId, userInfo.id, userInfo.email?.id ?: handleMissingEmail(provider, userInfo))
+        val response = thirdParty.signInUp(
+            thirdPartyId = body.thirdPartyId,
+            thirdPartyUserId = userInfo.id,
+            email = userInfo.email?.id ?: handleMissingEmail(provider, userInfo),
+            tenantId = null,
+            isVerified = userInfo.email?.isVerified == true,
+        )
 
         with(userHandler) {
             if (response.createdNewUser) {
@@ -60,7 +69,11 @@ open class ThirdPartyHandler(
         if (sessionsEnabled) {
             val session = sessions.createSession(
                 userId = response.user.id,
-                userDataInJWT = sessions.getJwtData(response.user),
+                tenantId = null,
+                userDataInJWT = sessions.getJwtData(
+                    user = response.user,
+                    tenantId = null,
+                ),
             )
 
             setSessionInResponse(
@@ -70,10 +83,8 @@ open class ThirdPartyHandler(
             )
         }
 
-        body.redirectURI?.let {
-            call.respondRedirect(it)
-        } ?: call.respond(
-            SignInUpResponse(
+        call.respond(
+            SignInUpResponseDTO(
                 user = response.user,
                 createdNewUser = response.createdNewUser,
             )
@@ -86,12 +97,14 @@ open class ThirdPartyHandler(
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.getAuthorizationUrl() {
         val thirdPartyId = call.parameters["thirdPartyId"] ?: throw NotFoundException()
+        val redirectURIOnProviderDashboard = call.parameters["redirectURIOnProviderDashboard"] ?: throw NotFoundException()
 
         val provider = thirdParty.getProviderById(thirdPartyId) ?: throw NotFoundException()
 
         call.respond(
-            AuthorizationUrlResponse(
-                url = provider.getAuthorizationEndpoint().fullUrl,
+            AuthorizationUrlResponseDTO(
+                urlWithQueryParams = provider.getAuthorizationEndpoint(redirectURIOnProviderDashboard).fullUrl,
+                pkceCodeVerifier = null, // TODO
             )
         )
     }
@@ -106,15 +119,29 @@ open class ThirdPartyHandler(
         val code = formParameters["code"] ?: throw BadRequestException(message = "Form Param 'code' is required")
         val state = formParameters["state"]
 
-        val tokens = provider.getTokens(code, null)
+        val tokens = provider.getTokens(
+            mapOf("code" to code),
+            null,
+            null,
+        )
         val userInfo = provider.getUserInfo(tokens)
 
-        val response = thirdParty.signInUp(provider.id, userInfo.id, userInfo.email?.id ?: handleMissingEmail(provider, userInfo))
+        val response = thirdParty.signInUp(
+            thirdPartyId = provider.id,
+            thirdPartyUserId = userInfo.id,
+            email = userInfo.email?.id ?: handleMissingEmail(provider, userInfo),
+            tenantId = null,
+            isVerified = userInfo.email?.isVerified == true,
+        )
 
         if (sessionsEnabled) {
             val session = sessions.createSession(
                 userId = response.user.id,
-                userDataInJWT = sessions.getJwtData(response.user),
+                tenantId = null,
+                userDataInJWT = sessions.getJwtData(
+                    response.user,
+                    tenantId = null,
+                ),
             )
 
             setSessionInResponse(
@@ -126,7 +153,7 @@ open class ThirdPartyHandler(
 
         call.respondRedirect {
             protocol = URLProtocol.HTTPS
-            host = call.fronend.host
+            host = call.frontend.host
         }
     }
 

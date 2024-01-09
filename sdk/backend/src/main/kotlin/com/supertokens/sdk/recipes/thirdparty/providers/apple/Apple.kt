@@ -2,7 +2,7 @@ package com.supertokens.sdk.recipes.thirdparty.providers.apple
 
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.ThirdPartyProvider
-import com.supertokens.sdk.common.responses.ThirdPartyTokenResponse
+import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProviderConfig
@@ -64,7 +64,7 @@ class AppleProvider(
         )
     }
 
-    override suspend fun getUserInfo(tokenResponse: ThirdPartyTokenResponse): ThirdPartyUserInfo {
+    override suspend fun getUserInfo(tokenResponse: ThirdPartyTokensDTO): ThirdPartyUserInfo {
         val idToken = tokenResponse.idToken ?: throw RuntimeException("No IdToken in TokenResponse")
 
         // TODO actual verifier

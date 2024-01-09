@@ -12,12 +12,11 @@ import com.supertokens.sdk.recipes.thirdparty.providers.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.providers.ProviderConfig
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartyEmail
 import com.supertokens.sdk.recipes.thirdparty.requests.ThirdPartySignInUpRequest
-import com.supertokens.sdk.common.responses.SignInUpResponse
+import com.supertokens.sdk.common.responses.SignInUpResponseDTO
 import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.post
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.header
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
 fun <C: ProviderConfig, R: Provider<C>> ThirdPartyConfig.provider(builder: ProviderBuilder<C, R>, configure: C.() -> Unit = {}) {
@@ -69,7 +68,7 @@ class ThirdPartyRecipe(
             )
         }
 
-        return response.parse<SignInUpResponse, SignInUpData> {
+        return response.parse<SignInUpResponseDTO, SignInUpData> {
             SignInUpData(
                 user = checkNotNull(it.user),
                 createdNewUser = checkNotNull(it.createdNewUser)
