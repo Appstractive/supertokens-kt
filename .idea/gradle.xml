@@ -7,11 +7,6 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
-              <build path="$PROJECT_DIR$/examples/ktor-server" name="SuperTokens-Ktor-Server">
-                <projects>
-                  <project path="$PROJECT_DIR$/examples/ktor-server" />
-                </projects>
-              </build>
               <build path="$PROJECT_DIR$/examples/app" name="MyApplication">
                 <projects>
                   <project path="$PROJECT_DIR$/examples/app" />
@@ -19,13 +14,16 @@
                   <project path="$PROJECT_DIR$/examples/app/shared" />
                 </projects>
               </build>
+              <build path="$PROJECT_DIR$/examples/ktor-server" name="SuperTokens-Ktor-Server">
+                <projects>
+                  <project path="$PROJECT_DIR$/examples/ktor-server" />
+                </projects>
+              </build>
             </builds>
           </compositeBuild>
         </compositeConfiguration>
-        <option name="testRunner" value="GRADLE" />
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="jbr-17" />
+        <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -41,6 +39,7 @@
             <option value="$PROJECT_DIR$/server/ktor" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

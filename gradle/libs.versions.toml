@@ -1,28 +1,26 @@
 [versions]
-kotlin = "1.9.10" # https://kotlinlang.org/docs/releases.html#release-details
-agp = "8.0.2" # https://developer.android.com/studio/releases/gradle-plugin
+kotlin = "1.9.22" # https://kotlinlang.org/docs/releases.html#release-details
+agp = "8.2.1" # https://developer.android.com/studio/releases/gradle-plugin
 
-compileSdk = "33"
+compileSdk = "34"
 minSdk = "24"
-targetSdk = "33"
 
 android-startup = "1.1.1"
 android-crypto = "1.1.0-alpha06"
 
-ktor_version = "2.3.4"
+ktor_version = "2.3.6"
 
-kotlin-datetime = "0.4.1"
-kotlin-serialization = "1.5.1"
+kotlin-serialization = "1.6.0"
 kotlin-coroutines = "1.7.3"
 
 jwt = "5.2.4"
 
 slf4j = "1.6.1"
 
-mail = "1.5"
-freemarker = "2.3.14"
+mail = "1.6.0"
+freemarker = "2.3.32"
 
-settings = "1.0.0"
+settings = "1.1.1"
 
 [libraries]
 androidGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -33,9 +31,7 @@ android-crypto = {module = "androidx.security:security-crypto-ktx", version.ref 
 
 kotlin-serialization = {module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization"}
 kotlin-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization"}
-kotlin-datetime = {module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime"}
 kotlin-coroutines = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines"}
-kotlin-reflect = {module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin"}
 
 ktor-serialization = {module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor_version"}
 
