@@ -38,6 +38,7 @@ class EmailVerificationTest {
     @Test
     fun testCreateVerificationToken() = runBlocking {
         val user = superTokens.getUsersByEMail(TEST_USER).first()
+        superTokens.setUnverified(user.id, TEST_USER)
 
         val token = superTokens.createEmailVerificationToken(user.id, TEST_USER)
         assertTrue(token.isNotEmpty())

@@ -44,9 +44,9 @@ class EmailVerificationRecipe(
     /**
      * Set the users email to verified
      */
-    suspend fun setVerified(userId: String, email: String) {
-        val token = createVerificationToken(userId, email)
-        verifyToken(token)
+    suspend fun setVerified(userId: String, email: String, tenantId: String?) {
+        val token = createVerificationToken(userId = userId, email = email, tenantId = tenantId)
+        verifyToken(token = token)
     }
 
     /**
@@ -64,7 +64,7 @@ class EmailVerificationRecipe(
         } ?: true
     }
 
-    override suspend fun getExtraJwtData(user: User): Map<String, Any?> {
+    override suspend fun getExtraJwtData(user: User, tenantId: String?): Map<String, Any?> {
         return buildMap {
             set(Claims.EMAIL_VERIFIED, isVerified(user.id, user.email))
         }
@@ -73,8 +73,8 @@ class EmailVerificationRecipe(
     /**
      * Generate a new email verification token for this user
      */
-    suspend fun createVerificationToken(userId: String, email: String): String {
-        val response = superTokens.post(PATH_CREATE_TOKEN) {
+    suspend fun createVerificationToken(userId: String, email: String, tenantId: String?): String {
+        val response = superTokens.post(PATH_CREATE_TOKEN, tenantId = tenantId) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -95,7 +95,7 @@ class EmailVerificationRecipe(
      * Remove all unused email verification tokens for this user
      */
     suspend fun removeAllVerificationTokens(userId: String, email: String): SuperTokensStatus {
-        val response = superTokens.post(PATH_DELETE_TOKENS) {
+        val response = superTokens.post(PATH_DELETE_TOKENS, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -116,7 +116,7 @@ class EmailVerificationRecipe(
      * Verify an email
      */
     suspend fun verifyToken(token: String): VerifyEmailTokenData {
-        val response = superTokens.post(PATH_VERIFY) {
+        val response = superTokens.post(PATH_VERIFY, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -141,7 +141,14 @@ class EmailVerificationRecipe(
      * Check if an email is verified
      */
     suspend fun checkEmailVerified(userId: String, email: String): Boolean {
-        val response = superTokens.get("$PATH_VERIFY?userId=$userId&email=$email", includeTenantId = false) {
+        val response = superTokens.get(
+            PATH_VERIFY,
+            tenantId = null,
+            queryParams = mapOf(
+                "userId" to userId,
+                "email" to email,
+            )
+        ) {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -154,7 +161,7 @@ class EmailVerificationRecipe(
      * Unverify an email
      */
     suspend fun setUnverified(userId: String, email: String): SuperTokensStatus {
-        val response = superTokens.post(PATH_VERIFY_REMOVE, includeTenantId = false) {
+        val response = superTokens.post(PATH_VERIFY_REMOVE, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -202,7 +209,12 @@ val EmailVerification = object: RecipeBuilder<EmailVerificationRecipeConfig, Ema
 suspend fun SuperTokens.createEmailVerificationToken(
     userId: String,
     email: String,
-) = getRecipe<EmailVerificationRecipe>().createVerificationToken(userId, email)
+    tenantId: String? = null,
+) = getRecipe<EmailVerificationRecipe>().createVerificationToken(
+    userId = userId,
+    email = email,
+    tenantId = tenantId
+)
 
 /**
  * Remove all unused email verification tokens for this user
@@ -210,14 +222,19 @@ suspend fun SuperTokens.createEmailVerificationToken(
 suspend fun SuperTokens.removeAllVerificationTokens(
     userId: String,
     email: String,
-) = getRecipe<EmailVerificationRecipe>().removeAllVerificationTokens(userId, email)
+) = getRecipe<EmailVerificationRecipe>().removeAllVerificationTokens(
+    userId = userId,
+    email = email,
+)
 
 /**
  * Verify an email
  */
 suspend fun SuperTokens.verifyToken(
     token: String,
-) = getRecipe<EmailVerificationRecipe>().verifyToken(token)
+) = getRecipe<EmailVerificationRecipe>().verifyToken(
+    token = token,
+)
 
 /**
  * Check if an email is verified
@@ -225,7 +242,10 @@ suspend fun SuperTokens.verifyToken(
 suspend fun SuperTokens.checkEmailVerified(
     userId: String,
     email: String,
-) = getRecipe<EmailVerificationRecipe>().checkEmailVerified(userId, email)
+) = getRecipe<EmailVerificationRecipe>().checkEmailVerified(
+    userId = userId,
+    email = email,
+)
 
 /**
  * Unverify an email
@@ -233,4 +253,7 @@ suspend fun SuperTokens.checkEmailVerified(
 suspend fun SuperTokens.setUnverified(
     userId: String,
     email: String,
-) = getRecipe<EmailVerificationRecipe>().setUnverified(userId, email)
+) = getRecipe<EmailVerificationRecipe>().setUnverified(
+    userId = userId,
+    email = email,
+)

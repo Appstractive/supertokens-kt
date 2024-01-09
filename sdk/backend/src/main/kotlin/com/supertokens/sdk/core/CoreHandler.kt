@@ -28,64 +28,69 @@ import kotlinx.serialization.json.JsonObject
 internal class CoreHandler {
 
     suspend fun SuperTokens.getUserById(userId: String): User {
-        val response = client.get {
-            url {
-                path(buildRequestPath(path = PATH_GET_USER_BY_ID, includeTenantId = false))
-                parameters.append("userId", userId)
-            }
-        }
+        val response = get(
+            PATH_GET_USER_BY_ID,
+            tenantId = null,
+            queryParams = mapOf(
+                "userId" to userId,
+            ),
+        )
 
         return response.parseUser()
     }
 
-    suspend fun SuperTokens.getUsersByEMail(email: String, doUnionOfAccountInfo: Boolean = true): List<User> {
-        val response = client.get {
-            url {
-                path(buildRequestPath(path = PATH_GET_USER_BY_ACCOUNT_INFO))
-                parameters.append("email", email)
-                parameters.append("doUnionOfAccountInfo", doUnionOfAccountInfo.toString())
-            }
-        }
+    suspend fun SuperTokens.getUsersByEMail(email: String, tenantId: String?): List<User> {
+        val response = get(
+            PATH_GET_USER_BY_ACCOUNT_INFO,
+            tenantId = tenantId,
+            queryParams = mapOf(
+                "email" to email,
+                "doUnionOfAccountInfo" to (tenantId == null).toString(),
+            )
+        )
 
         return response.parse<GetUsersResponse, List<User>> {
             requireNotNull(it.users)
         }
     }
 
-    suspend fun SuperTokens.getUsersByPhoneNumber(phoneNumber: String, doUnionOfAccountInfo: Boolean = true): List<User> {
-        val response = client.get {
-            url {
-                path(buildRequestPath(path = PATH_GET_USER_BY_ACCOUNT_INFO))
-                parameters.append("phoneNumber", phoneNumber)
-                parameters.append("doUnionOfAccountInfo", doUnionOfAccountInfo.toString())
-            }
-        }
+    suspend fun SuperTokens.getUsersByPhoneNumber(phoneNumber: String, tenantId: String?): List<User> {
+        val response = get(
+            PATH_GET_USER_BY_ACCOUNT_INFO,
+            tenantId = tenantId,
+            queryParams = mapOf(
+                "phoneNumber" to phoneNumber,
+                "doUnionOfAccountInfo" to (tenantId == null).toString(),
+            ),
+        )
 
         return response.parse<GetUsersResponse, List<User>> {
             requireNotNull(it.users)
         }
     }
 
-    suspend fun SuperTokens.getUsersByThirdParty(thirdPartyId: String, thirdPartyUserId: String, doUnionOfAccountInfo: Boolean = true): List<User> {
-        val response = client.get {
-            url {
-                path(buildRequestPath(path = PATH_GET_USER_BY_ACCOUNT_INFO))
-                parameters.append("thirdPartyId", thirdPartyId)
-                parameters.append("thirdPartyUserId", thirdPartyUserId)
-                parameters.append("doUnionOfAccountInfo", doUnionOfAccountInfo.toString())
-            }
-        }
+    suspend fun SuperTokens.getUsersByThirdParty(thirdPartyId: String, thirdPartyUserId: String, tenantId: String?): List<User> {
+        val response = get(
+            PATH_GET_USER_BY_ACCOUNT_INFO,
+            tenantId = tenantId,
+            queryParams = mapOf(
+                "thirdPartyId" to thirdPartyId,
+                "thirdPartyUserId" to thirdPartyUserId,
+                "doUnionOfAccountInfo" to (tenantId == null).toString(),
+            ),
+        )
 
         return response.parse<GetUsersResponse, List<User>> {
             requireNotNull(it.users)
         }
     }
 
-    suspend fun SuperTokens.deleteUser(userId: String): SuperTokensStatus {
-        val response = post(PATH_DELETE_USER, includeTenantId = false) {
+    suspend fun SuperTokens.deleteUser(userId: String, removeAllLinkedAccounts: Boolean): SuperTokensStatus {
+        val response = post(PATH_DELETE_USER, tenantId = null) {
             setBody(
                 DeleteUserRequest(
                     userId = userId,
+                    removeAllLinkedAccounts = removeAllLinkedAccounts,
                 )
             )
         }
@@ -95,8 +100,8 @@ internal class CoreHandler {
         }
     }
 
-    suspend fun SuperTokens.getJwks(): JsonObject {
-        val response = get("/.well-known/jwks.json", includeTenantId = false)
+    suspend fun SuperTokens.getJwks(tenantId: String?): JsonObject {
+        val response = get(PATH_JWKS, tenantId = tenantId)
 
         return response.body()
     }
@@ -107,7 +112,7 @@ internal class CoreHandler {
         useStaticSigningKey: Boolean = false,
         payload: Map<String, Any?>? = null
     ): String {
-        val response = post(PATH_CREATE_JWT, includeTenantId = false) {
+        val response = post(PATH_CREATE_JWT, tenantId = null) {
             setBody(
                 CreateJwtRequest(
                     jwksDomain = issuer,
@@ -128,6 +133,7 @@ internal class CoreHandler {
         const val PATH_GET_USER_BY_ACCOUNT_INFO = "/users/by-accountinfo"
         const val PATH_DELETE_USER = "/user/remove"
         const val PATH_CREATE_JWT = "/recipe/jwt"
+        const val PATH_JWKS = "/.well-known/jwks.json"
     }
 
 }
@@ -140,53 +146,86 @@ suspend fun SuperTokens.getUserByIdOrNull(userId: String): User? = runCatching {
     getUserById(userId = userId)
 }.getOrNull()
 
-suspend fun SuperTokens.getUsersByEMail(email: String, doUnionOfAccountInfo: Boolean = true) = with(core) {
+suspend fun SuperTokens.getUsersByEMail(
+    email: String,
+    tenantId: String? = null,
+) = with(core) {
     getUsersByEMail(
         email = email,
-        doUnionOfAccountInfo = doUnionOfAccountInfo,
+        tenantId = tenantId,
     )
 }
 
-suspend fun SuperTokens.getUserByEMailOrNull(email: String): User? = runCatching {
+suspend fun SuperTokens.getUserByEMailOrNull(
+    email: String,
+    tenantId: String? = null,
+): User? = runCatching {
     getUsersByEMail(
         email = email,
-        doUnionOfAccountInfo = true,
+        tenantId = tenantId,
     ).firstOrNull()
 }.getOrNull()
 
-suspend fun SuperTokens.getUsersByPhoneNumber(phoneNumber: String, doUnionOfAccountInfo: Boolean = true) = with(core) {
+suspend fun SuperTokens.getUsersByPhoneNumber(
+    phoneNumber: String,
+    tenantId: String? = null,
+) = with(core) {
     getUsersByPhoneNumber(
         phoneNumber = phoneNumber,
-        doUnionOfAccountInfo = doUnionOfAccountInfo,
+        tenantId = tenantId,
     )
 }
 
-suspend fun SuperTokens.getUsersByThirdParty(thirdPartyId: String, thirdPartyUserId: String, doUnionOfAccountInfo: Boolean = true) = with(core) {
+suspend fun SuperTokens.getUsersByThirdParty(
+    thirdPartyId: String,
+    thirdPartyUserId: String,
+    tenantId: String? = null,
+) = with(core) {
     getUsersByThirdParty(
         thirdPartyId = thirdPartyId,
         thirdPartyUserId = thirdPartyUserId,
-        doUnionOfAccountInfo = doUnionOfAccountInfo,
+        tenantId = tenantId,
     )
 }
 
-suspend fun SuperTokens.getUsersByThirdPartyOrNull(thirdPartyId: String, thirdPartyUserId: String): User? = runCatching {
+suspend fun SuperTokens.getUsersByThirdPartyOrNull(
+    thirdPartyId: String,
+    thirdPartyUserId: String,
+    tenantId: String? = null,
+): User? = runCatching {
     getUsersByThirdParty(
         thirdPartyId = thirdPartyId,
         thirdPartyUserId = thirdPartyUserId,
-        doUnionOfAccountInfo = true,
+        tenantId = tenantId,
     ).firstOrNull()
 }.getOrNull()
 
-suspend fun SuperTokens.getUserByPhoneNumberOrNull(phoneNumber: String): User? = runCatching {
-    getUsersByPhoneNumber(phoneNumber, true).firstOrNull()
+suspend fun SuperTokens.getUserByPhoneNumberOrNull(
+    phoneNumber: String,
+    tenantId: String? = null,
+): User? = runCatching {
+    getUsersByPhoneNumber(
+        phoneNumber = phoneNumber,
+        tenantId = tenantId,
+    ).firstOrNull()
 }.getOrNull()
 
-suspend fun SuperTokens.deleteUser(userId: String): SuperTokensStatus = with(core) {
-    return deleteUser(userId)
+suspend fun SuperTokens.deleteUser(
+    userId: String,
+    removeAllLinkedAccounts: Boolean = false,
+): SuperTokensStatus = with(core) {
+    return deleteUser(
+        userId = userId,
+        removeAllLinkedAccounts = removeAllLinkedAccounts,
+    )
 }
 
-suspend fun SuperTokens.getJwks(): JsonObject = with(core) {
-    return getJwks()
+suspend fun SuperTokens.getJwks(
+    tenantId: String? = null,
+): JsonObject = with(core) {
+    return getJwks(
+        tenantId = tenantId,
+    )
 }
 
 suspend fun SuperTokens.createJwt(

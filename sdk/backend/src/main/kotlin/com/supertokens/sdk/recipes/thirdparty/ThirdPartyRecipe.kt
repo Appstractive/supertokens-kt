@@ -50,9 +50,10 @@ class ThirdPartyRecipe(
         thirdPartyUserId: String,
         email: String,
         isVerified: Boolean,
+        tenantId: String?,
     ): SignInUpData {
         Result
-        val response = superTokens.post(PATH_SIGN_IN_UP) {
+        val response = superTokens.post(PATH_SIGN_IN_UP, tenantId = tenantId) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -123,9 +124,11 @@ suspend fun SuperTokens.thirdPartySignInUp(
     thirdPartyUserId: String,
     email: String,
     isVerified: Boolean,
+    tenantId: String? = null,
 ) = getRecipe<ThirdPartyRecipe>().signInUp(
     thirdPartyId = thirdPartyId,
     thirdPartyUserId = thirdPartyUserId,
     email = email,
-    isVerified = isVerified
+    isVerified = isVerified,
+    tenantId = tenantId,
 )

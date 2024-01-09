@@ -48,12 +48,15 @@ class RolesRecipe(
     val addPermissionsToToken = config.addPermissionsToToken
     val defaultUserRoles = config.defaultUserRoles
 
-    override suspend fun getExtraJwtData(user: User): Map<String, Any?> {
+    override suspend fun getExtraJwtData(user: User, tenantId: String?): Map<String, Any?> {
         if (!addRolesToToken && !addPermissionsToToken) {
             return emptyMap()
         }
 
-        val userRoles = getUserRoles(user.id)
+        val userRoles = getUserRoles(
+            userId = user.id,
+            tenantId = tenantId,
+        )
 
         val userPermissions = if (addPermissionsToToken) {
             buildSet {
@@ -80,7 +83,7 @@ class RolesRecipe(
      * @return true, if the role was newly created
      */
     suspend fun createOrUpdateRole(role: String, permissions: List<String>): Boolean {
-        val response = superTokens.put(PATH_ROLE, includeTenantId = false) {
+        val response = superTokens.put(PATH_ROLE, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -103,7 +106,7 @@ class RolesRecipe(
      * @return true, if the did exist
      */
     suspend fun deleteRole(role: String): Boolean {
-        val response = superTokens.post(PATH_ROLES_REMOVE, includeTenantId = false) {
+        val response = superTokens.post(PATH_ROLES_REMOVE, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -123,7 +126,7 @@ class RolesRecipe(
      * Retrive all created roles
      */
     suspend fun getRoles(): List<String> {
-        val response = superTokens.get(PATH_ROLES, includeTenantId = false) {
+        val response = superTokens.get(PATH_ROLES, tenantId = null) {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -136,7 +139,13 @@ class RolesRecipe(
      * Retrive the permissions associated with a role
      */
     suspend fun getRolePermissions(role: String): List<String> {
-        val response = superTokens.get("$PATH_ROLES_PERMISSIONS?role=$role", includeTenantId = false) {
+        val response = superTokens.get(
+            PATH_ROLES_PERMISSIONS,
+            tenantId = null,
+            queryParams = mapOf(
+                "role" to role,
+            )
+        ) {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -148,8 +157,14 @@ class RolesRecipe(
     /**
      * Retrive the users associated with the role.
      */
-    suspend fun getRoleUsers(role: String): List<String> {
-        val response = superTokens.get("$PATH_ROLES_USERS?role=$role") {
+    suspend fun getRoleUsers(role: String, tenantId: String?): List<String> {
+        val response = superTokens.get(
+            PATH_ROLES_USERS,
+            tenantId = tenantId,
+            queryParams = mapOf(
+                "role" to role,
+            ),
+        ) {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -162,7 +177,7 @@ class RolesRecipe(
      * Removes permissions mapped to a role, if no permissions are passed all permissions mapped to the role are removed
      */
     suspend fun removeRolePermissions(role: String, permissions: List<String>): SuperTokensStatus {
-        val response = superTokens.post(PATH_ROLES_PERMISSIONS_REMOVE, includeTenantId = false) {
+        val response = superTokens.post(PATH_ROLES_PERMISSIONS_REMOVE, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -183,7 +198,13 @@ class RolesRecipe(
      * Retrieve the roles associated with the permission
      */
     suspend fun getPermissionRoles(permission: String): List<String> {
-        val response = superTokens.get("$PATH_PERMISSIONS_ROLES?permission=$permission", includeTenantId = false) {
+        val response = superTokens.get(
+            PATH_PERMISSIONS_ROLES,
+            tenantId = null,
+            queryParams = mapOf(
+                "permission" to permission,
+            )
+        ) {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -197,8 +218,8 @@ class RolesRecipe(
      *
      * @return true, if the user already had the role assigned
      */
-    suspend fun setUserRole(userId: String, role: String): Boolean {
-        val response = superTokens.put(PATH_USER_ROLE) {
+    suspend fun setUserRole(userId: String, role: String, tenantId: String?): Boolean {
+        val response = superTokens.put(PATH_USER_ROLE, tenantId = tenantId) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -220,8 +241,8 @@ class RolesRecipe(
      *
      * @return true, if the user had the role
      */
-    suspend fun removeUserRole(userId: String, role: String): Boolean {
-        val response = superTokens.post(PATH_USER_ROLE_REMOVE) {
+    suspend fun removeUserRole(userId: String, role: String, tenantId: String?): Boolean {
+        val response = superTokens.post(PATH_USER_ROLE_REMOVE, tenantId = tenantId) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -241,8 +262,14 @@ class RolesRecipe(
     /**
      * Retrive the roles associated with the user.
      */
-    suspend fun getUserRoles(userId: String): List<String> {
-        val response = superTokens.get("$PATH_USER_ROLES?userId=$userId") {
+    suspend fun getUserRoles(userId: String, tenantId: String?): List<String> {
+        val response = superTokens.get(
+            PATH_USER_ROLES,
+            tenantId = tenantId,
+            queryParams = mapOf(
+                "userId" to userId,
+            ),
+        ) {
             header(Constants.HEADER_RECIPE_ID, ID)
         }
 
@@ -321,7 +348,11 @@ suspend fun SuperTokens.removeRolePermissions(
  */
 suspend fun SuperTokens.getRoleUsers(
     role: String,
-) = getRecipe<RolesRecipe>().getRoleUsers(role)
+    tenantId: String? = null,
+) = getRecipe<RolesRecipe>().getRoleUsers(
+    role = role,
+    tenantId = tenantId,
+)
 
 /**
  * Retrive the roles associated with the permission
@@ -336,7 +367,12 @@ suspend fun SuperTokens.getPermissionRoles(
 suspend fun SuperTokens.setUserRole(
     userId: String,
     role: String,
-) = getRecipe<RolesRecipe>().setUserRole(userId, role)
+    tenantId: String? = null,
+) = getRecipe<RolesRecipe>().setUserRole(
+    userId = userId,
+    role = role,
+    tenantId = tenantId,
+)
 
 /**
  * Removes a User Role mapping
@@ -344,11 +380,20 @@ suspend fun SuperTokens.setUserRole(
 suspend fun SuperTokens.removeUserRole(
     userId: String,
     role: String,
-) = getRecipe<RolesRecipe>().removeUserRole(userId, role)
+    tenantId: String? = null,
+) = getRecipe<RolesRecipe>().removeUserRole(
+    userId = userId,
+    role = role,
+    tenantId = tenantId,
+)
 
 /**
  * Retrive the roles associated with the user.
  */
 suspend fun SuperTokens.getUserRoles(
     userId: String,
-) = getRecipe<RolesRecipe>().getUserRoles(userId)
+    tenantId: String? = null,
+) = getRecipe<RolesRecipe>().getUserRoles(
+    userId = userId,
+    tenantId = tenantId,
+)

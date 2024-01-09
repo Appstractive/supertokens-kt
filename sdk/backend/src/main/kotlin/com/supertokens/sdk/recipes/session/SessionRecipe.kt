@@ -117,7 +117,7 @@ class SessionRecipe(
         config.issuer ?: superTokens.appConfig.api.host
     }
 
-    suspend fun getJwtData(user: User): Map<String, Any?> = buildMap {
+    suspend fun getJwtData(user: User, tenantId: String?): Map<String, Any?> = buildMap {
         set(Claims.ISSUER, issuer)
         set(Claims.AUDIENCE, superTokens.appConfig.frontends.map { it.host })
 
@@ -129,7 +129,7 @@ class SessionRecipe(
         }
 
         superTokens.recipes.forEach {
-            it.getExtraJwtData(user).forEach { entry ->
+            it.getExtraJwtData(user = user, tenantId = tenantId).forEach { entry ->
                 set(entry.key, entry.value)
             }
         }
@@ -145,10 +145,11 @@ class SessionRecipe(
      */
     suspend fun createSession(
         userId: String,
+        tenantId: String?,
         userDataInJWT: Map<String, Any?> = emptyMap(),
         userDataInDatabase: Map<String, Any?> = emptyMap(),
     ): CreateSessionData {
-        val response = superTokens.post(PATH_SESSION) {
+        val response = superTokens.post(PATH_SESSION, tenantId = tenantId) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -177,7 +178,13 @@ class SessionRecipe(
      * Get user and session information for a given session handle
      */
     suspend fun getSession(sessionHandle: String): GetSessionData {
-        val response = superTokens.get("$PATH_SESSION?sessionHandle=$sessionHandle", includeTenantId = false) {
+        val response = superTokens.get(
+            PATH_SESSION,
+            tenantId = null,
+            queryParams = mapOf(
+                "sessionHandle" to sessionHandle,
+            ),
+        ) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
         }
@@ -201,8 +208,15 @@ class SessionRecipe(
     /**
      * Get session handles for a user
      */
-    suspend fun getSessions(userId: String, fetchAcrossAllTenants: Boolean = true): List<String> {
-        val response = superTokens.get("$PATH_SESSIONS?userId=$userId&fetchAcrossAllTenants=${fetchAcrossAllTenants}") {
+    suspend fun getSessions(userId: String, tenantId: String?): List<String> {
+        val response = superTokens.get(
+            PATH_SESSIONS,
+            tenantId = tenantId,
+            queryParams =  mapOf(
+                "userId" to userId,
+                "fetchAcrossAllTenants" to (tenantId == null).toString(),
+            ),
+        ) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
         }
@@ -215,12 +229,12 @@ class SessionRecipe(
     /**
      * Delete sessions
      */
-    suspend fun removeSessions(sessionHandles: List<String>): List<String> {
+    suspend fun removeSessions(sessionHandles: List<String>, tenantId: String?): List<String> {
         if (sessionHandles.isEmpty()) {
             return emptyList()
         }
 
-        val response = superTokens.post(PATH_SESSION_REMOVE) {
+        val response = superTokens.post(PATH_SESSION_REMOVE, tenantId = tenantId) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -239,15 +253,15 @@ class SessionRecipe(
     /**
      * Delete sessions for a user
      */
-    suspend fun removeSessionsForUser(userId: String, revokeAcrossAllTenants: Boolean = true): List<String> {
-        val response = superTokens.post(PATH_SESSION_REMOVE) {
+    suspend fun removeSessionsForUser(userId: String, tenantId: String?): List<String> {
+        val response = superTokens.post(PATH_SESSION_REMOVE, tenantId = tenantId) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
             setBody(
                 RemoveSessionsForUserRequest(
                     userId = userId,
-                    revokeAcrossAllTenants = revokeAcrossAllTenants,
+                    revokeAcrossAllTenants = tenantId == null,
                 )
             )
         }
@@ -267,7 +281,7 @@ class SessionRecipe(
         antiCsrfToken: String? = null,
     ): VerifySessionData {
 
-        val response = superTokens.post(PATH_SESSION_VERIFY, includeTenantId = false) {
+        val response = superTokens.post(PATH_SESSION_VERIFY, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -297,7 +311,7 @@ class SessionRecipe(
         refreshToken: String,
         antiCsrfToken: String? = null,
     ): CreateSessionData {
-        val response = superTokens.post(PATH_SESSION_REFRESH, includeTenantId = false) {
+        val response = superTokens.post(PATH_SESSION_REFRESH, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -328,7 +342,7 @@ class SessionRecipe(
         userDataInJWT: Map<String, Any?>? = null,
     ): RegenerateSessionData {
 
-        val response = superTokens.post(PATH_SESSION_REGENERATE, includeTenantId = false) {
+        val response = superTokens.post(PATH_SESSION_REGENERATE, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -352,7 +366,7 @@ class SessionRecipe(
      * Change session data
      */
     suspend fun updateSessionData(sessionHandle: String, userDataInDatabase: Map<String, Any?>): SuperTokensStatus {
-        val response = superTokens.put(PATH_SESSION_DATA, includeTenantId = false) {
+        val response = superTokens.put(PATH_SESSION_DATA, tenantId = null) {
 
             header(Constants.HEADER_RECIPE_ID, ID)
 
@@ -370,8 +384,8 @@ class SessionRecipe(
     /**
      * Change JWT data for a session
      */
-    suspend fun updateJwtData(sessionHandle: String, userDataInJWT: Map<String, Any?>): SuperTokensStatus {
-        val response = superTokens.put(PATH_JWT_DATA) {
+    suspend fun updateJwtData(sessionHandle: String, userDataInJWT: Map<String, Any?>, tenantId: String?): SuperTokensStatus {
+        val response = superTokens.put(PATH_JWT_DATA, tenantId = tenantId) {
 
             header("rid", ID)
 
@@ -418,26 +432,32 @@ val Sessions = object : RecipeBuilder<SessionConfig, SessionRecipe>() {
  */
 suspend fun SuperTokens.createSession(
     userId: String,
+    tenantId: String? = null,
     userDataInJWT: Map<String, Any?> = emptyMap(),
     userDataInDatabase: Map<String, Any?> = emptyMap(),
-) = getRecipe<SessionRecipe>().createSession(userId, userDataInJWT, userDataInDatabase)
+) = getRecipe<SessionRecipe>().createSession(
+    userId = userId,
+    tenantId = tenantId,
+    userDataInJWT = userDataInJWT,
+    userDataInDatabase = userDataInDatabase,
+)
 
 /**
  * Get user and session information for a given session handle
  */
 suspend fun SuperTokens.getSession(
     sessionHandle: String,
-) = getRecipe<SessionRecipe>().getSession(sessionHandle)
+) = getRecipe<SessionRecipe>().getSession(sessionHandle = sessionHandle)
 
 /**
  * Get session handles for a user
  */
 suspend fun SuperTokens.getSessions(
     userId: String,
-    fetchAcrossAllTenants: Boolean = true,
+    tenantId: String? = null,
 ) = getRecipe<SessionRecipe>().getSessions(
     userId = userId,
-    fetchAcrossAllTenants = fetchAcrossAllTenants,
+    tenantId = tenantId,
 )
 
 /**
@@ -445,7 +465,11 @@ suspend fun SuperTokens.getSessions(
  */
 suspend fun SuperTokens.removeSessions(
     sessionHandles: List<String>,
-) = getRecipe<SessionRecipe>().removeSessions(sessionHandles)
+    tenantId: String? = null,
+) = getRecipe<SessionRecipe>().removeSessions(
+    sessionHandles = sessionHandles,
+    tenantId = tenantId,
+)
 
 /**
  * Verify a Session
@@ -455,7 +479,12 @@ suspend fun SuperTokens.verifySession(
     doAntiCsrfCheck: Boolean = false,
     checkDatabase: Boolean = false,
     antiCsrfToken: String? = null,
-) = getRecipe<SessionRecipe>().verifySession(accessToken, doAntiCsrfCheck, checkDatabase, antiCsrfToken)
+) = getRecipe<SessionRecipe>().verifySession(
+    accessToken = accessToken,
+    doAntiCsrfCheck = doAntiCsrfCheck,
+    checkDatabase = checkDatabase,
+    antiCsrfToken = antiCsrfToken
+)
 
 /**
  * Refresh a Session
@@ -463,7 +492,10 @@ suspend fun SuperTokens.verifySession(
 suspend fun SuperTokens.refreshSession(
     refreshToken: String,
     antiCsrfToken: String? = null,
-) = getRecipe<SessionRecipe>().refreshSession(refreshToken, antiCsrfToken)
+) = getRecipe<SessionRecipe>().refreshSession(
+    refreshToken = refreshToken,
+    antiCsrfToken = antiCsrfToken
+)
 
 /**
  * Regenerate a session
@@ -471,7 +503,10 @@ suspend fun SuperTokens.refreshSession(
 suspend fun SuperTokens.regenerateSession(
     accessToken: String,
     userDataInJWT: Map<String, Any?>? = null,
-) = getRecipe<SessionRecipe>().regenerateSession(accessToken, userDataInJWT)
+) = getRecipe<SessionRecipe>().regenerateSession(
+    accessToken = accessToken,
+    userDataInJWT = userDataInJWT
+)
 
 /**
  * Change session data
@@ -479,7 +514,10 @@ suspend fun SuperTokens.regenerateSession(
 suspend fun SuperTokens.updateSessionData(
     sessionHandle: String,
     userDataInDatabase: Map<String, Any?>,
-) = getRecipe<SessionRecipe>().updateSessionData(sessionHandle, userDataInDatabase)
+) = getRecipe<SessionRecipe>().updateSessionData(
+    sessionHandle = sessionHandle,
+    userDataInDatabase = userDataInDatabase
+)
 
 /**
  * Change JWT data for a session
@@ -487,4 +525,9 @@ suspend fun SuperTokens.updateSessionData(
 suspend fun SuperTokens.updateJwtData(
     sessionHandle: String,
     userDataInJWT: Map<String, Any?>,
-) = getRecipe<SessionRecipe>().updateJwtData(sessionHandle, userDataInJWT)
+    tenantId: String? = null,
+) = getRecipe<SessionRecipe>().updateJwtData(
+    sessionHandle = sessionHandle,
+    userDataInJWT = userDataInJWT,
+    tenantId = tenantId,
+)

@@ -40,7 +40,7 @@ class CoreTests {
 
     @Test
     fun testGetUserById() = runBlocking {
-        val user = superTokens.getUsersByEMail(TEST_USER).first()
+        val user = superTokens.getUsersByEMail(TEST_USER, null).first()
 
         val getResponse = superTokens.getUserById(user.id)
 
@@ -49,7 +49,7 @@ class CoreTests {
 
     @Test
     fun testGetUserByMail() = runBlocking {
-        val user = superTokens.getUsersByEMail(TEST_USER).first()
+        val user = superTokens.getUsersByEMail(TEST_USER, null).first()
 
         assertEquals(TEST_USER, user.email)
     }
@@ -60,7 +60,7 @@ class CoreTests {
         assertTrue(code.codeId.isNotEmpty())
 
         val response = superTokens.consumePasswordlessUserInputCode(code.preAuthSessionId, code.deviceId, code.userInputCode)
-        val user = superTokens.getUsersByPhoneNumber("+491601234567").first()
+        val user = superTokens.getUsersByPhoneNumber("+491601234567", null).first()
 
         assertEquals("+491601234567", user.phoneNumber)
     }
