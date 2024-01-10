@@ -3,6 +3,9 @@ package com.supertokens.sdk.common.responses
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Deprecated("Use ThirdPartyTokensDTO instead")
+typealias ThirdPartyTokens = ThirdPartyTokensDTO
+
 @Serializable
 data class ThirdPartyTokensDTO(
     @SerialName("access_token")

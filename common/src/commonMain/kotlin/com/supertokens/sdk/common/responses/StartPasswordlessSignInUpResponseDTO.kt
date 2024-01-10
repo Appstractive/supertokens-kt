@@ -4,6 +4,9 @@ import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.PasswordlessMode
 import kotlinx.serialization.Serializable
 
+@Deprecated("Use StartPasswordlessSignInUpResponseDTO instead")
+typealias StartPasswordlessSignInUpResponse = StartPasswordlessSignInUpResponseDTO
+
 @Serializable
 data class StartPasswordlessSignInUpResponseDTO(
     override val status: String = SuperTokensStatus.OK.value,

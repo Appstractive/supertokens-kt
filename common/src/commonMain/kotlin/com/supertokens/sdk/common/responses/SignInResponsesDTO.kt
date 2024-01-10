@@ -4,6 +4,11 @@ import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.User
 import kotlinx.serialization.Serializable
 
+@Deprecated("Use SignInResponseDTO instead")
+typealias SignInResponse = SignInResponseDTO
+@Deprecated("Use FormFieldErrorDTO instead")
+typealias FormFieldError = FormFieldErrorDTO
+
 @Serializable
 data class FormFieldErrorDTO(
     val id: String,

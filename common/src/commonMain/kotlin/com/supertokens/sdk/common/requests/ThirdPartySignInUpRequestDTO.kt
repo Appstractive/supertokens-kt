@@ -3,6 +3,11 @@ package com.supertokens.sdk.common.requests
 import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import kotlinx.serialization.Serializable
 
+@Deprecated("Use ThirdPartySignInUpRequestDTO instead")
+typealias ThirdPartySignInUpRequest = ThirdPartySignInUpRequestDTO
+@Deprecated("Use RedirectUriInfoDTO instead")
+typealias RedirectUriInfo = RedirectUriInfoDTO
+
 @Serializable
 data class RedirectUriInfoDTO(
     val redirectURIOnProviderDashboard: String,
