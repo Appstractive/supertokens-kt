@@ -3,7 +3,7 @@ package com.supertokens.sdk
 import com.supertokens.sdk.handlers.signInWith
 import com.supertokens.sdk.handlers.signOut
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
-import com.supertokens.sdk.repositories.tokens.TokensRepositoryMemory
+import com.supertokens.sdk.recipes.sessions.repositories.TokensRepositoryMemory
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
@@ -18,6 +18,7 @@ class SessionTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {
         tokensRepository = TokensRepositoryMemory()
+        recipe(EmailPassword)
     }
 
     @Serializable

@@ -1,8 +1,7 @@
-package com.supertokens.sdk.repositories.tokens
+package com.supertokens.sdk.recipes.sessions.repositories
 
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
-import com.supertokens.sdk.repositories.user.UserRepositorySettings
 
 class TokensRepositorySettings(
     private val settings: Settings,

@@ -21,6 +21,10 @@ interface UserRepository {
         setClaims(jwt.parseJwtClaims())
     }
 
+    suspend fun getUserId(): String? = getClaims()?.get(Claims.USER_ID)?.toString()
+    suspend fun getEmail(): String? = getClaims()?.get(Claims.EMAIL)?.toString()
+    suspend fun isEmailVerified(): Boolean = getClaims()?.get(Claims.EMAIL_VERIFIED) != false
+
 }
 
 @OptIn(ExperimentalEncodingApi::class)
@@ -30,13 +34,13 @@ fun String.parseJwtClaims(): Map<String, Any?> {
 }
 
 suspend fun SuperTokensClient.getUserId(): String? {
-    return userRepository.getClaims()?.get(Claims.USER_ID)?.toString()
+    return userRepository.getUserId()
 }
 
 suspend fun SuperTokensClient.getEmail(): String? {
-    return userRepository.getClaims()?.get(Claims.EMAIL)?.toString()
+    return userRepository.getEmail()
 }
 
 suspend fun SuperTokensClient.isEmailVerified(): Boolean {
-    return userRepository.getClaims()?.get(Claims.EMAIL_VERIFIED) != false
+    return userRepository.isEmailVerified()
 }

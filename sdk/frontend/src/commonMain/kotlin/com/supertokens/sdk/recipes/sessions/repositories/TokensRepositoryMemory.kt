@@ -1,4 +1,4 @@
-package com.supertokens.sdk.repositories.tokens
+package com.supertokens.sdk.recipes.sessions.repositories
 
 class TokensRepositoryMemory: TokensRepository() {
 

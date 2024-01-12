@@ -13,19 +13,19 @@ fun SuperTokensClient.tokenHeaderInterceptor(): suspend Sender.(HttpRequestBuild
         if(it.response.status == HttpStatusCode.OK) {
             it.response.headers[HEADER_ACCESS_TOKEN]?.let { token ->
                 if(token.isNotBlank()) {
-                    tokensUseCase.updateAccessToken(token)
+                    updateAccessTokenUseCase.updateAccessToken(token)
                 }
                 else {
-                    tokensUseCase.clearAccessToken()
+                   logoutUseCase.logout()
                 }
             }
 
             it.response.headers[HEADER_REFRESH_TOKEN]?.let { token ->
                 if(token.isNotBlank()) {
-                    tokensUseCase.updateRefreshToken(token)
+                    updateRefreshTokenUseCase.updateRefreshToken(token)
                 }
                 else {
-                    tokensUseCase.clearRefreshToken()
+                    logoutUseCase.logout()
                 }
             }
         }

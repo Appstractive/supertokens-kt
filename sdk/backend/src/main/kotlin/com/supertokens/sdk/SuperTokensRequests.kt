@@ -27,7 +27,6 @@ suspend inline fun SuperTokens.get(
     queryParams: Map<String, String> = emptyMap(),
     block: HttpRequestBuilder.() -> Unit = {}
 ): HttpResponse = client.get {
-    url()
     url {
         path(buildRequestPath(
             path = urlString,

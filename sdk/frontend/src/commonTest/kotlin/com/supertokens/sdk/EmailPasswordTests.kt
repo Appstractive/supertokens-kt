@@ -6,7 +6,7 @@ import com.supertokens.sdk.handlers.FormFieldException
 import com.supertokens.sdk.handlers.signInWith
 import com.supertokens.sdk.handlers.signUpWith
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
-import com.supertokens.sdk.repositories.tokens.TokensRepositoryMemory
+import com.supertokens.sdk.recipes.sessions.repositories.TokensRepositoryMemory
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -20,6 +20,7 @@ class EmailPasswordTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {
         tokensRepository = TokensRepositoryMemory()
+        recipe(EmailPassword)
     }
 
     @Test

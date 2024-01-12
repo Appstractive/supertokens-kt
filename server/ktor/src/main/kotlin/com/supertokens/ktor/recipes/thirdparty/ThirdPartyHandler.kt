@@ -11,6 +11,7 @@ import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequestDTO
 import com.supertokens.sdk.common.responses.AuthorizationUrlResponseDTO
 import com.supertokens.sdk.common.responses.SignInUpResponseDTO
+import com.supertokens.sdk.common.util.generateCodeVerifier
 import com.supertokens.sdk.recipes.thirdparty.providers.Provider
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
 import io.ktor.http.URLProtocol
@@ -22,6 +23,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
+import java.security.SecureRandom
 
 open class ThirdPartyHandler(
     protected val scope: CoroutineScope,
@@ -104,7 +106,7 @@ open class ThirdPartyHandler(
         call.respond(
             AuthorizationUrlResponseDTO(
                 urlWithQueryParams = provider.getAuthorizationEndpoint(redirectURIOnProviderDashboard).fullUrl,
-                pkceCodeVerifier = null, // TODO
+                pkceCodeVerifier = generateCodeVerifier(),
             )
         )
     }

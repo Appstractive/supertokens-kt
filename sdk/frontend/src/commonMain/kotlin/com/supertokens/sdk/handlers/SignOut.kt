@@ -6,5 +6,5 @@ import io.ktor.client.request.post
 
 suspend fun SuperTokensClient.signOut() {
     val response = apiClient.post(Routes.Session.SIGN_OUT)
-    tokensUseCase.clearTokens(true)
+    logoutUseCase.logout()
 }

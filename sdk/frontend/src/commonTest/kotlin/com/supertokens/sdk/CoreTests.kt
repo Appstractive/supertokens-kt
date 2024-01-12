@@ -2,7 +2,7 @@ package com.supertokens.sdk
 
 import com.supertokens.sdk.recipes.checkEmailExists
 import com.supertokens.sdk.recipes.checkPhoneNumberExists
-import com.supertokens.sdk.repositories.tokens.TokensRepositoryMemory
+import com.supertokens.sdk.recipes.sessions.repositories.TokensRepositoryMemory
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertFalse

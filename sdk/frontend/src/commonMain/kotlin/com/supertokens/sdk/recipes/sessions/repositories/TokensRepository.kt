@@ -1,4 +1,4 @@
-package com.supertokens.sdk.repositories.tokens
+package com.supertokens.sdk.recipes.sessions.repositories
 
 import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.common.COOKIE_ACCESS_TOKEN

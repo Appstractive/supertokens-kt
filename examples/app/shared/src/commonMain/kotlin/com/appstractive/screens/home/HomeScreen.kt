@@ -28,7 +28,7 @@ object HomeScreen : Screen {
     @Composable
     override fun Content() {
         val scope = rememberCoroutineScope()
-        val viewModel = rememberScreenModel { HomeViewModel(scope) }
+        val viewModel = rememberScreenModel { HomeViewModel() }
         val navigator = LocalNavigator.currentOrThrow
 
         Column(

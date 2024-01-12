@@ -8,7 +8,9 @@ import com.supertokens.sdk.recipes.thirdparty.providers.Facebook
 import com.supertokens.sdk.recipes.thirdparty.providers.GitHub
 import com.supertokens.sdk.recipes.thirdparty.providers.GitLab
 import com.supertokens.sdk.recipes.thirdparty.providers.Google
-import com.supertokens.sdk.repositories.tokens.TokensRepositoryMemory
+import com.supertokens.sdk.recipes.sessions.repositories.TokensRepositoryMemory
+import com.supertokens.sdk.recipes.thirdparty.ThirdParty
+import com.supertokens.sdk.recipes.thirdparty.provider
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -16,17 +18,35 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @Ignore()
-class ThirdPartyTests {
+class ThirdPartySignInTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {
         tokensRepository = TokensRepositoryMemory()
+        recipe(ThirdParty) {
+            provider(Apple) {
+                redirectUri = "localhost"
+            }
+            provider(Bitbucket) {
+                redirectUri = "localhost"
+            }
+            provider(Facebook) {
+                redirectUri = "localhost"
+            }
+            provider(GitHub) {
+                redirectUri = "localhost"
+            }
+            provider(GitLab) {
+                redirectUri = "localhost"
+            }
+            provider(Google) {
+                redirectUri = "localhost"
+            }
+        }
     }
 
     @Test
     fun testAppleAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(Apple.AuthCode) {
-            pkceCodeVerifier = "wsgewhekjdrtkjt"
-            redirectURI = "https://auth.appstractive.com/callback"
             redirectURIQueryParams = mapOf(
                 "code" to "123456",
                 "state" to "signup"
@@ -48,15 +68,13 @@ class ThirdPartyTests {
 
     @Test
     fun testAppleAuthUrl() = runBlocking {
-        val authUrl = client.getThirdPartyAuthorizationUrl(Apple)
+        val authUrl = client.getThirdPartyAuthorizationUrl(Apple.id)
         assertTrue(authUrl.isNotEmpty())
     }
 
     @Test
     fun testBitbucketAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(Bitbucket.AuthCode) {
-            pkceCodeVerifier = "wsgewhekjdrtkjt"
-            redirectURI = "https://auth.appstractive.com/callback"
             redirectURIQueryParams = mapOf(
                 "code" to "123456",
                 "state" to "signup"
@@ -77,15 +95,13 @@ class ThirdPartyTests {
 
     @Test
     fun testBitbucketAuthUrl() = runBlocking {
-        val authUrl = client.getThirdPartyAuthorizationUrl(Bitbucket)
+        val authUrl = client.getThirdPartyAuthorizationUrl(Bitbucket.id)
         assertTrue(authUrl.isNotEmpty())
     }
 
     @Test
     fun testFacebookAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(Facebook.AuthCode) {
-            pkceCodeVerifier = "wsgewhekjdrtkjt"
-            redirectURI = "https://auth.appstractive.com/callback"
             redirectURIQueryParams = mapOf(
                 "code" to "123456",
                 "state" to "signup"
@@ -106,15 +122,13 @@ class ThirdPartyTests {
 
     @Test
     fun testFacebookAuthUrl() = runBlocking {
-        val authUrl = client.getThirdPartyAuthorizationUrl(Facebook)
+        val authUrl = client.getThirdPartyAuthorizationUrl(Facebook.id)
         assertTrue(authUrl.isNotEmpty())
     }
 
     @Test
     fun testGitHubAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(GitHub.AuthCode) {
-            pkceCodeVerifier = "wsgewhekjdrtkjt"
-            redirectURI = "https://auth.appstractive.com/callback"
             redirectURIQueryParams = mapOf(
                 "code" to "123456",
                 "state" to "signup"
@@ -135,15 +149,13 @@ class ThirdPartyTests {
 
     @Test
     fun testGitHubAuthUrl() = runBlocking {
-        val authUrl = client.getThirdPartyAuthorizationUrl(GitHub)
+        val authUrl = client.getThirdPartyAuthorizationUrl(GitHub.id)
         assertTrue(authUrl.isNotEmpty())
     }
 
     @Test
     fun testGitLabAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(GitLab.AuthCode) {
-            pkceCodeVerifier = "wsgewhekjdrtkjt"
-            redirectURI = "https://auth.appstractive.com/callback"
             redirectURIQueryParams = mapOf(
                 "code" to "123456",
                 "state" to "signup"
@@ -164,15 +176,13 @@ class ThirdPartyTests {
 
     @Test
     fun testGitLabAuthUrl() = runBlocking {
-        val authUrl = client.getThirdPartyAuthorizationUrl(GitLab)
+        val authUrl = client.getThirdPartyAuthorizationUrl(GitLab.id)
         assertTrue(authUrl.isNotEmpty())
     }
 
     @Test
     fun testGoogleAuthCodeSignIn() = runBlocking {
         val response = client.signInWith(Google.AuthCode) {
-            pkceCodeVerifier = "wsgewhekjdrtkjt"
-            redirectURI = "https://auth.appstractive.com/callback"
             redirectURIQueryParams = mapOf(
                 "code" to "123456",
                 "state" to "signup"
@@ -193,7 +203,7 @@ class ThirdPartyTests {
 
     @Test
     fun testGoogleAuthUrl() = runBlocking {
-        val authUrl = client.getThirdPartyAuthorizationUrl(Google)
+        val authUrl = client.getThirdPartyAuthorizationUrl(Google.id)
         assertTrue(authUrl.isNotEmpty())
     }
 

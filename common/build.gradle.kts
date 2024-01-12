@@ -50,6 +50,8 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.serialization)
                 implementation(libs.kotlin.serialization.json)
+                implementation(libs.kotlin.random)
+                implementation(libs.kotlin.hash.sha)
             }
         }
         val commonTest by getting {
