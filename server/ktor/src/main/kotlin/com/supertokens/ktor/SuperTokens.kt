@@ -99,7 +99,7 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
 
     application.routing {
 
-        route("${superTokens.appConfig.api.basePath}{tenantId?}/") {
+        route(superTokens.appConfig.api.basePath) {
 
             install(ContentNegotiation) {
                 json(Json {
@@ -108,10 +108,7 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
                 })
             }
 
-            coreRoutes(config.coreHandler)
-
             if (superTokens.hasRecipe<SessionRecipe>()) {
-
                 application.install(Authentication) {
                     jwt(name = SuperTokensAuth) {
                         validate(config.jwtValidator)
@@ -123,7 +120,7 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
                         }
                     }
 
-                    if(superTokens.hasRecipe<RolesRecipe>()) {
+                    if (superTokens.hasRecipe<RolesRecipe>()) {
                         roleBased {
                             extractRoles { principal ->
                                 (principal as? AuthenticatedUser)?.roles ?: emptySet()
@@ -134,26 +131,40 @@ val SuperTokens = createApplicationPlugin(name = "SuperTokens", createConfigurat
                         }
                     }
                 }
-
-                sessionRoutes(config.sessionHandler)
             }
 
-            if (superTokens.hasRecipe<EmailPasswordRecipe>()) {
-                emailPasswordRoutes(config.emailPasswordHandler)
-            }
+            recipeRoutes(superTokens, config)
 
-            if(superTokens.hasRecipe<ThirdPartyRecipe>()) {
-                thirdPartyRoutes(config.thirdPartyHandler)
-            }
-
-            if(superTokens.hasRecipe<EmailVerificationRecipe>()) {
-                emailVerificationRoutes(config.emailVerificationHandler)
-            }
-
-            if(superTokens.hasRecipe<PasswordlessRecipe>()) {
-                passwordlessRoutes(config.passwordlessHandler)
+            // we need to install the routes for the optional tenantId again,
+            // because optional path parameters are only allowed at the end of a path
+            route("{tenantId?}/") {
+                recipeRoutes(superTokens, config)
             }
         }
+    }
+}
+
+private fun Route.recipeRoutes(superTokens: SuperTokens,config: SuperTokensConfig) {
+    coreRoutes(config.coreHandler)
+
+    if (superTokens.hasRecipe<SessionRecipe>()) {
+        sessionRoutes(config.sessionHandler)
+    }
+
+    if (superTokens.hasRecipe<EmailPasswordRecipe>()) {
+        emailPasswordRoutes(config.emailPasswordHandler)
+    }
+
+    if(superTokens.hasRecipe<ThirdPartyRecipe>()) {
+        thirdPartyRoutes(config.thirdPartyHandler)
+    }
+
+    if(superTokens.hasRecipe<EmailVerificationRecipe>()) {
+        emailVerificationRoutes(config.emailVerificationHandler)
+    }
+
+    if(superTokens.hasRecipe<PasswordlessRecipe>()) {
+        passwordlessRoutes(config.passwordlessHandler)
     }
 }
 

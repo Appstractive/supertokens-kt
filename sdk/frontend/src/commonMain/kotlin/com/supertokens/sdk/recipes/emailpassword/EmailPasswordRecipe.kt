@@ -67,32 +67,18 @@ object EmailPassword : RecipeBuilder<EmailPasswordConfig, EmailPasswordRecipe>()
     override suspend fun signIn(superTokensClient: SuperTokensClient, configure: Config.() -> Unit): User {
         val config = Config().apply(configure)
 
-        val email = config.email
-        val password = config.password
-
-        if(email == null || password == null) {
-            throw IllegalStateException("'email' and 'password' must be provided")
-        }
-
         return superTokensClient.getRecipe<EmailPasswordRecipe>().signIn(
-            email = email,
-            password = password,
+            email = checkNotNull(config.email) { "email is required" },
+            password = checkNotNull(config.password) { "password is required" },
         )
     }
 
     override suspend fun signUp(superTokensClient: SuperTokensClient, configure: Config.() -> Unit): User {
         val config = Config().apply(configure)
 
-        val email = config.email
-        val password = config.password
-
-        if(email == null || password == null) {
-            throw IllegalStateException("'email' and 'password' must be provided")
-        }
-
         return superTokensClient.getRecipe<EmailPasswordRecipe>().signUp(
-            email = email,
-            password = password,
+            email = checkNotNull(config.email) { "email is required" },
+            password = checkNotNull(config.password) { "password is required" },
         )
     }
 

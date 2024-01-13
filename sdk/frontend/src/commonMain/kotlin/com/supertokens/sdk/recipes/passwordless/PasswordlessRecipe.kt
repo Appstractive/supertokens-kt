@@ -128,16 +128,9 @@ object PasswordlessLinkCode : SignInProvider<PasswordlessLinkCode.SignInConfig, 
     override suspend fun signIn(superTokensClient: SuperTokensClient, configure: SignInConfig.() -> Unit): SignInData {
         val config = SignInConfig().apply(configure)
 
-        val preAuthSessionId = config.preAuthSessionId
-        val linkCode = config.linkCode
-
-        if(preAuthSessionId == null || linkCode == null) {
-            throw IllegalStateException("'preAuthSessionId' and 'linkCode' must be provided")
-        }
-
         return superTokensClient.getRecipe<PasswordlessRecipe>().signInLinkCode(
-            preAuthSessionId = preAuthSessionId,
-            linkCode = linkCode,
+            preAuthSessionId = checkNotNull(config.preAuthSessionId) { "preAuthSessionId is required" },
+            linkCode = checkNotNull(config.linkCode) { "linkCode is required" },
         )
     }
 
@@ -154,18 +147,10 @@ object PasswordlessInputCode : SignInProvider<PasswordlessInputCode.SignInConfig
     override suspend fun signIn(superTokensClient: SuperTokensClient, configure: SignInConfig.() -> Unit): SignInData {
         val config = SignInConfig().apply(configure)
 
-        val preAuthSessionId = config.preAuthSessionId
-        val deviceId = config.deviceId
-        val userInputCode = config.userInputCode
-
-        if(preAuthSessionId == null || deviceId == null || userInputCode == null) {
-            throw IllegalStateException("'preAuthSessionId', 'deviceId' and 'userInputCode' must be provided")
-        }
-
         return superTokensClient.getRecipe<PasswordlessRecipe>().signInInputCode(
-            preAuthSessionId = preAuthSessionId,
-            deviceId = deviceId,
-            userInputCode = userInputCode,
+            preAuthSessionId = checkNotNull(config.preAuthSessionId) { "preAuthSessionId is required" },
+            deviceId = checkNotNull(config.deviceId) { "deviceId is required" },
+            userInputCode = checkNotNull(config.userInputCode) { "userInputCode is required" },
         )
     }
 }

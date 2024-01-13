@@ -28,7 +28,7 @@ abstract class ThirdPartySignInAuthCode(
 
         return superTokensClient.getRecipe<ThirdPartyRecipe>().thirdPartyAuthCodeSignIn(
             providerId = providerId,
-            redirectURI = checkNotNull(provider.config.redirectUri),
+            redirectURI = checkNotNull(provider.config.redirectUri) { "The provider needs to have a redirectUri configured" },
             redirectURIQueryParams = config.redirectURIQueryParams ?: emptyMap(),
             clientType = config.clientType,
         )
