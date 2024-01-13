@@ -29,13 +29,15 @@ class SplashScreen(
 
         LaunchedEffect(scope) {
             scope.launch {
-                delay(500)
-
-                if(client.isLoggedIn()) {
-                    navigator.replace(HomeScreen)
-                }
-                else {
-                    navigator.replace(AuthScreen)
+                client.isInitialized.collect {
+                    if(it) {
+                        if(client.isLoggedIn()) {
+                            navigator.replace(HomeScreen)
+                        }
+                        else {
+                            navigator.replace(AuthScreen)
+                        }
+                    }
                 }
             }
         }

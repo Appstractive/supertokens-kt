@@ -55,7 +55,7 @@ object HomeScreen : Screen {
                     },
                     shape = RoundedCornerShape(50.dp), modifier = Modifier.fillMaxWidth().height(50.dp),
                 ) {
-                    Text(text = "SIgnOut")
+                    Text(text = "SignOut")
                 }
             }
         }

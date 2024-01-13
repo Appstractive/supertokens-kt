@@ -5,11 +5,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.appstractive.ViewModel
 import com.appstractive.dependencies
 import com.supertokens.sdk.SuperTokensClient
-import com.supertokens.sdk.handlers.signOut
+import com.supertokens.sdk.recipes.sessions.signOut
 import com.supertokens.sdk.repositories.user.getUserId
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch

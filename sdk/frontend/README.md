@@ -68,7 +68,7 @@ val data = client.signUpWith(Passwordless) {
 // wait email
 
 val userData = client.signInWith(PasswordlessInputCode) {
-    preAuthSessionId = "test@test.de"
+    preAuthSessionId = data.preAuthSessionId
     deviceId = data.deviceId
     userInputCode = "12345"
 }

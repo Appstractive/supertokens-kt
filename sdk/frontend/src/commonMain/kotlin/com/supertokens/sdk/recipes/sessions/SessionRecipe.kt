@@ -76,9 +76,7 @@ class SessionRecipe(
     override suspend fun postInit() {
         superTokens.apiClient.plugin(HttpSend).intercept(tokenHeaderInterceptor())
 
-        superTokens.scope.launch {
-            refreshTokens()
-        }
+        refreshTokens()
     }
 
     suspend fun refreshTokens() = refreshTokensUseCase.refreshTokens(superTokens.apiClient)

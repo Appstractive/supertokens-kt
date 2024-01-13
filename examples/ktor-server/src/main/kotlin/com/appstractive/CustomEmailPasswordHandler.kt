@@ -5,9 +5,11 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 
-class CustomEmailPasswordHandler: EmailPasswordHandler() {
+class CustomEmailPasswordHandler(
+    scope: CoroutineScope,
+): EmailPasswordHandler(scope) {
 
-    private val defaultEmailPasswordHandler = EmailPasswordHandler()
+    private val defaultEmailPasswordHandler = EmailPasswordHandler(scope)
 
     override suspend fun PipelineContext<Unit, ApplicationCall>.signIn() {
         // TODO we can't use super.signin() at the moment (see https://youtrack.jetbrains.com/issue/KT-11488)

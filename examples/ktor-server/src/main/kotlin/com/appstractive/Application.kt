@@ -8,7 +8,7 @@ import com.supertokens.ktor.plugins.superTokens
 import com.supertokens.ktor.plugins.withPermission
 import com.supertokens.ktor.plugins.withRole
 import com.supertokens.sdk.AppConfig
-import com.supertokens.sdk.ServerConfig
+import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.ingredients.email.smtp.SmtpConfig
 import com.supertokens.sdk.ingredients.email.smtp.SmtpEmailService
@@ -73,14 +73,14 @@ fun Application.module() {
             connectionURI = superTokensUrl,
             appConfig = AppConfig(
                 name = "Ktor Example Server",
-                api = ServerConfig(),
+                api = EndpointConfig(),
                 frontends = listOf(
-                    ServerConfig(
+                    EndpointConfig(
                         scheme = frontendScheme,
                         host = frontendHost,
                         path = frontendPath,
                     ),
-                    ServerConfig(
+                    EndpointConfig(
                         scheme = "my-app",
                         host = "MyMobileApp",
                         path = "/callbacks",
@@ -155,7 +155,7 @@ fun Application.module() {
             }
         }
 
-        emailPasswordHandler = CustomEmailPasswordHandler()
+        emailPasswordHandler = CustomEmailPasswordHandler(scope)
 
         jwtVerification {
             withAudience(frontendHost)

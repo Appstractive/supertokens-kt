@@ -18,7 +18,7 @@ Please refer to the respective directories for installation and usage instructio
 ### SDKs
 
 - [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-backend?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-backend)[Backend SDK](https://github.com/Appstractive/supertokens-kt/tree/main/sdk/backend)
-- [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-frontend?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-backend)[KTOR Server Plugin](https://github.com/Appstractive/supertokens-kt/tree/main/server/ktor)
+- [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-frontend?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-frontend)[KTOR Server Plugin](https://github.com/Appstractive/supertokens-kt/tree/main/server/ktor)
 - [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-backend-ktor?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-backend-ktor)[Frontend SDK](https://github.com/Appstractive/supertokens-kt/tree/main/sdk/frontend)
 
 

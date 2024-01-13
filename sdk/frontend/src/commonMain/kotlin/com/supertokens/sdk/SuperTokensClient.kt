@@ -23,6 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -105,13 +107,31 @@ class SuperTokensClient(
     val userRepository by lazy { config.userRepository ?: UserRepositorySettings(getDefaultSettings()) }
     val authRepository by lazy { config.authRepository ?: AuthRepositoryImpl() }
 
+    private val _isInitialized = MutableStateFlow(false)
+    val isInitialized = _isInitialized.asStateFlow()
+
     inline fun <reified T : Recipe<*>> getRecipe(): T = recipes.filterIsInstance<T>().firstOrNull()
         ?: throw RuntimeException("Recipe ${T::class.simpleName} not configured")
 
     inline fun <reified T : Recipe<*>> hasRecipe(): Boolean = recipes.filterIsInstance<T>().isNotEmpty()
 
-    suspend fun isLoggedIn(): Boolean = authRepository.authState.value is AuthState.LoggedIn
+    /** true, if the the user is at least logged in (but may not be authenticated from the backend yet)
+     *  It essentially means, there is a refresh token present, but no access token yet, e.g. during startup
+     *  when a new access token hasn't been fetched yet.
+     */
+    suspend fun isLoggedIn(): Boolean = authRepository.authState.value !is AuthState.Unauthenticated
+    // true, if the user was authenticated from the backend (an access token is present)
     suspend fun isAuthenticated():Boolean = authRepository.authState.value is AuthState.Authenticated
+
+    init {
+        scope.launch {
+            recipes.forEach {  recipe ->
+                recipe.postInit()
+            }
+
+            _isInitialized.value = true
+        }
+    }
 
 }
 
@@ -119,11 +139,5 @@ fun superTokensClient(apiBaseUrl: String, init: SuperTokensClientConfig.() -> Un
     val config = SuperTokensClientConfig(
         apiBaseUrl = apiBaseUrl,
     ).apply(init)
-    return SuperTokensClient(config).also {
-        it.scope.launch {
-            it.recipes.forEach {  recipe ->
-                recipe.postInit()
-            }
-        }
-    }
+    return SuperTokensClient(config)
 }
