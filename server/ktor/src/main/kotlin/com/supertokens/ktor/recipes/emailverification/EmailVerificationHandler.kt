@@ -10,7 +10,7 @@ import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
-import com.supertokens.sdk.ServerConfig
+import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
@@ -18,7 +18,6 @@ import com.supertokens.sdk.common.requests.VerifyEmailTokenRequestDTO
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.responses.VerifyEmailResponseDTO
 import com.supertokens.sdk.core.getUserByEMailOrNull
-import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
@@ -37,7 +36,7 @@ open class EmailVerificationHandler(
     protected val scope: CoroutineScope,
 ) {
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(frontend: ServerConfig, token: String) =
+    open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(frontend: EndpointConfig, token: String) =
         "${frontend.fullUrl}verify-email?token=$token"
 
     /**

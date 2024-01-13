@@ -9,7 +9,7 @@ import com.supertokens.ktor.userHandler
 import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
-import com.supertokens.sdk.ServerConfig
+import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.PasswordlessMode
@@ -51,7 +51,7 @@ open class PasswordlessHandler(
         PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK -> emailService.magicLinkOtpLoginTemplateName
     }
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(frontend: ServerConfig, codeData: PasswordlessCodeData): String =
+    open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(frontend: EndpointConfig, codeData: PasswordlessCodeData): String =
         "${frontend.fullUrl}verify?preAuthSessionId=${codeData.preAuthSessionId}#${codeData.linkCode}"
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginMail(email: String, codeData: PasswordlessCodeData): PasswordlessCodeData {

@@ -21,7 +21,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
-data class ServerConfig(
+@Deprecated("Use UrlConfig instead")
+typealias ServerConfig = EndpointConfig
+
+data class EndpointConfig(
     val scheme: String = "http",
     val host: String = "localhost",
     val path: String = "/",
@@ -35,10 +38,10 @@ data class ServerConfig(
 
 data class AppConfig(
     val name: String,
-    val frontends: List<ServerConfig> = listOf(
-        ServerConfig(),
+    val frontends: List<EndpointConfig> = listOf(
+        EndpointConfig(),
     ),
-    val api: ServerConfig = ServerConfig(),
+    val api: EndpointConfig = EndpointConfig(),
 )
 
 fun <C: RecipeConfig, R: Recipe<C>> SuperTokensConfig.recipe(builder: RecipeBuilder<C, R>, configure: C.() -> Unit = {}) {
@@ -121,7 +124,7 @@ class SuperTokens(
 
     inline fun <reified T : Recipe<*>> hasRecipe(): Boolean = recipes.filterIsInstance<T>().isNotEmpty()
 
-    fun getFrontEnd(origin: String?): ServerConfig {
+    fun getFrontEnd(origin: String?): EndpointConfig {
         val frontends = appConfig.frontends
         return origin.takeIf { !it.equals("null", ignoreCase = true) }?.let {
             frontends.firstOrNull {

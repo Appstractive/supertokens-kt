@@ -5,9 +5,7 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 
-class CustomEmailPasswordHandler(
-    scope: CoroutineScope,
-): EmailPasswordHandler() {
+class CustomEmailPasswordHandler: EmailPasswordHandler() {
 
     private val defaultEmailPasswordHandler = EmailPasswordHandler()
 

@@ -13,7 +13,7 @@ import com.supertokens.ktor.utils.getNewPasswordField
 import com.supertokens.ktor.utils.getPasswordField
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
-import com.supertokens.sdk.ServerConfig
+import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.common.SuperTokensStatus
@@ -182,7 +182,7 @@ open class EmailPasswordHandler(
         }
     }
 
-    open suspend fun createPasswordResetLink(frontend: ServerConfig, token: String) =
+    open suspend fun createPasswordResetLink(frontend: EndpointConfig, token: String) =
         "${frontend.fullUrl}reset-password?token=$token"
 
     /**
