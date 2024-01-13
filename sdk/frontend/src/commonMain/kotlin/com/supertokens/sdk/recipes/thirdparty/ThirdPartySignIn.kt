@@ -28,7 +28,6 @@ abstract class ThirdPartySignInAuthCode(
 
         return superTokensClient.getRecipe<ThirdPartyRecipe>().thirdPartyAuthCodeSignIn(
             providerId = providerId,
-            pkceCodeVerifier = superTokensClient.pkceRepository.getPkceCodeVerifier(providerId),
             redirectURI = checkNotNull(provider.config.redirectUri),
             redirectURIQueryParams = config.redirectURIQueryParams ?: emptyMap(),
             clientType = config.clientType,
@@ -41,7 +40,7 @@ abstract class ThirdPartySignInTokens(
 ) : ThirdPartySignIn<ThirdPartySignInTokens.Config>() {
 
     data class Config(
-        var accessToken: String = "",
+        var accessToken: String? = null,
         var idToken: String? = null,
         var clientType: String? = null,
     ) : SignInProviderConfig
@@ -51,7 +50,7 @@ abstract class ThirdPartySignInTokens(
 
         return superTokensClient.getRecipe<ThirdPartyRecipe>().thirdPartyTokenSignIn(
             providerId = providerId,
-            accessToken = config.accessToken,
+            accessToken = requireNotNull(config.accessToken) { "accessToken is required" },
             idToken = config.idToken,
             clientType = config.clientType,
         )

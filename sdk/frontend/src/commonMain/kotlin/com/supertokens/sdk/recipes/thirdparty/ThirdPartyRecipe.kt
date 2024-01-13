@@ -4,6 +4,8 @@ import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
+import com.supertokens.sdk.recipes.thirdparty.repositories.PkceRepository
+import com.supertokens.sdk.recipes.thirdparty.repositories.PkceRepositoryImpl
 import com.supertokens.sdk.recipes.thirdparty.usecases.GetThirdPartyAuthUrlUseCase
 import com.supertokens.sdk.recipes.thirdparty.usecases.ThirdPartyAuthCodeSignInUseCase
 import com.supertokens.sdk.recipes.thirdparty.usecases.ThirdPartyTokenSignInUseCase
@@ -21,6 +23,8 @@ class ThirdPartyConfig: RecipeConfig {
         providers = providers + this
     }
 
+    var pkceRepository: PkceRepository? = null
+
 }
 
 class ThirdPartyRecipe(
@@ -29,6 +33,8 @@ class ThirdPartyRecipe(
 ) : Recipe<ThirdPartyConfig> {
 
     private val providers: List<Provider<*>> = config.providers.map { it.invoke(superTokens, this) }
+
+    val pkceRepository by lazy { config.pkceRepository ?: PkceRepositoryImpl() }
 
     private val thirdPartyAuthCodeSignInUseCase by lazy {
         ThirdPartyAuthCodeSignInUseCase(
@@ -52,13 +58,12 @@ class ThirdPartyRecipe(
 
     suspend fun thirdPartyAuthCodeSignIn(
         providerId: String,
-        pkceCodeVerifier: String,
         redirectURI: String,
         redirectURIQueryParams: Map<String, String>,
         clientType: String? = null,
     ) = thirdPartyAuthCodeSignInUseCase.signIn(
         providerId = providerId,
-        pkceCodeVerifier = pkceCodeVerifier,
+        pkceCodeVerifier = pkceRepository.getPkceCodeVerifier(providerId),
         redirectURI = redirectURI,
         redirectURIQueryParams = redirectURIQueryParams,
         clientType = clientType,

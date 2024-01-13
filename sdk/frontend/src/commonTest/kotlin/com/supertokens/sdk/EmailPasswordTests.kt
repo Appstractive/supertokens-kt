@@ -6,7 +6,10 @@ import com.supertokens.sdk.handlers.FormFieldException
 import com.supertokens.sdk.handlers.signInWith
 import com.supertokens.sdk.handlers.signUpWith
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
+import com.supertokens.sdk.recipes.sessions.Session
 import com.supertokens.sdk.recipes.sessions.repositories.TokensRepositoryMemory
+import com.supertokens.sdk.recipes.sessions.repositories.getAccessToken
+import com.supertokens.sdk.recipes.sessions.repositories.getRefreshToken
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -19,8 +22,10 @@ import kotlin.test.assertTrue
 class EmailPasswordTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {
-        tokensRepository = TokensRepositoryMemory()
         recipe(EmailPassword)
+        recipe(Session) {
+            tokensRepository = TokensRepositoryMemory()
+        }
     }
 
     @Test
@@ -72,8 +77,8 @@ class EmailPasswordTests {
 
         assertEquals("test@test.de", user.email)
 
-        val accessToken = assertNotNull(client.tokensRepository.getAccessToken())
-        val refreshToken = assertNotNull(client.tokensRepository.getAccessToken())
+        val accessToken = assertNotNull(client.getAccessToken())
+        val refreshToken = assertNotNull(client.getRefreshToken())
     }
 
 }

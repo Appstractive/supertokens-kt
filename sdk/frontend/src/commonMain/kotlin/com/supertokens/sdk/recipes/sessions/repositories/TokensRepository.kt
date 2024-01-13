@@ -6,6 +6,7 @@ import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
 import com.supertokens.sdk.common.HEADER_REFRESH_TOKEN
 import com.supertokens.sdk.common.Routes
+import com.supertokens.sdk.recipes.sessions.SessionRecipe
 import com.supertokens.sdk.repositories.user.UserRepository
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.RefreshTokensParams
@@ -26,9 +27,9 @@ abstract class TokensRepository {
 }
 
 suspend fun SuperTokensClient.getAccessToken(): String? {
-    return tokensRepository.getAccessToken()
+    return getRecipe<SessionRecipe>().tokensRepository.getAccessToken()
 }
 
 suspend fun SuperTokensClient.getRefreshToken(): String? {
-    return tokensRepository.getRefreshToken()
+    return getRecipe<SessionRecipe>().tokensRepository.getRefreshToken()
 }

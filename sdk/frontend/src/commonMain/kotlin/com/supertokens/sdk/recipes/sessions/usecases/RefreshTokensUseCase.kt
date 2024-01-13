@@ -30,7 +30,7 @@ class RefreshTokensUseCase(
             }
 
             if(response.status != HttpStatusCode.OK) {
-                logoutUseCase.logout()
+                logoutUseCase.signOut()
                 return null
             }
 
@@ -60,7 +60,7 @@ class RefreshTokensUseCase(
             }
 
             if(response.status != HttpStatusCode.OK) {
-                logoutUseCase.logout()
+                logoutUseCase.signOut()
                 return null
             }
 

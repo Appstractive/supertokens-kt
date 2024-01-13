@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.asStateFlow
 sealed class AuthState {
 
     data object Unauthenticated: AuthState()
+
+    data class LoggedIn(val userId: String): AuthState()
     data class Authenticated(val userId: String): AuthState()
 
 }
@@ -16,6 +18,7 @@ interface AuthRepository {
     val authState: StateFlow<AuthState>
 
     fun setAuthenticated(userId: String)
+    fun setLoggedIn(userId: String)
     fun setUnauthenticated()
 
 }
@@ -27,6 +30,10 @@ class AuthRepositoryImpl: AuthRepository {
 
     override fun setAuthenticated(userId: String) {
         _authState.value = AuthState.Authenticated(userId = userId)
+    }
+
+    override fun setLoggedIn(userId: String) {
+        _authState.value = AuthState.LoggedIn(userId = userId)
     }
 
     override fun setUnauthenticated() {

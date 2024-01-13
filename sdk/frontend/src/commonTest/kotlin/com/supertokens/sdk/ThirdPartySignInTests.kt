@@ -1,6 +1,7 @@
 package com.supertokens.sdk
 
 import com.supertokens.sdk.handlers.signInWith
+import com.supertokens.sdk.recipes.sessions.Session
 import com.supertokens.sdk.recipes.thirdparty.getThirdPartyAuthorizationUrl
 import com.supertokens.sdk.recipes.thirdparty.providers.Apple
 import com.supertokens.sdk.recipes.thirdparty.providers.Bitbucket
@@ -21,7 +22,6 @@ import kotlin.test.assertTrue
 class ThirdPartySignInTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {
-        tokensRepository = TokensRepositoryMemory()
         recipe(ThirdParty) {
             provider(Apple) {
                 redirectUri = "localhost"
@@ -41,6 +41,9 @@ class ThirdPartySignInTests {
             provider(Google) {
                 redirectUri = "localhost"
             }
+        }
+        recipe(Session) {
+            tokensRepository = TokensRepositoryMemory()
         }
     }
 

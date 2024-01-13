@@ -7,6 +7,7 @@ import com.supertokens.sdk.handlers.signUpWith
 import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.passwordless.PasswordlessInputCode
 import com.supertokens.sdk.recipes.passwordless.PasswordlessLinkCode
+import com.supertokens.sdk.recipes.sessions.Session
 import com.supertokens.sdk.recipes.sessions.repositories.TokensRepositoryMemory
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Ignore
@@ -19,8 +20,10 @@ import kotlin.test.assertTrue
 class PasswordlessTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {
-        tokensRepository = TokensRepositoryMemory()
         recipe(Passwordless)
+        recipe(Session) {
+            tokensRepository = TokensRepositoryMemory()
+        }
     }
 
     @Test

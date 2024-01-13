@@ -2,14 +2,15 @@ package com.supertokens.sdk.recipes.sessions
 
 import com.supertokens.sdk.common.COOKIE_ACCESS_TOKEN
 import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
+import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.recipes.sessions.repositories.TokensRepository
 import com.supertokens.sdk.recipes.sessions.usecases.LogoutUseCase
-import com.supertokens.sdk.recipes.sessions.usecases.RefreshTokensUseCase
 import com.supertokens.sdk.recipes.sessions.usecases.UpdateAccessTokenUseCase
 import com.supertokens.sdk.recipes.sessions.usecases.UpdateRefreshTokenUseCase
 import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.http.Cookie
 import io.ktor.http.Url
+import io.ktor.http.fullPath
 
 internal fun defaultCookieStorage(
     logoutUseCase: LogoutUseCase,
@@ -28,7 +29,7 @@ internal fun defaultCookieStorage(
             COOKIE_REFRESH_TOKEN -> {
                 val token = cookie.value
                 if(token.isBlank()) {
-                    logoutUseCase.logout()
+                    logoutUseCase.signOut()
                 }
                 else {
                     updateRefreshTokenUseCase.updateRefreshToken(token)
@@ -41,8 +42,10 @@ internal fun defaultCookieStorage(
         tokensRepository.getAccessToken()?.let {
             add(Cookie(COOKIE_ACCESS_TOKEN, it))
         }
-        tokensRepository.getRefreshToken()?.let {
-            add(Cookie(COOKIE_REFRESH_TOKEN, it))
+        if(requestUrl.fullPath.endsWith(Routes.Session.REFRESH)) {
+            tokensRepository.getRefreshToken()?.let {
+                add(Cookie(COOKIE_REFRESH_TOKEN, it))
+            }
         }
     }
 

@@ -1,9 +1,12 @@
 package com.supertokens.sdk
 
 import com.supertokens.sdk.handlers.signInWith
-import com.supertokens.sdk.handlers.signOut
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
+import com.supertokens.sdk.recipes.sessions.Session
+import com.supertokens.sdk.recipes.sessions.SessionRecipe
 import com.supertokens.sdk.recipes.sessions.repositories.TokensRepositoryMemory
+import com.supertokens.sdk.recipes.sessions.repositories.getAccessToken
+import com.supertokens.sdk.recipes.sessions.signOut
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
@@ -12,13 +15,16 @@ import kotlinx.serialization.Serializable
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
-@Ignore()
+@Ignore
 class SessionTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {
-        tokensRepository = TokensRepositoryMemory()
         recipe(EmailPassword)
+        recipe(Session) {
+            tokensRepository = TokensRepositoryMemory()
+        }
     }
 
     @Serializable
@@ -63,6 +69,30 @@ class SessionTests {
         response = client.apiClient.get("/private")
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
+
+    @Test
+    fun testTokenRefresh() = runBlocking {
+        val user = client.signInWith(EmailPassword) {
+            email = "test@test.de"
+            password = "a1234567"
+        }
+
+        var response = client.apiClient.get("/private")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+
+        val firstToken = client.getAccessToken()
+
+        client.getRecipe<SessionRecipe>().refreshTokens()
+
+        val secondToken = client.getAccessToken()
+
+        assertNotEquals(firstToken, secondToken)
+
+        response = client.apiClient.get("/private")
+
+        assertEquals(HttpStatusCode.OK, response.status)
     }
 
 }
