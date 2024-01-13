@@ -1,8 +1,9 @@
 package com.supertokens.sdk
 
-import com.supertokens.sdk.recipes.checkEmailExists
-import com.supertokens.sdk.recipes.checkPhoneNumberExists
-import com.supertokens.sdk.recipes.sessions.repositories.TokensRepositoryMemory
+import com.supertokens.sdk.recipes.core.checkEmailExists
+import com.supertokens.sdk.recipes.emailpassword.EmailPassword
+import com.supertokens.sdk.recipes.passwordless.Passwordless
+import com.supertokens.sdk.recipes.passwordless.checkPhoneNumberExists
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -11,7 +12,8 @@ import kotlin.test.assertTrue
 class CoreTests {
 
     private val client = superTokensClient("https://auth.appstractive.com") {
-
+        recipe(EmailPassword)
+        recipe(Passwordless)
     }
 
     @Test

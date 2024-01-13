@@ -16,14 +16,24 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.appendEncodedPathSegments
 
 class EmailPasswordSignUpUseCase(
     private val client: HttpClient,
     private val authRepository: AuthRepository,
+    private val tenantId: String?,
 ) {
 
     suspend fun signUp(email: String, password: String): User {
-        val response = client.post(Routes.EmailPassword.SIGN_UP) {
+        val response = client.post {
+            url {
+                appendEncodedPathSegments(
+                    listOfNotNull(
+                        tenantId,
+                        Routes.EmailPassword.SIGN_UP,
+                    )
+                )
+            }
             setBody(
                 FormFieldRequestDTO(
                     formFields = listOf(

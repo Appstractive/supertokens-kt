@@ -3,6 +3,8 @@ package com.supertokens.sdk.recipes.emailverification
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.Claims
+import com.supertokens.sdk.common.HEADER_RECIPE_ID
+import com.supertokens.sdk.common.RECIPE_EMAIL_VERIFICATION
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.responses.StatusResponseDTO
@@ -74,7 +76,7 @@ class EmailVerificationRecipe(
     suspend fun createVerificationToken(userId: String, email: String, tenantId: String?): String {
         val response = superTokens.post(PATH_CREATE_TOKEN, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_VERIFICATION)
 
             setBody(
                 EmailVerificationRequest(
@@ -95,7 +97,7 @@ class EmailVerificationRecipe(
     suspend fun removeAllVerificationTokens(userId: String, email: String): SuperTokensStatus {
         val response = superTokens.post(PATH_DELETE_TOKENS, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_VERIFICATION)
 
             setBody(
                 EmailVerificationRequest(
@@ -116,7 +118,7 @@ class EmailVerificationRecipe(
     suspend fun verifyToken(token: String): VerifyEmailTokenData {
         val response = superTokens.post(PATH_VERIFY, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_VERIFICATION)
 
             setBody(
                 VerifyEmailTokenRequestDTO(
@@ -147,7 +149,7 @@ class EmailVerificationRecipe(
                 "email" to email,
             )
         ) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_VERIFICATION)
         }
 
         return response.parse<VerifyEmailResponseDTO, Boolean> {
@@ -161,7 +163,7 @@ class EmailVerificationRecipe(
     suspend fun setUnverified(userId: String, email: String): SuperTokensStatus {
         val response = superTokens.post(PATH_VERIFY_REMOVE, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_VERIFICATION)
 
             setBody(
                 EmailVerificationRequest(
@@ -179,8 +181,6 @@ class EmailVerificationRecipe(
     }
 
     companion object {
-        const val ID = "emailverification"
-
         const val PATH_CREATE_TOKEN = "/recipe/user/email/verify/token"
         const val PATH_DELETE_TOKENS = "/recipe/user/email/verify/token/remove"
         const val PATH_VERIFY = "/recipe/user/email/verify"

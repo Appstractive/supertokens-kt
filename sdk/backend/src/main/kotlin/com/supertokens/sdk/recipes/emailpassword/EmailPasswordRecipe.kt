@@ -5,6 +5,8 @@ import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
+import com.supertokens.sdk.common.HEADER_RECIPE_ID
+import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.common.models.User
@@ -59,7 +61,7 @@ class EmailPasswordRecipe(
     suspend fun signUp(email: String, password: String, tenantId: String?): User {
         val response = superTokens.post(PATH_SIGNUP, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
 
             setBody(
                 EmailPasswordSignUpRequest(
@@ -80,7 +82,7 @@ class EmailPasswordRecipe(
     suspend fun signIn(email: String, password: String, tenantId: String?): User {
         val response = superTokens.post(PATH_SIGNIN, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
 
             setBody(
                 EmailPasswordSignInRequest(
@@ -100,7 +102,7 @@ class EmailPasswordRecipe(
      */
     suspend fun createResetPasswordToken(userId: String, email: String, tenantId: String?): String {
         val response = superTokens.post(PATH_CREATE_PASSWORD_RESET_TOKEN, tenantId = tenantId) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
 
             setBody(
                 CreateResetPasswordTokenRequest(
@@ -125,7 +127,7 @@ class EmailPasswordRecipe(
         }
 
         val response = superTokens.post(PATH_CONSUME_PASSWORD_RESET_TOKEN, tenantId = tenantId) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
 
             setBody(
                 ConsumePasswordTokenRequest(
@@ -152,7 +154,7 @@ class EmailPasswordRecipe(
      */
     suspend fun updateEmail(userId: String, email: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.put(PATH_UPDATE_USER, tenantId = tenantId) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
 
             setBody(
                 UpdateUserRequest(
@@ -177,7 +179,7 @@ class EmailPasswordRecipe(
         }
 
         val response = superTokens.put(PATH_UPDATE_USER, tenantId = tenantId) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
 
             setBody(
                 UpdateUserRequest(
@@ -197,7 +199,7 @@ class EmailPasswordRecipe(
      */
     suspend fun importUser(email: String, passwordHash: String, hashingAlgorithm: String, tenantId: String?): ImportUserData {
         val response = superTokens.post(PATH_UPDATE_USER, tenantId = tenantId) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
 
             setBody(
                 ImportUserRequest(
@@ -230,8 +232,6 @@ class EmailPasswordRecipe(
     }
 
     companion object {
-        const val ID = "emailpassword"
-
         const val PATH_SIGNIN = "/recipe/signin"
         const val PATH_SIGNUP = "/recipe/signup"
         const val PATH_UPDATE_USER = "/recipe/user"

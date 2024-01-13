@@ -1,41 +1,41 @@
-package com.supertokens.sdk.recipes.thirdparty.usecases
+package com.supertokens.sdk.recipes.core.usecases
 
+import com.supertokens.sdk.common.HEADER_RECIPE_ID
 import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.responses.AuthorizationUrlResponseDTO
+import com.supertokens.sdk.common.responses.ExistsResponseDTO
 import com.supertokens.sdk.common.toStatus
-import com.supertokens.sdk.recipes.thirdparty.Provider
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.http.appendEncodedPathSegments
-import io.ktor.http.path
 
-class GetThirdPartyAuthUrlUseCase(
+class CheckEmailExistsUseCase(
     private val client: HttpClient,
+    private val recipeId: String,
     private val tenantId: String?,
 ) {
 
-    suspend fun getAuthUrl(provider: Provider<*>): String {
+    suspend fun checkEmailExists(email: String): Boolean {
         val response = client.get {
             url {
                 appendEncodedPathSegments(
                     listOfNotNull(
                         tenantId,
-                        Routes.ThirdParty.AUTH_URL,
+                        Routes.EMAIL_EXISTS,
                     )
                 )
-                parameters.append("thirdPartyId", provider.id)
-                parameters.append("redirectURIOnProviderDashboard", checkNotNull(provider.config.redirectUri))
+                parameters.append("email", email)
             }
-
+            header(HEADER_RECIPE_ID, recipeId)
         }
 
-        val body = response.body<AuthorizationUrlResponseDTO>()
+        val body = response.body<ExistsResponseDTO>()
 
         return when(body.status) {
-            SuperTokensStatus.OK.value -> checkNotNull(body.urlWithQueryParams)
+            SuperTokensStatus.OK.value -> body.exists
             else -> throw SuperTokensStatusException(body.status.toStatus())
         }
     }

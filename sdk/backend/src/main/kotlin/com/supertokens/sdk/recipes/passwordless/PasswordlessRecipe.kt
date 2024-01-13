@@ -2,6 +2,8 @@ package com.supertokens.sdk.recipes.passwordless
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.HEADER_RECIPE_ID
+import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.common.responses.StatusResponseDTO
@@ -52,7 +54,7 @@ class PasswordlessRecipe(
     suspend fun createEmailCode(email: String, tenantId: String?): PasswordlessCodeData {
         val response = superTokens.post(PATH_CREATE_CODE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 CreatePasswordlessCodeRequest(
@@ -80,7 +82,7 @@ class PasswordlessRecipe(
     suspend fun createPhoneNumberCode(phoneNumber: String, tenantId: String?): PasswordlessCodeData {
         val response = superTokens.post(PATH_CREATE_CODE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 CreatePasswordlessCodeRequest(
@@ -108,7 +110,7 @@ class PasswordlessRecipe(
     suspend fun createDeviceIdCode(deviceId: String, userInputCode: String, tenantId: String?): PasswordlessCodeData {
         val response = superTokens.post(PATH_CREATE_CODE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 CreatePasswordlessCodeRequest(
@@ -137,7 +139,7 @@ class PasswordlessRecipe(
     suspend fun recreateCode(deviceId: String, tenantId: String?): PasswordlessCodeData {
         val response = superTokens.post(PATH_CREATE_CODE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 CreatePasswordlessCodeRequest(
@@ -165,7 +167,7 @@ class PasswordlessRecipe(
     suspend fun consumeLinkCode(preAuthSessionId: String, linkCode: String, tenantId: String?): SignInUpData {
         val response = superTokens.post(PATH_CONSUME_CODE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 ConsumePasswordlessCodeRequestDTO(
@@ -196,7 +198,7 @@ class PasswordlessRecipe(
     suspend fun consumeUserInputCode(preAuthSessionId: String, deviceId: String, userInputCode: String, tenantId: String?): SignInUpData {
         val response = superTokens.post(PATH_CONSUME_CODE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 ConsumePasswordlessCodeRequestDTO(
@@ -221,7 +223,7 @@ class PasswordlessRecipe(
     suspend fun revokeCode(codeId: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.post(PATH_REVOKE_CODE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 RevokePasswordlesCodeRequest(
@@ -241,7 +243,7 @@ class PasswordlessRecipe(
     suspend fun revokeEmailCodes(email: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.post(PATH_REVOKE_CODES, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 RevokeAllPasswordlessCodesRequest(
@@ -261,7 +263,7 @@ class PasswordlessRecipe(
     suspend fun revokePhoneNumberCodes(phoneNumber: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.post(PATH_REVOKE_CODES, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 RevokeAllPasswordlessCodesRequest(
@@ -286,7 +288,7 @@ class PasswordlessRecipe(
                 "email" to email
             ),
         ) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
         }
 
         return response.parse<GetPasswordlessCodesResponseDTO, List<PasswordlessDevices>> {
@@ -305,7 +307,7 @@ class PasswordlessRecipe(
                 "deviceId" to deviceId
             ),
         ) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
         }
 
         return response.parse<GetPasswordlessCodesResponseDTO, List<PasswordlessDevices>> {
@@ -324,7 +326,7 @@ class PasswordlessRecipe(
                 "phoneNumber" to phoneNumber
             ),
         ) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
         }
 
         return response.parse<GetPasswordlessCodesResponseDTO, List<PasswordlessDevices>> {
@@ -343,7 +345,7 @@ class PasswordlessRecipe(
                 "preAuthSessionId" to preAuthSessionId
             ),
         ) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
         }
 
         return response.parse<GetPasswordlessCodesResponseDTO, List<PasswordlessDevices>> {
@@ -356,7 +358,7 @@ class PasswordlessRecipe(
      */
     suspend fun updatePhoneNumber(userId: String, phoneNumber: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.put(PATH_UPDATE_USER, tenantId = tenantId) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
 
             setBody(
                 UpdateUserRequest(
@@ -375,8 +377,6 @@ class PasswordlessRecipe(
     }
 
     companion object {
-        const val ID = "passwordless"
-
         const val PATH_CREATE_CODE = "/recipe/signinup/code"
         const val PATH_CONSUME_CODE = "/recipe/signinup/code/consume"
         const val PATH_REVOKE_CODE = "/recipe/signinup/code/remove"

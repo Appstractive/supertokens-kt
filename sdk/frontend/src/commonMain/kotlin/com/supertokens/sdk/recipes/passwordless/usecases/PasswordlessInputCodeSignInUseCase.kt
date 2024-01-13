@@ -11,13 +11,23 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.appendEncodedPathSegments
 
 class PasswordlessInputCodeSignInUseCase(
     private val client: HttpClient,
+    private val tenantId: String?,
 ) {
 
     suspend fun signIn(preAuthSessionId: String, deviceId: String, userInputCode: String): SignInData {
-        val response = client.post(Routes.Passwordless.SIGNUP_CODE_CONSUME) {
+        val response = client.post {
+            url {
+                appendEncodedPathSegments(
+                    listOfNotNull(
+                        tenantId,
+                        Routes.Passwordless.SIGNUP_CODE_CONSUME,
+                    )
+                )
+            }
             setBody(
                 ConsumePasswordlessCodeRequestDTO(
                     preAuthSessionId = preAuthSessionId,

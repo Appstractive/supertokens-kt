@@ -2,6 +2,8 @@ package com.supertokens.sdk.recipes.usermetadata
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.HEADER_RECIPE_ID
+import com.supertokens.sdk.common.RECIPE_META_DATA
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.responses.StatusResponseDTO
@@ -40,7 +42,7 @@ class UserMetaDataRecipe(
             ),
         ) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_META_DATA)
         }
 
         return response.parse<UserMetaDataResponseDTO, Map<String, Any?>> {
@@ -58,7 +60,7 @@ class UserMetaDataRecipe(
     suspend fun updateMetaData(userId: String, metaData: Map<String, Any?>): Map<String, Any?> {
         val response = superTokens.put(PATH_META_DATA, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, SessionRecipe.ID)
+            header(HEADER_RECIPE_ID, RECIPE_META_DATA)
 
             setBody(
                 UpdateUserMetaDataRequest(
@@ -79,7 +81,7 @@ class UserMetaDataRecipe(
     suspend fun deleteMetaData(userId: String): SuperTokensStatus {
         val response = superTokens.post(PATH_META_DATA_REMOVE, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, SessionRecipe.ID)
+            header(HEADER_RECIPE_ID, RECIPE_META_DATA)
 
             setBody(
                 DeleteUserMetaDataRequest(
@@ -94,8 +96,6 @@ class UserMetaDataRecipe(
     }
 
     companion object {
-        const val ID = "usermetadata"
-
         const val PATH_META_DATA = "/recipe/user/metadata"
         const val PATH_META_DATA_REMOVE = "/recipe/user/metadata/remove"
     }

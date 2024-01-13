@@ -3,6 +3,8 @@ package com.supertokens.sdk.recipes.session
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.Claims
+import com.supertokens.sdk.common.HEADER_RECIPE_ID
+import com.supertokens.sdk.common.RECIPE_SESSION
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.toJsonElement
@@ -148,7 +150,7 @@ class SessionRecipe(
     ): CreateSessionData {
         val response = superTokens.post(PATH_SESSION, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
 
             setBody(
                 CreateSessionRequest(
@@ -183,7 +185,7 @@ class SessionRecipe(
             ),
         ) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
         }
 
         return response.parse<GetSessionResponseDTO, GetSessionData> {
@@ -215,7 +217,7 @@ class SessionRecipe(
             ),
         ) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
         }
 
         return response.parse<GetSessionsResponseDTO, List<String>> {
@@ -233,7 +235,7 @@ class SessionRecipe(
 
         val response = superTokens.post(PATH_SESSION_REMOVE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
 
             setBody(
                 RemoveSessionsRequest(
@@ -253,7 +255,7 @@ class SessionRecipe(
     suspend fun removeSessionsForUser(userId: String, tenantId: String?): List<String> {
         val response = superTokens.post(PATH_SESSION_REMOVE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
 
             setBody(
                 RemoveSessionsForUserRequest(
@@ -280,7 +282,7 @@ class SessionRecipe(
 
         val response = superTokens.post(PATH_SESSION_VERIFY, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
 
             setBody(
                 VerifySessionRequest(
@@ -310,7 +312,7 @@ class SessionRecipe(
     ): CreateSessionData {
         val response = superTokens.post(PATH_SESSION_REFRESH, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
 
             setBody(
                 RefreshSessionRequest(
@@ -341,7 +343,7 @@ class SessionRecipe(
 
         val response = superTokens.post(PATH_SESSION_REGENERATE, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
 
             setBody(
                 RegenerateSessionRequest(
@@ -365,7 +367,7 @@ class SessionRecipe(
     suspend fun updateSessionData(sessionHandle: String, userDataInDatabase: Map<String, Any?>): SuperTokensStatus {
         val response = superTokens.put(PATH_SESSION_DATA, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
 
             setBody(
                 UpdateSessionDataRequest(
@@ -384,7 +386,7 @@ class SessionRecipe(
     suspend fun updateJwtData(sessionHandle: String, userDataInJWT: Map<String, Any?>, tenantId: String?): SuperTokensStatus {
         val response = superTokens.put(PATH_JWT_DATA, tenantId = tenantId) {
 
-            header("rid", ID)
+            header(HEADER_RECIPE_ID, RECIPE_SESSION)
 
             setBody(
                 UpdateJwtDataRequest(
@@ -398,8 +400,6 @@ class SessionRecipe(
     }
 
     companion object {
-        const val ID = "session"
-
         const val PATH_SESSION = "/recipe/session"
         const val PATH_SESSION_REMOVE = "/recipe/session/remove"
         const val PATH_SESSION_VERIFY = "/recipe/session/verify"

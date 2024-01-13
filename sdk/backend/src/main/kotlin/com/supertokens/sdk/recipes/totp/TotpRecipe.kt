@@ -2,6 +2,8 @@ package com.supertokens.sdk.recipes.totp
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.HEADER_RECIPE_ID
+import com.supertokens.sdk.common.RECIPE_TOTP
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toStatus
@@ -52,7 +54,7 @@ class TotpRecipe(
     suspend fun addDevice(userId: String, deviceName: String, skew: Int? = null, period: Int? = null): String {
         val response = superTokens.post(PATH_TOTP_DEVICE, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_TOTP)
 
             setBody(
                 AddTotpDeviceRequest(
@@ -75,7 +77,7 @@ class TotpRecipe(
     suspend fun changeDeviceName(userId: String, oldDeviceName: String, newDeviceName: String): SuperTokensStatus {
         val response = superTokens.post(PATH_TOTP_DEVICE, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_TOTP)
 
             setBody(
                 ChangeTotpDeviceNameRequest(
@@ -103,7 +105,7 @@ class TotpRecipe(
             )
         ) {
 
-            header(Constants.HEADER_RECIPE_ID, SessionRecipe.ID)
+            header(HEADER_RECIPE_ID, RECIPE_TOTP)
         }
 
         return response.parse<TotpDevicesResponseDTO, List<TotpDevice>> {
@@ -126,7 +128,7 @@ class TotpRecipe(
     suspend fun removeDevice(userId: String, deviceName: String): Boolean {
         val response = superTokens.post(PATH_TOTP_DEVICE_REMOVE, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_TOTP)
 
             setBody(
                 RemoveTotpDeviceRequest(
@@ -147,7 +149,7 @@ class TotpRecipe(
     suspend fun verifyCode(userId: String, totp: String, tenantId: String?): Boolean {
         val response = superTokens.post(PATH_TOTP_CODE_VERIFY, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_TOTP)
 
             setBody(
                 VerifyTotpCodeRequest(
@@ -170,7 +172,7 @@ class TotpRecipe(
     suspend fun verifyDevice(userId: String, deviceName: String, totp: String, tenantId: String?): Boolean {
         val response = superTokens.post(PATH_TOTP_DEVICE_VERIFY, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_TOTP)
 
             setBody(
                 VerifyTotpDeviceRequest(
@@ -187,8 +189,6 @@ class TotpRecipe(
     }
 
     companion object {
-        const val ID = "totp"
-
         const val PATH_TOTP_DEVICE = "/recipe/totp/device"
         const val PATH_TOTP_DEVICES = "/recipe/totp/device/list"
         const val PATH_TOTP_DEVICE_REMOVE = "/recipe/totp/device/remove"

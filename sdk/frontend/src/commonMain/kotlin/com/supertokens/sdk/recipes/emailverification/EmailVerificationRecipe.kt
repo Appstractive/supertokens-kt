@@ -18,12 +18,14 @@ class EmailVerificationRecipe(
     private val sendEmailVerificationUseCase by lazy {
         SendEmailVerificationUseCase(
             client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
         )
     }
 
     private val verifyEmailUseCase by lazy {
         VerifyEmailUseCase(
             client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
         )
     }
 

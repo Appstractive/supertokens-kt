@@ -39,18 +39,21 @@ class ThirdPartyRecipe(
     private val thirdPartyAuthCodeSignInUseCase by lazy {
         ThirdPartyAuthCodeSignInUseCase(
             client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
         )
     }
 
     private val thirdPartyTokenSignInUseCase by lazy {
         ThirdPartyTokenSignInUseCase(
             client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
         )
     }
 
     private val getThirdPartyAuthUrlUseCase by lazy {
         GetThirdPartyAuthUrlUseCase(
             client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
         )
     }
 

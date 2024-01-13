@@ -2,6 +2,8 @@ package com.supertokens.sdk.recipes.thirdparty
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.HEADER_RECIPE_ID
+import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -54,7 +56,7 @@ class ThirdPartyRecipe(
         Result
         val response = superTokens.post(PATH_SIGN_IN_UP, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_THIRD_PARTY)
 
             setBody(
                 ThirdPartySignInUpRequest(
@@ -96,8 +98,6 @@ class ThirdPartyRecipe(
     }
 
     companion object {
-        const val ID = "thirdparty"
-
         const val PATH_SIGN_IN_UP = "/recipe/signinup"
     }
 

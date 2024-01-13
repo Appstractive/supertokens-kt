@@ -12,9 +12,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.appendEncodedPathSegments
 
 class ThirdPartyTokenSignInUseCase(
     private val client: HttpClient,
+    private val tenantId: String?,
 ) {
 
     suspend fun signIn(
@@ -23,7 +25,15 @@ class ThirdPartyTokenSignInUseCase(
         idToken: String?,
         clientType: String? = null,
     ): SignInData {
-        val response = client.post(Routes.ThirdParty.SIGN_IN_UP) {
+        val response = client.post {
+            url {
+                appendEncodedPathSegments(
+                    listOfNotNull(
+                        tenantId,
+                        Routes.ThirdParty.SIGN_IN_UP,
+                    )
+                )
+            }
             setBody(
                 ThirdPartySignInUpRequestDTO(
                     oAuthTokens = ThirdPartyTokensDTO(

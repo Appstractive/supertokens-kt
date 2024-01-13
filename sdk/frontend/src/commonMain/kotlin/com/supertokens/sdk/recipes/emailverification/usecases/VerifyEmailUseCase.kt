@@ -9,13 +9,23 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.appendEncodedPathSegments
 
 class VerifyEmailUseCase(
     private val client: HttpClient,
+    private val tenantId: String?,
 ) {
 
     suspend fun verifyEmail(token: String): Boolean {
-        val response = client.post(Routes.EmailVerification.VERIFY) {
+        val response = client.post {
+            url {
+                appendEncodedPathSegments(
+                    listOfNotNull(
+                        tenantId,
+                        Routes.EmailVerification.VERIFY,
+                    )
+                )
+            }
             setBody(
                 VerifyEmailTokenRequestDTO(
                     token = token,

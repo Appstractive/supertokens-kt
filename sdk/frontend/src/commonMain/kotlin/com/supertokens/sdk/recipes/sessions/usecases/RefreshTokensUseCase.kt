@@ -24,60 +24,40 @@ class RefreshTokensUseCase(
 
     suspend fun refreshTokens(client: HttpClient): BearerTokens? {
         return tokensRepository.getRefreshToken()?.let {
-            val response = client.post(Routes.Session.REFRESH) {
-                header(HEADER_REFRESH_TOKEN, it)
-                attributes.put(Auth.AuthCircuitBreaker, Unit)
-            }
-
-            if(response.status != HttpStatusCode.OK) {
-                logoutUseCase.signOut()
-                return null
-            }
-
-            val cookies = response.setCookie()
-
-            val newRefreshToken = response.headers[HEADER_REFRESH_TOKEN]
-                ?: cookies.firstOrNull {it.name == COOKIE_REFRESH_TOKEN}?.value
-                ?: return null
-            val newAccessToken = response.headers[HEADER_ACCESS_TOKEN]
-                ?: cookies.firstOrNull {it.name == COOKIE_ACCESS_TOKEN}?.value
-                ?: return null
-
-            updateAccessTokenUseCase.updateAccessToken(newAccessToken)
-            updateRefreshTokenUseCase.updateRefreshToken(newRefreshToken)
-
-            BearerTokens(newAccessToken, newRefreshToken)
+            refreshTokens(client, it)
         }
     }
 
     suspend fun refreshTokens(params: RefreshTokensParams): BearerTokens? {
         return (params.oldTokens?.refreshToken ?: tokensRepository.getRefreshToken())?.let {
-            val response = params.client.post(Routes.Session.REFRESH) {
-                header(HEADER_REFRESH_TOKEN, it)
-                with(params) {
-                    markAsRefreshTokenRequest()
-                }
-            }
-
-            if(response.status != HttpStatusCode.OK) {
-                logoutUseCase.signOut()
-                return null
-            }
-
-            val cookies = response.setCookie()
-
-            val newRefreshToken = response.headers[HEADER_REFRESH_TOKEN]
-                ?: cookies.firstOrNull {it.name == COOKIE_REFRESH_TOKEN}?.value
-                ?: return null
-            val newAccessToken = response.headers[HEADER_ACCESS_TOKEN]
-                ?: cookies.firstOrNull {it.name == COOKIE_ACCESS_TOKEN}?.value
-                ?: return null
-
-            updateAccessTokenUseCase.updateAccessToken(newAccessToken)
-            updateRefreshTokenUseCase.updateRefreshToken(newRefreshToken)
-
-            BearerTokens(newAccessToken, newRefreshToken)
+            refreshTokens(params.client, it)
         }
+    }
+
+    private suspend fun refreshTokens(client: HttpClient, refreshToken: String): BearerTokens? {
+        val response = client.post(Routes.Session.REFRESH) {
+            header(HEADER_REFRESH_TOKEN, refreshToken)
+            attributes.put(Auth.AuthCircuitBreaker, Unit)
+        }
+
+        if(response.status != HttpStatusCode.OK) {
+            logoutUseCase.signOut()
+            return null
+        }
+
+        val cookies = response.setCookie()
+
+        val newRefreshToken = response.headers[HEADER_REFRESH_TOKEN]
+            ?: cookies.firstOrNull {it.name == COOKIE_REFRESH_TOKEN}?.value
+            ?: return null
+        val newAccessToken = response.headers[HEADER_ACCESS_TOKEN]
+            ?: cookies.firstOrNull {it.name == COOKIE_ACCESS_TOKEN}?.value
+            ?: return null
+
+        updateAccessTokenUseCase.updateAccessToken(newAccessToken)
+        updateRefreshTokenUseCase.updateRefreshToken(newRefreshToken)
+
+        return BearerTokens(newAccessToken, newRefreshToken)
     }
 
 }

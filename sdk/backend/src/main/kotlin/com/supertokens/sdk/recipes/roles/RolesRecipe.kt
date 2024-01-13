@@ -2,6 +2,8 @@ package com.supertokens.sdk.recipes.roles
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.HEADER_RECIPE_ID
+import com.supertokens.sdk.common.RECIPE_ROLES
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.common.responses.StatusResponseDTO
@@ -82,7 +84,7 @@ class RolesRecipe(
     suspend fun createOrUpdateRole(role: String, permissions: List<String>): Boolean {
         val response = superTokens.put(PATH_ROLE, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
 
             setBody(
                 CreateOrUpdateRoleRequest(
@@ -105,7 +107,7 @@ class RolesRecipe(
     suspend fun deleteRole(role: String): Boolean {
         val response = superTokens.post(PATH_ROLES_REMOVE, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
 
             setBody(
                 DeleteRoleRequest(
@@ -124,7 +126,7 @@ class RolesRecipe(
      */
     suspend fun getRoles(): List<String> {
         val response = superTokens.get(PATH_ROLES, tenantId = null) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
         }
 
         return response.parse<GetRolesResponseDTO, List<String>> {
@@ -143,7 +145,7 @@ class RolesRecipe(
                 "role" to role,
             )
         ) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
         }
 
         return response.parse<GetRolePermissionsResponseDTO, List<String>> {
@@ -162,7 +164,7 @@ class RolesRecipe(
                 "role" to role,
             ),
         ) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
         }
 
         return response.parse<GetRoleUsersResponseDTO, List<String>> {
@@ -176,7 +178,7 @@ class RolesRecipe(
     suspend fun removeRolePermissions(role: String, permissions: List<String>): SuperTokensStatus {
         val response = superTokens.post(PATH_ROLES_PERMISSIONS_REMOVE, tenantId = null) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
 
             setBody(
                 RemoveRolePermissionsRequest(
@@ -202,7 +204,7 @@ class RolesRecipe(
                 "permission" to permission,
             )
         ) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
         }
 
         return response.parse<GetRolesResponseDTO, List<String>> {
@@ -218,7 +220,7 @@ class RolesRecipe(
     suspend fun setUserRole(userId: String, role: String, tenantId: String?): Boolean {
         val response = superTokens.put(PATH_USER_ROLE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
 
             setBody(
                 UserRoleRequest(
@@ -241,7 +243,7 @@ class RolesRecipe(
     suspend fun removeUserRole(userId: String, role: String, tenantId: String?): Boolean {
         val response = superTokens.post(PATH_USER_ROLE_REMOVE, tenantId = tenantId) {
 
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
 
             setBody(
                 UserRoleRequest(
@@ -267,7 +269,7 @@ class RolesRecipe(
                 "userId" to userId,
             ),
         ) {
-            header(Constants.HEADER_RECIPE_ID, ID)
+            header(HEADER_RECIPE_ID, RECIPE_ROLES)
         }
 
         return response.parse<GetRolesResponseDTO, List<String>> {
@@ -276,8 +278,6 @@ class RolesRecipe(
     }
 
     companion object {
-        const val ID = "userroles"
-
         const val PATH_ROLE = "/recipe/role"
         const val PATH_ROLES = "/recipe/roles"
         const val PATH_ROLES_REMOVE = "/recipe/role/remove"

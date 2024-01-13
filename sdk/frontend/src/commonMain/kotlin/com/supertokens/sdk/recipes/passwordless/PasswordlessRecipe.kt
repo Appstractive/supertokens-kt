@@ -1,6 +1,7 @@
 package com.supertokens.sdk.recipes.passwordless
 
 import com.supertokens.sdk.SuperTokensClient
+import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.handlers.SignInProvider
 import com.supertokens.sdk.handlers.SignInProviderConfig
@@ -10,6 +11,8 @@ import com.supertokens.sdk.models.SignInData
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
+import com.supertokens.sdk.recipes.core.usecases.CheckEmailExistsUseCase
+import com.supertokens.sdk.recipes.passwordless.usecases.CheckPhoneNumberExistsUseCase
 import com.supertokens.sdk.recipes.passwordless.usecases.PasswordlessEmailSignUpUseCase
 import com.supertokens.sdk.recipes.passwordless.usecases.PasswordlessInputCodeSignInUseCase
 import com.supertokens.sdk.recipes.passwordless.usecases.PasswordlessLinkCodeSignInUseCase
@@ -25,24 +28,43 @@ class PasswordlessRecipe(
     private val passwordlessEmailSignUpUseCase by lazy {
         PasswordlessEmailSignUpUseCase(
             client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
         )
     }
 
     private val passwordlessPhoneNumberSignUpUseCase by lazy {
         PasswordlessPhoneNumberSignUpUseCase(
             client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
         )
     }
 
-    val passwordlessLinkCodeSignInUseCase by lazy {
+    private val passwordlessLinkCodeSignInUseCase by lazy {
         PasswordlessLinkCodeSignInUseCase(
             client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
         )
     }
 
-    val passwordlessInputCodeSignInUseCase by lazy {
+    private val passwordlessInputCodeSignInUseCase by lazy {
         PasswordlessInputCodeSignInUseCase(
             client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
+        )
+    }
+
+    private val checkEmailExistsUseCase by lazy {
+        CheckEmailExistsUseCase(
+            client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
+            recipeId = RECIPE_PASSWORDLESS,
+        )
+    }
+
+    private val checkPhoneNumberExistsUseCase by lazy {
+        CheckPhoneNumberExistsUseCase(
+            client = superTokens.apiClient,
+            tenantId = superTokens.tenantId,
         )
     }
 
@@ -57,6 +79,9 @@ class PasswordlessRecipe(
         deviceId = deviceId,
         userInputCode = userInputCode,
     )
+
+    suspend fun checkEmailExists(email: String) = checkEmailExistsUseCase.checkEmailExists(email)
+    suspend fun checkPhoneNumberExists(phoneNumber: String) = checkPhoneNumberExistsUseCase.checkPhoneNumberExists(phoneNumber)
 
 }
 
@@ -143,4 +168,8 @@ object PasswordlessInputCode : SignInProvider<PasswordlessInputCode.SignInConfig
             userInputCode = userInputCode,
         )
     }
+}
+
+suspend fun SuperTokensClient.checkPhoneNumberExists(phoneNumber: String): Boolean {
+    return getRecipe<PasswordlessRecipe>().checkPhoneNumberExists(phoneNumber)
 }

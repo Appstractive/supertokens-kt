@@ -34,12 +34,14 @@ class SuperTokensClientConfig(
     val apiBaseUrl: String,
 ) {
 
+    var tenantId: String? = null
+
+    // Modify the http client config used by the SDK
     var clientConfig: HttpClientConfig<*>.() -> Unit = {}
 
     var userRepository: UserRepository? = null
 
     var authRepository: AuthRepository? = null
-
 
     var clientName: String = "MyMobileApp"
 
@@ -64,6 +66,9 @@ class SuperTokensClient(
 
     val scope: CoroutineScope
         get() = config.scope
+
+    val tenantId: String?
+        get() = config.tenantId
 
     val recipes: List<Recipe<*>> = config.recipes.map { it.invoke(this) }
 
