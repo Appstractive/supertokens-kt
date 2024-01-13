@@ -198,7 +198,7 @@ class EmailPasswordRecipe(
      * Import a user with email ID and password hash
      */
     suspend fun importUser(email: String, passwordHash: String, hashingAlgorithm: String, tenantId: String?): ImportUserData {
-        val response = superTokens.post(PATH_UPDATE_USER, tenantId = tenantId) {
+        val response = superTokens.post(PATH_IMPORT_USER, tenantId = tenantId) {
             header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
 
             setBody(
