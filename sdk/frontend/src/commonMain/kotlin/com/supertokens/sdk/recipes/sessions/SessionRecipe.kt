@@ -25,13 +25,14 @@ import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.launch
 
 class SessionRecipeConfig: RecipeConfig {
 
     var tokensRepository: TokensRepository? = null
 
     var cookiesStorage: CookiesStorage? = null
+
+    var refreshTokensOnStart: Boolean = true
 
 }
 
@@ -76,7 +77,9 @@ class SessionRecipe(
     override suspend fun postInit() {
         superTokens.apiClient.plugin(HttpSend).intercept(tokenHeaderInterceptor())
 
-        refreshTokens()
+        if(config.refreshTokensOnStart) {
+            refreshTokens()
+        }
     }
 
     suspend fun refreshTokens() = refreshTokensUseCase.refreshTokens(superTokens.apiClient)
