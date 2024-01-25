@@ -1,4 +1,4 @@
-# SuperTokens [KTOR](https://github.com/ktorio/ktor) Server Plugin
+# SuperTokens Kotlin Multiplatform Frontend SDK
 
 ## Installation
 
