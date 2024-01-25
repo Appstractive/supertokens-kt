@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
-expect fun getDefaultSettings(): Settings
+internal expect fun getDefaultSettings(): Settings
 
 @SuperTokensDslMarker
 class SuperTokensClientConfig(

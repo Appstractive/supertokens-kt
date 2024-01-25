@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.Payload
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.utils.UnauthorizedException
 import com.supertokens.sdk.common.COOKIE_ACCESS_TOKEN
+import com.supertokens.sdk.common.Claims
 import com.supertokens.sdk.common.HEADER_ANTI_CSRF
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.server.application.call
@@ -42,8 +43,8 @@ val TokenValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = {
             id = sub,
             sessionHandle = sessionHandle,
             jwtPayload = it.payload,
-            roles = it.payload.claims["st-role"]?.asList(String::class.java)?.toSet(),
-            permissions = (it.payload.claims["st-perm"]?.asList(String::class.java)?.toSet()),
+            roles = it.payload.claims[Claims.ROLES]?.asList(String::class.java)?.toSet(),
+            permissions = (it.payload.claims[Claims.PERMISSIONS]?.asList(String::class.java)?.toSet()),
         )
     } else {
         null

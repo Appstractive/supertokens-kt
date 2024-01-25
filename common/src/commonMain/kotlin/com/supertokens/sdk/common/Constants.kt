@@ -29,6 +29,8 @@ object Claims {
     const val EMAIL = "email"
     const val EMAIL_VERIFIED = "st-ev"
     const val PHONE_NUMBER = "phoneNumber"
+    const val ROLES = "st-role"
+    const val PERMISSIONS = "st-perm"
 
 }
 

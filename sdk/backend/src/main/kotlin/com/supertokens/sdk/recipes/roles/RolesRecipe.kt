@@ -2,6 +2,7 @@ package com.supertokens.sdk.recipes.roles
 
 import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.Claims
 import com.supertokens.sdk.common.HEADER_RECIPE_ID
 import com.supertokens.sdk.common.RECIPE_ROLES
 import com.supertokens.sdk.common.SuperTokensStatus
@@ -67,11 +68,11 @@ class RolesRecipe(
 
         return buildMap {
             if (addRolesToToken && userRoles.isNotEmpty()) {
-                set("st-role", userRoles)
+                set(Claims.ROLES, userRoles)
             }
 
             if (userPermissions.isNotEmpty()) {
-                set("st-perm", userPermissions)
+                set(Claims.PERMISSIONS, userPermissions)
             }
         }
     }

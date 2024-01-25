@@ -7,13 +7,13 @@ import androidx.startup.Initializer
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
 
-actual fun getDefaultSettings(): Settings {
+internal actual fun getDefaultSettings(): Settings {
     return settings
 }
 
-lateinit var settings: Settings
+internal lateinit var settings: Settings
 
-class DefaultSettingsInitializer : Initializer<Settings> {
+internal class DefaultSettingsInitializer : Initializer<Settings> {
     override fun create(context: Context): Settings {
         return SharedPreferencesSettings(
             EncryptedSharedPreferences.create(
