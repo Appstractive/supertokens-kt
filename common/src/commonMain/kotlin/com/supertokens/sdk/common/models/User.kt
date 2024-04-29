@@ -23,6 +23,7 @@ data class LoginMethod(
 @Serializable
 data class User(
     val id: String,
+    val isPrimaryUser: Boolean,
     val tenantIds: List<String>? = null,
     val emails: List<String>? = null,
     val phoneNumbers: List<String>? = null,

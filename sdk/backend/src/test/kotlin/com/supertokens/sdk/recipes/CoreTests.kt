@@ -1,11 +1,11 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.core.createJwt
 import com.supertokens.sdk.core.deleteUser
-import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.core.getUserById
+import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.core.getUsersByPhoneNumber
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
@@ -13,7 +13,6 @@ import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignUp
 import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.passwordless.consumePasswordlessUserInputCode
 import com.supertokens.sdk.recipes.passwordless.createPasswordlessPhoneNumberCode
-import com.supertokens.sdk.superTokens
 import io.fusionauth.jwt.JWTDecoder
 import io.fusionauth.jwt.Verifier
 import io.fusionauth.jwt.domain.Algorithm
@@ -26,14 +25,9 @@ import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CoreTests {
+class CoreTests : BaseTest() {
 
-    private val superTokens = superTokens(
-        connectionURI = "https://try.supertokens.com/",
-        appConfig = AppConfig(
-            name = "TestApp",
-        ),
-    ) {
+    override fun SuperTokensConfig.configure() {
         recipe(EmailPassword)
         recipe(Passwordless)
     }
@@ -59,7 +53,11 @@ class CoreTests {
         val code = superTokens.createPasswordlessPhoneNumberCode("+491601234567")
         assertTrue(code.codeId.isNotEmpty())
 
-        val response = superTokens.consumePasswordlessUserInputCode(code.preAuthSessionId, code.deviceId, code.userInputCode)
+        val response = superTokens.consumePasswordlessUserInputCode(
+            code.preAuthSessionId,
+            code.deviceId,
+            code.userInputCode
+        )
         val user = superTokens.getUsersByPhoneNumber("+491601234567", null).first()
 
         assertEquals("+491601234567", user.phoneNumber)
@@ -82,9 +80,14 @@ class CoreTests {
             payload = jwtData,
         )
 
-        val decoded = JWTDecoder().decode(jwt, object: Verifier{
+        val decoded = JWTDecoder().decode(jwt, object : Verifier {
             override fun canVerify(algorithm: Algorithm?) = true
-            override fun verify(algorithm: Algorithm?, message: ByteArray?, signature: ByteArray?) {}
+            override fun verify(
+                algorithm: Algorithm?,
+                message: ByteArray?,
+                signature: ByteArray?
+            ) {
+            }
         })
 
         assertEquals("Test", decoded.issuer)
@@ -108,9 +111,7 @@ class CoreTests {
     )
 
     companion object {
-        const val TEST_USER = "test@test.de"
-        const val TEST_PASSWORD = "a1234567"
-        
+
         private val jsonEncoder = Json { encodeDefaults = true }
 
         val jwtData: Map<String, Any?> = mapOf(

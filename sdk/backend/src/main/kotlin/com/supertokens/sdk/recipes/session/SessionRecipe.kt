@@ -6,6 +6,7 @@ import com.supertokens.sdk.common.Claims
 import com.supertokens.sdk.common.HEADER_RECIPE_ID
 import com.supertokens.sdk.common.RECIPE_SESSION
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.toJsonElement
 import com.supertokens.sdk.models.CreateSessionData
@@ -142,6 +143,7 @@ class SessionRecipe(
     /**
      * Create a new Session
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun createSession(
         userId: String,
         tenantId: String?,
@@ -176,6 +178,7 @@ class SessionRecipe(
     /**
      * Get user and session information for a given session handle
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun getSession(sessionHandle: String): GetSessionData {
         val response = superTokens.get(
             PATH_SESSION,
@@ -207,6 +210,7 @@ class SessionRecipe(
     /**
      * Get session handles for a user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun getSessions(userId: String, tenantId: String?): List<String> {
         val response = superTokens.get(
             PATH_SESSIONS,
@@ -228,6 +232,7 @@ class SessionRecipe(
     /**
      * Delete sessions
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun removeSessions(sessionHandles: List<String>, tenantId: String?): List<String> {
         if (sessionHandles.isEmpty()) {
             return emptyList()
@@ -252,6 +257,7 @@ class SessionRecipe(
     /**
      * Delete sessions for a user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun removeSessionsForUser(userId: String, tenantId: String?): List<String> {
         val response = superTokens.post(PATH_SESSION_REMOVE, tenantId = tenantId) {
 
@@ -273,6 +279,7 @@ class SessionRecipe(
     /**
      * Verify a Session
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun verifySession(
         accessToken: String,
         doAntiCsrfCheck: Boolean = false,
@@ -306,6 +313,7 @@ class SessionRecipe(
     /**
      * Refresh a Session
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun refreshSession(
         refreshToken: String,
         antiCsrfToken: String? = null,
@@ -336,6 +344,7 @@ class SessionRecipe(
     /**
      * Regenerate a session
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun regenerateSession(
         accessToken: String,
         userDataInJWT: Map<String, Any?>? = null,
@@ -364,6 +373,7 @@ class SessionRecipe(
     /**
      * Change session data
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun updateSessionData(sessionHandle: String, userDataInDatabase: Map<String, Any?>): SuperTokensStatus {
         val response = superTokens.put(PATH_SESSION_DATA, tenantId = null) {
 
@@ -383,6 +393,7 @@ class SessionRecipe(
     /**
      * Change JWT data for a session
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun updateJwtData(sessionHandle: String, userDataInJWT: Map<String, Any?>, tenantId: String?): SuperTokensStatus {
         val response = superTokens.put(PATH_JWT_DATA, tenantId = tenantId) {
 

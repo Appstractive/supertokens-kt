@@ -1,31 +1,25 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailverification.EmailVerification
 import com.supertokens.sdk.recipes.emailverification.EmailVerificationRecipe
+import com.supertokens.sdk.recipes.emailverification.checkEmailVerified
 import com.supertokens.sdk.recipes.emailverification.createEmailVerificationToken
 import com.supertokens.sdk.recipes.emailverification.removeAllVerificationTokens
 import com.supertokens.sdk.recipes.emailverification.setUnverified
-import com.supertokens.sdk.recipes.emailverification.checkEmailVerified
 import com.supertokens.sdk.recipes.emailverification.verifyToken
-import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class EmailVerificationTest {
+class EmailVerificationTest : BaseTest() {
 
-    private val superTokens = superTokens(
-        connectionURI = "https://try.supertokens.com/",
-        appConfig = AppConfig(
-            name = "TestApp",
-        ),
-    ) {
+    override fun SuperTokensConfig.configure() {
         recipe(EmailPassword)
         recipe(EmailVerification)
     }
@@ -83,9 +77,4 @@ class EmailVerificationTest {
         val status = superTokens.setUnverified(user.id, TEST_USER)
         assertEquals(SuperTokensStatus.OK, status)
     }
-
-    companion object {
-        const val TEST_USER = "test@test.de"
-    }
-
 }

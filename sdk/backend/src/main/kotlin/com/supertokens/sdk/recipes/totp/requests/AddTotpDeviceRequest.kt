@@ -8,4 +8,5 @@ data class AddTotpDeviceRequest(
     val deviceName: String,
     val skew: Int,
     val period: Int,
+    val secretKey: String? = null,
 )

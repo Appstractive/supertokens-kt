@@ -28,6 +28,10 @@ sealed class SuperTokensStatus(
     data object TotpDeviceUnknownError: SuperTokensStatus("UNKNOWN_DEVICE_ERROR")
     data object InvalidTotpCodeError: SuperTokensStatus("INVALID_TOTP_ERROR")
     data object TotpLimitReachedError: SuperTokensStatus("LIMIT_REACHED_ERROR")
+    data object AccountInfoAlreadyAssociatedError: SuperTokensStatus("ACCOUNT_INFO_ALREADY_ASSOCIATED_WITH_ANOTHER_PRIMARY_USER_ID_ERROR")
+    data object RecipeUserIdAlreadyLinkedWithAnotherPrimaryUserError: SuperTokensStatus("RECIPE_USER_ID_ALREADY_LINKED_WITH_ANOTHER_PRIMARY_USER_ID_ERROR")
+    data object RecipeUserIdAlreadyLinkedError: SuperTokensStatus("RECIPE_USER_ID_ALREADY_LINKED_WITH_PRIMARY_USER_ID_ERROR")
+    data object NotPrimaryUserError: SuperTokensStatus("INPUT_USER_IS_NOT_A_PRIMARY_USER")
     class AppIdOrTenantIdNotFoundError(message: String): SuperTokensStatus(message)
 
     data object UnknownError: SuperTokensStatus("UNKNOWN_ERROR")

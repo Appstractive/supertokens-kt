@@ -1,6 +1,6 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.common.SuperTokensStatus
@@ -11,26 +11,20 @@ import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
 import com.supertokens.sdk.recipes.emailpassword.createResetPasswordToken
-import com.supertokens.sdk.recipes.emailpassword.resetPasswordWithToken
 import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignIn
 import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignUp
+import com.supertokens.sdk.recipes.emailpassword.resetPasswordWithToken
 import com.supertokens.sdk.recipes.emailpassword.updateEmail
 import com.supertokens.sdk.recipes.emailpassword.updatePassword
-import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.time.Instant
 import kotlin.test.assertEquals
 
 
-class EmailPasswordRecipeTests {
+class EmailPasswordRecipeTests : BaseTest() {
 
-    private val superTokens = superTokens(
-        connectionURI = "https://try.supertokens.com/",
-        appConfig = AppConfig(
-            name = "TestApp",
-        ),
-    ) {
+    override fun SuperTokensConfig.configure() {
         recipe(EmailPassword) {
             emailService = SmtpEmailService(
                 SmtpConfig(
@@ -54,14 +48,14 @@ class EmailPasswordRecipeTests {
 
     @Test
     fun testCreateUser() = runBlocking {
-        val email = "${Instant.now().epochSecond}@test.de"
+        val email = "${Instant.now().toEpochMilli()}@test.de"
         val user = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
         assertEquals(email, user.email)
     }
 
     @Test
     fun testSignInUser() = runBlocking {
-        val email = "${Instant.now().epochSecond}@test.de"
+        val email = "${Instant.now().toEpochMilli()}@test.de"
         val user = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
         val signedInUser = superTokens.emailPasswordSignIn(email, TEST_PASSWORD)
         assertEquals(signedInUser.id, user.id)
@@ -79,7 +73,7 @@ class EmailPasswordRecipeTests {
 
     @Test
     fun testChangeEMail() = runBlocking {
-        val user = superTokens.getUsersByEMail(TEST_USER).first()
+        val user = getRecipeUser(TEST_USER)
 
         assertEquals(SuperTokensStatus.OK, superTokens.updateEmail(user.id, "test2@test.de"))
         assertEquals(SuperTokensStatus.OK, superTokens.updateEmail(user.id, TEST_USER))
@@ -87,7 +81,7 @@ class EmailPasswordRecipeTests {
 
     @Test
     fun testChangePassword() = runBlocking {
-        val user = superTokens.getUsersByEMail(TEST_USER).first()
+        val user = getRecipeUser(TEST_USER)
 
         assertEquals(SuperTokensStatus.OK, superTokens.updatePassword(user.id, "1abcdefg"))
         assertEquals(SuperTokensStatus.OK, superTokens.updatePassword(user.id, TEST_PASSWORD))
@@ -97,14 +91,17 @@ class EmailPasswordRecipeTests {
     fun testChangePasswordDefaultPolicyError() = runBlocking {
         val user = superTokens.getUsersByEMail(TEST_USER).first()
 
-        assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.updatePassword(user.id, "abcdefgh"))
-        assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.updatePassword(user.id, "12345678"))
-        assertEquals(SuperTokensStatus.PasswordPolicyViolatedError, superTokens.updatePassword(user.id, "abc123"))
+        assertEquals(
+            SuperTokensStatus.PasswordPolicyViolatedError,
+            superTokens.updatePassword(user.id, "abcdefgh")
+        )
+        assertEquals(
+            SuperTokensStatus.PasswordPolicyViolatedError,
+            superTokens.updatePassword(user.id, "12345678")
+        )
+        assertEquals(
+            SuperTokensStatus.PasswordPolicyViolatedError,
+            superTokens.updatePassword(user.id, "abc123")
+        )
     }
-    
-    companion object {
-        const val TEST_USER = "test@test.de"
-        const val TEST_PASSWORD = "a1234567"
-    }
-
 }

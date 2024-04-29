@@ -1,15 +1,14 @@
 package com.supertokens.sdk.recipes.emailpassword
 
-import com.supertokens.sdk.Constants
-import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
 import com.supertokens.sdk.common.HEADER_RECIPE_ID
 import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
+import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.common.models.User
+import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.post
 import com.supertokens.sdk.put
@@ -19,14 +18,14 @@ import com.supertokens.sdk.recipes.RecipeConfig
 import com.supertokens.sdk.recipes.common.models.FormField
 import com.supertokens.sdk.recipes.common.models.Validate
 import com.supertokens.sdk.recipes.emailpassword.models.ImportUserData
+import com.supertokens.sdk.recipes.emailpassword.requests.ConsumePasswordTokenRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.CreateResetPasswordTokenRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignInRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.EmailPasswordSignUpRequest
-import com.supertokens.sdk.recipes.emailpassword.requests.ConsumePasswordTokenRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.ImportUserRequest
 import com.supertokens.sdk.recipes.emailpassword.requests.UpdateUserRequest
-import com.supertokens.sdk.recipes.emailpassword.responses.CreateResetPasswordTokenResponseDTO
 import com.supertokens.sdk.recipes.emailpassword.responses.ConsumePasswordTokenResponseDTO
+import com.supertokens.sdk.recipes.emailpassword.responses.CreateResetPasswordTokenResponseDTO
 import com.supertokens.sdk.recipes.emailpassword.responses.ImportUserResponseDTO
 import com.supertokens.sdk.utils.parse
 import com.supertokens.sdk.utils.parseUser
@@ -58,6 +57,7 @@ class EmailPasswordRecipe(
     /**
      * Signup a user with email ID and password
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun signUp(email: String, password: String, tenantId: String?): User {
         val response = superTokens.post(PATH_SIGNUP, tenantId = tenantId) {
 
@@ -72,13 +72,14 @@ class EmailPasswordRecipe(
         }
 
         return response.parseUser().also {
-            superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it))
+            superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it, RECIPE_EMAIL_PASSWORD))
         }
     }
 
     /**
      * Signin a user with email ID and password
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun signIn(email: String, password: String, tenantId: String?): User {
         val response = superTokens.post(PATH_SIGNIN, tenantId = tenantId) {
 
@@ -93,13 +94,14 @@ class EmailPasswordRecipe(
         }
 
         return response.parseUser().also {
-            superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it))
+            superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it, RECIPE_EMAIL_PASSWORD))
         }
     }
 
     /**
      * Generate a new reset password token for this user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun createResetPasswordToken(userId: String, email: String, tenantId: String?): String {
         val response = superTokens.post(PATH_CREATE_PASSWORD_RESET_TOKEN, tenantId = tenantId) {
             header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
@@ -120,6 +122,7 @@ class EmailPasswordRecipe(
     /**
      * Reset a password using password reset token
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun resetPasswordWithToken(token: String, newPassword: String, tenantId: String?): String {
 
         if(config.validatePasswordOnReset && !validatePassword(newPassword)) {
@@ -152,6 +155,7 @@ class EmailPasswordRecipe(
     /**
      * Update a user's email
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun updateEmail(userId: String, email: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.put(PATH_UPDATE_USER, tenantId = tenantId) {
             header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
@@ -172,6 +176,7 @@ class EmailPasswordRecipe(
     /**
      * Update a user's password
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun updatePassword(userId: String, password: String, tenantId: String?): SuperTokensStatus {
 
         if(config.validatePasswordOnUpdate && !validatePassword(password)) {
@@ -197,6 +202,7 @@ class EmailPasswordRecipe(
     /**
      * Import a user with email ID and password hash
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun importUser(email: String, passwordHash: String, hashingAlgorithm: String, tenantId: String?): ImportUserData {
         val response = superTokens.post(PATH_IMPORT_USER, tenantId = tenantId) {
             header(HEADER_RECIPE_ID, RECIPE_EMAIL_PASSWORD)
@@ -221,6 +227,7 @@ class EmailPasswordRecipe(
     /**
      * Validate a password against the configured form field
      */
+    @Throws(SuperTokensStatusException::class)
     fun validatePassword(password: String): Boolean {
         formFields.firstOrNull {it.id == FORM_FIELD_PASSWORD_ID}?.validate?.let {
             if(!it.invoke(password)) {

@@ -73,6 +73,7 @@ class EmailVerificationRecipe(
     /**
      * Generate a new email verification token for this user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun createVerificationToken(userId: String, email: String, tenantId: String?): String {
         val response = superTokens.post(PATH_CREATE_TOKEN, tenantId = tenantId) {
 
@@ -94,6 +95,7 @@ class EmailVerificationRecipe(
     /**
      * Remove all unused email verification tokens for this user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun removeAllVerificationTokens(userId: String, email: String): SuperTokensStatus {
         val response = superTokens.post(PATH_DELETE_TOKENS, tenantId = null) {
 
@@ -115,6 +117,7 @@ class EmailVerificationRecipe(
     /**
      * Verify an email
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun verifyToken(token: String): VerifyEmailTokenData {
         val response = superTokens.post(PATH_VERIFY, tenantId = null) {
 
@@ -140,6 +143,7 @@ class EmailVerificationRecipe(
     /**
      * Check if an email is verified
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun checkEmailVerified(userId: String, email: String): Boolean {
         val response = superTokens.get(
             PATH_VERIFY,
@@ -160,6 +164,7 @@ class EmailVerificationRecipe(
     /**
      * Unverify an email
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun setUnverified(userId: String, email: String): SuperTokensStatus {
         val response = superTokens.post(PATH_VERIFY_REMOVE, tenantId = null) {
 

@@ -28,7 +28,7 @@ services:
       - app_network
     restart: unless-stopped
   supertokens:
-    image: registry.supertokens.io/supertokens/supertokens-postgresql:7.0
+    image: registry.supertokens.io/supertokens/supertokens-postgresql:9.0
     depends_on:
       db:
         condition: service_healthy
@@ -36,6 +36,7 @@ services:
       - 3567:3567
     environment:
       POSTGRESQL_CONNECTION_URI: "postgresql://supertokens_user:somePassword@db:5432/supertokens"
+      LOG_LEVEL: DEBUG
     networks:
       - app_network
     restart: unless-stopped
@@ -45,24 +46,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  supertokens-server:
-    image: supertokens-ktor-example:1.0.6
-    environment:
-      SUPERTOKENS_URL: "http://supertokens:3567"
-      SUPERTOKENS_FRONTEND_SCHEME: "http"
-      SUPERTOKENS_FRONTEND_HOST: "localhost"
-      SUPERTOKENS_FRONTEND_PATH: "/"
-      SUPERTOKENS_ISSUER: "localhost"
-      SMTP_USER: 
-      SMTP_PW: 
-      SMTP_HOST: mailhog
-      SMTP_PORT: 1025
-    depends_on:
-      - supertokens
-    ports:
-      - "8080:8080"
-    networks:
-      - app_network
 
 networks:
   app_network:

@@ -1,6 +1,6 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.roles.Roles
@@ -14,20 +14,14 @@ import com.supertokens.sdk.recipes.roles.getUserRoles
 import com.supertokens.sdk.recipes.roles.removeRolePermissions
 import com.supertokens.sdk.recipes.roles.removeUserRole
 import com.supertokens.sdk.recipes.roles.setUserRole
-import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class RolesTests {
+class RolesTests : BaseTest() {
 
-    private val superTokens = superTokens(
-        connectionURI = "https://try.supertokens.com/",
-        appConfig = AppConfig(
-            name = "TestApp",
-        ),
-    ) {
+    override fun SuperTokensConfig.configure() {
         recipe(Roles)
     }
 
@@ -103,10 +97,6 @@ class RolesTests {
 
         roles = superTokens.getUserRoles(user.id)
         assertFalse(roles.contains("Everyone"))
-    }
-
-    companion object {
-        const val TEST_USER = "test@test.de"
     }
 
 }

@@ -20,6 +20,7 @@ const val RECIPE_EMAIL_VERIFICATION = "emailverification"
 const val RECIPE_ROLES = "userroles"
 const val RECIPE_TOTP = "totp"
 const val RECIPE_META_DATA = "usermetadata"
+const val RECIPE_ACCOUNT_LINKING = "accountlinking"
 
 object Claims {
 
@@ -31,6 +32,7 @@ object Claims {
     const val PHONE_NUMBER = "phoneNumber"
     const val ROLES = "st-role"
     const val PERMISSIONS = "st-perm"
+    const val MFA = "st-mfa"
 
 }
 

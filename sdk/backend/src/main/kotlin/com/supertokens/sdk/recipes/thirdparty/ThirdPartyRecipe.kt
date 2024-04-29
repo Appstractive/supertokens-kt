@@ -4,6 +4,7 @@ import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.HEADER_RECIPE_ID
 import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -46,6 +47,7 @@ class ThirdPartyRecipe(
     /**
      * Signin/up a user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun signInUp(
         thirdPartyId: String,
         thirdPartyUserId: String,
@@ -77,10 +79,10 @@ class ThirdPartyRecipe(
             )
         }.also {
             if(it.createdNewUser) {
-                superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it.user))
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it.user, RECIPE_THIRD_PARTY))
             }
             else {
-                superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it.user))
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it.user, RECIPE_THIRD_PARTY))
             }
         }
     }

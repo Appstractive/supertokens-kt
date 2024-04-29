@@ -1,6 +1,6 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.recipe
@@ -9,31 +9,22 @@ import com.supertokens.sdk.recipes.totp.TotpRecipe
 import com.supertokens.sdk.recipes.totp.addTotpDevice
 import com.supertokens.sdk.recipes.totp.changeTotpDeviceName
 import com.supertokens.sdk.recipes.totp.getTotpDevices
+import com.supertokens.sdk.recipes.totp.importTotpDevice
 import com.supertokens.sdk.recipes.totp.removeTotpDevice
 import com.supertokens.sdk.recipes.totp.verifyTotpCode
 import com.supertokens.sdk.recipes.totp.verifyTotpDevice
-import com.supertokens.sdk.superTokens
-import dev.turingcomplete.kotlinonetimepassword.HmacAlgorithm
-import dev.turingcomplete.kotlinonetimepassword.TimeBasedOneTimePasswordConfig
-import dev.turingcomplete.kotlinonetimepassword.TimeBasedOneTimePasswordGenerator
+import dev.turingcomplete.kotlinonetimepassword.GoogleAuthenticator
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
+import org.junit.Assert.assertFalse
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@Ignore("Requires License")
-class TotpTests {
+class TotpTests : BaseTest() {
 
-    private val superTokens = superTokens(
-        connectionURI = "https://try.supertokens.com/",
-        appConfig = AppConfig(
-            name = "TestApp",
-        ),
-    ) {
+    override fun SuperTokensConfig.configure() {
         recipe(Totp)
     }
 
@@ -56,16 +47,33 @@ class TotpTests {
     }
 
     @Test
+    fun testImportDevice() = runBlocking {
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
+        superTokens.removeTotpDevice(user.id, TEST_TOTP_DEVICE_NAME)
+
+        val name = superTokens.importTotpDevice(user.id, TEST_TOTP_DEVICE_NAME, "rgret43634t3at")
+        assertEquals(TEST_TOTP_DEVICE_NAME, name)
+
+        val devices = superTokens.getTotpDevices(user.id)
+
+        val device = assertNotNull(devices.firstOrNull { it.name == TEST_TOTP_DEVICE_NAME })
+    }
+
+    @Test
     fun testRenameDevice() = runBlocking {
         val user = superTokens.getUsersByEMail(TEST_USER).first()
         superTokens.removeTotpDevice(user.id, TEST_TOTP_DEVICE_NAME)
 
         val secret = superTokens.addTotpDevice(user.id, TEST_TOTP_DEVICE_NAME)
+        val devices = superTokens.getTotpDevices(userId = user.id)
+        assertTrue(devices.isNotEmpty())
 
-        var response = superTokens.changeTotpDeviceName(user.id, TEST_TOTP_DEVICE_NAME, "Test TOTP Device 2")
+        var response =
+            superTokens.changeTotpDeviceName(user.id, TEST_TOTP_DEVICE_NAME, "Test TOTP Device 2")
         assertEquals(SuperTokensStatus.OK, response)
 
-        response = superTokens.changeTotpDeviceName(user.id, "Test TOTP Device 2", TEST_TOTP_DEVICE_NAME)
+        response =
+            superTokens.changeTotpDeviceName(user.id, "Test TOTP Device 2", TEST_TOTP_DEVICE_NAME)
     }
 
     @Test
@@ -90,9 +98,15 @@ class TotpTests {
 
         val secret = superTokens.addTotpDevice(user.id, TEST_TOTP_DEVICE_NAME)
         val generator = getTotpGenerator(secret)
+        val totp = generator.generate()
 
-        val response = superTokens.verifyTotpDevice(user.id, TEST_TOTP_DEVICE_NAME, generator.generate())
-        assertTrue(response)
+        val response =
+            superTokens.verifyTotpDevice(
+                userId = user.id,
+                deviceName = TEST_TOTP_DEVICE_NAME,
+                totp = totp,
+            )
+        assertFalse(response)
     }
 
     @Test
@@ -102,23 +116,40 @@ class TotpTests {
 
         val secret = superTokens.addTotpDevice(user.id, TEST_TOTP_DEVICE_NAME)
         val generator = getTotpGenerator(secret)
+        val totp = generator.generate()
 
-        val response = superTokens.verifyTotpCode(user.id, generator.generate())
+        val response = superTokens.verifyTotpCode(
+            userId = user.id,
+            totp = totp,
+            allowUnverifiedDevices = true,
+        )
         assertTrue(response)
     }
 
-    private fun getTotpGenerator(secret: String): TimeBasedOneTimePasswordGenerator {
-        val config = TimeBasedOneTimePasswordConfig(
-            codeDigits = 6,
-            hmacAlgorithm = HmacAlgorithm.SHA1,
-            timeStep = 30,
-            timeStepUnit = TimeUnit.SECONDS,
+    @Test
+    fun testVerifyImportedCode() = runBlocking {
+        val user = superTokens.getUsersByEMail(TEST_USER).first()
+        superTokens.removeTotpDevice(user.id, TEST_TOTP_DEVICE_NAME)
+
+        val secret = GoogleAuthenticator.createRandomSecret()
+
+        superTokens.importTotpDevice(user.id, TEST_TOTP_DEVICE_NAME, secret)
+        val generator = getTotpGenerator(secret)
+        val totp = generator.generate()
+
+        val response = superTokens.verifyTotpCode(
+            userId = user.id,
+            totp = totp,
+            allowUnverifiedDevices = true,
         )
-        return TimeBasedOneTimePasswordGenerator(secret.toByteArray(), config)
+        assertTrue(response)
+    }
+
+    private fun getTotpGenerator(secret: String): GoogleAuthenticator {
+        return GoogleAuthenticator(secret)
     }
 
     companion object {
-        const val TEST_USER = "test@test.de"
         const val TEST_TOTP_DEVICE_NAME = "Test TOTP Device"
     }
 

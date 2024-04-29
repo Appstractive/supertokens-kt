@@ -2,8 +2,8 @@ package com.supertokens.sdk
 
 import com.supertokens.sdk.core.CoreHandler
 import com.supertokens.sdk.models.SuperTokensEvent
-import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.BuildRecipe
+import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
 import io.ktor.client.HttpClient
@@ -32,7 +32,7 @@ data class EndpointConfig(
 
     val fullUrl = "$scheme://$host$path"
     val basePath: String
-        get() = if(path.endsWith("/")) path else "${path}/"
+        get() = if (path.endsWith("/")) path else "${path}/"
 
 }
 
@@ -44,7 +44,10 @@ data class AppConfig(
     val api: EndpointConfig = EndpointConfig(),
 )
 
-fun <C: RecipeConfig, R: Recipe<C>> SuperTokensConfig.recipe(builder: RecipeBuilder<C, R>, configure: C.() -> Unit = {}) {
+fun <C : RecipeConfig, R : Recipe<C>> SuperTokensConfig.recipe(
+    builder: RecipeBuilder<C, R>,
+    configure: C.() -> Unit = {}
+) {
     +builder.install(configure)
 }
 
@@ -103,7 +106,7 @@ class SuperTokens(
             })
         }
 
-        if(config.enableRequestLogging) {
+        if (config.enableRequestLogging) {
             install(Logging)
         }
 
@@ -122,7 +125,8 @@ class SuperTokens(
     inline fun <reified T : Recipe<*>> getRecipe(): T = recipes.filterIsInstance<T>().firstOrNull()
         ?: throw RuntimeException("Recipe ${T::class.java.simpleName} not configured")
 
-    inline fun <reified T : Recipe<*>> hasRecipe(): Boolean = recipes.filterIsInstance<T>().isNotEmpty()
+    inline fun <reified T : Recipe<*>> hasRecipe(): Boolean =
+        recipes.filterIsInstance<T>().isNotEmpty()
 
     fun getFrontEnd(origin: String?): EndpointConfig {
         val frontends = appConfig.frontends
@@ -135,7 +139,11 @@ class SuperTokens(
 
 }
 
-fun superTokens(connectionURI: String, appConfig: AppConfig, init: SuperTokensConfig.() -> Unit): SuperTokens {
+fun superTokens(
+    connectionURI: String,
+    appConfig: AppConfig,
+    init: SuperTokensConfig.() -> Unit
+): SuperTokens {
     val config = SuperTokensConfig(
         connectionUrl = connectionURI,
         appConfig = appConfig,

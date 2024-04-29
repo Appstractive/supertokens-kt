@@ -1,6 +1,6 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.recipe
@@ -16,7 +16,6 @@ import com.supertokens.sdk.recipes.session.removeSessions
 import com.supertokens.sdk.recipes.session.updateJwtData
 import com.supertokens.sdk.recipes.session.updateSessionData
 import com.supertokens.sdk.recipes.session.verifySession
-import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -26,14 +25,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class SessionRecipeTests {
+class SessionRecipeTests : BaseTest() {
 
-    private val superTokens = superTokens(
-        connectionURI = "https://try.supertokens.com/",
-        appConfig = AppConfig(
-            name = "TestApp",
-        ),
-    ) {
+    override fun SuperTokensConfig.configure() {
         recipe(EmailPassword)
         recipe(Sessions)
     }
@@ -47,7 +41,11 @@ class SessionRecipeTests {
     fun testCreateSession() = runBlocking {
         val user = superTokens.getUsersByEMail(TEST_USER).first()
 
-        val session = superTokens.createSession(userId = user.id, userDataInJWT = jwtData, userDataInDatabase = dbData)
+        val session = superTokens.createSession(
+            userId = user.id,
+            userDataInJWT = jwtData,
+            userDataInDatabase = dbData
+        )
         assertEquals(user.id, session.session.userId)
     }
 
@@ -55,7 +53,11 @@ class SessionRecipeTests {
     fun testGetSession() = runBlocking {
         val user = superTokens.getUsersByEMail(TEST_USER).first()
 
-        val session = superTokens.createSession(userId = user.id, userDataInJWT = jwtData, userDataInDatabase = dbData)
+        val session = superTokens.createSession(
+            userId = user.id,
+            userDataInJWT = jwtData,
+            userDataInDatabase = dbData
+        )
 
         val getResponse = superTokens.getSession(session.session.handle)
         assertEquals(session.session.handle, getResponse.sessionHandle)
@@ -164,8 +166,6 @@ class SessionRecipeTests {
     )
 
     companion object {
-
-        const val TEST_USER = "test@test.de"
 
         private val jsonEncoder = Json { encodeDefaults = true }
 

@@ -15,6 +15,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 
+@Throws(SuperTokensStatusException::class)
 suspend inline fun <reified R: BaseResponseDTO, T> HttpResponse.parse(convert: (R) -> T): T {
     if (status != HttpStatusCode.OK) {
         throw SuperTokensStatusException(bodyAsText().toStatus())
@@ -28,6 +29,7 @@ suspend inline fun <reified R: BaseResponseDTO, T> HttpResponse.parse(convert: (
     }
 }
 
+@Throws(SuperTokensStatusException::class)
 suspend fun HttpResponse.parse(): SuperTokensStatus {
     if(status != HttpStatusCode.OK) {
         throw SuperTokensStatusException(bodyAsText().toStatus())
@@ -38,6 +40,7 @@ suspend fun HttpResponse.parse(): SuperTokensStatus {
     return body.status.toStatus()
 }
 
+@Throws(SuperTokensStatusException::class)
 suspend fun HttpResponse.parseUser(): User {
     if(status != HttpStatusCode.OK) {
         throw SuperTokensStatusException(bodyAsText().toStatus())

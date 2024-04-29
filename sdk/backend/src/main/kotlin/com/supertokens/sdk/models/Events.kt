@@ -4,8 +4,8 @@ import com.supertokens.sdk.common.models.User
 
 sealed class SuperTokensEvent {
 
-    class UserSignUp(val user: User): SuperTokensEvent()
-    class UserSignIn(val user: User): SuperTokensEvent()
+    class UserSignUp(val user: User, val recipeId: String): SuperTokensEvent()
+    class UserSignIn(val user: User, val recipeId: String): SuperTokensEvent()
     class UserPasswordChanged(val userId: String): SuperTokensEvent()
     class UserEmailChanged(val userId: String, val email: String): SuperTokensEvent()
     class UserPhoneNumberChanged(val userId: String, val phoneNumber: String): SuperTokensEvent()

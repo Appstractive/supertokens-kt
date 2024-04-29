@@ -5,6 +5,7 @@ import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.HEADER_RECIPE_ID
 import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toStatus
@@ -51,6 +52,7 @@ class PasswordlessRecipe(
     /**
      * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun createEmailCode(email: String, tenantId: String?): PasswordlessCodeData {
         val response = superTokens.post(PATH_CREATE_CODE, tenantId = tenantId) {
 
@@ -79,6 +81,7 @@ class PasswordlessRecipe(
     /**
      * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun createPhoneNumberCode(phoneNumber: String, tenantId: String?): PasswordlessCodeData {
         val response = superTokens.post(PATH_CREATE_CODE, tenantId = tenantId) {
 
@@ -107,6 +110,7 @@ class PasswordlessRecipe(
     /**
      * Starts a sign in process by requesting a linkCode and a deviceId + userInputCode combination the user can use to sign in.
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun createDeviceIdCode(deviceId: String, userInputCode: String, tenantId: String?): PasswordlessCodeData {
         val response = superTokens.post(PATH_CREATE_CODE, tenantId = tenantId) {
 
@@ -136,6 +140,7 @@ class PasswordlessRecipe(
     /**
      * Restarts a sign in process the user can use to sign in.
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun recreateCode(deviceId: String, tenantId: String?): PasswordlessCodeData {
         val response = superTokens.post(PATH_CREATE_CODE, tenantId = tenantId) {
 
@@ -164,6 +169,7 @@ class PasswordlessRecipe(
     /**
      * Tries to consume the passed linkCode to sign the user in
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun consumeLinkCode(preAuthSessionId: String, linkCode: String, tenantId: String?): SignInUpData {
         val response = superTokens.post(PATH_CONSUME_CODE, tenantId = tenantId) {
 
@@ -184,10 +190,10 @@ class PasswordlessRecipe(
             )
         }.also {
             if(it.createdNewUser) {
-                superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it.user))
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it.user, RECIPE_PASSWORDLESS))
             }
             else {
-                superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it.user))
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it.user, RECIPE_PASSWORDLESS))
             }
         }
     }
@@ -195,6 +201,7 @@ class PasswordlessRecipe(
     /**
      * Tries to consume the passed userInputCode+deviceId combo to sign the user in
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun consumeUserInputCode(preAuthSessionId: String, deviceId: String, userInputCode: String, tenantId: String?): SignInUpData {
         val response = superTokens.post(PATH_CONSUME_CODE, tenantId = tenantId) {
 
@@ -220,6 +227,7 @@ class PasswordlessRecipe(
     /**
      * Revokes a code by id
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun revokeCode(codeId: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.post(PATH_REVOKE_CODE, tenantId = tenantId) {
 
@@ -240,6 +248,7 @@ class PasswordlessRecipe(
     /**
      * Revokes all codes issued for the user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun revokeEmailCodes(email: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.post(PATH_REVOKE_CODES, tenantId = tenantId) {
 
@@ -260,6 +269,7 @@ class PasswordlessRecipe(
     /**
      * Revokes all codes issued for the user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun revokePhoneNumberCodes(phoneNumber: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.post(PATH_REVOKE_CODES, tenantId = tenantId) {
 
@@ -280,6 +290,7 @@ class PasswordlessRecipe(
     /**
      * Lists all active passwordless codes of the user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun getCodesByEmail(email: String, tenantId: String?): List<PasswordlessDevices> {
         val response = superTokens.get(
             PATH_GET_CODES,
@@ -299,6 +310,7 @@ class PasswordlessRecipe(
     /**
      * Lists all active passwordless codes of the user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun getCodesByDeviceId(deviceId: String, tenantId: String?): List<PasswordlessDevices> {
         val response = superTokens.get(
             PATH_GET_CODES,
@@ -318,6 +330,7 @@ class PasswordlessRecipe(
     /**
      * Lists all active passwordless codes of the user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun getCodesByPhoneNumber(phoneNumber: String, tenantId: String?): List<PasswordlessDevices> {
         val response = superTokens.get(
             PATH_GET_CODES,
@@ -337,6 +350,7 @@ class PasswordlessRecipe(
     /**
      * Lists all active passwordless codes of the user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun getCodesByPreAuthSessionId(preAuthSessionId: String, tenantId: String?): List<PasswordlessDevices> {
         val response = superTokens.get(
             PATH_GET_CODES,
@@ -356,6 +370,7 @@ class PasswordlessRecipe(
     /**
      * Update a user's phone number
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun updatePhoneNumber(userId: String, phoneNumber: String, tenantId: String?): SuperTokensStatus {
         val response = superTokens.put(PATH_UPDATE_USER, tenantId = tenantId) {
             header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)

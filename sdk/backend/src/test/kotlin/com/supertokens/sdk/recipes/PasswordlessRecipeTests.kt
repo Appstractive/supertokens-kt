@@ -1,8 +1,8 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.AppConfig
-import com.supertokens.sdk.common.SuperTokensStatusException
+import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.passwordless.PasswordlessRecipe
@@ -18,7 +18,6 @@ import com.supertokens.sdk.recipes.passwordless.recreatePasswordlessCode
 import com.supertokens.sdk.recipes.passwordless.revokePasswordlessCode
 import com.supertokens.sdk.recipes.passwordless.revokePasswordlessEmailCodes
 import com.supertokens.sdk.recipes.passwordless.revokePasswordlessPhoneNumberCodes
-import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -26,17 +25,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class PasswordlessRecipeTests {
+class PasswordlessRecipeTests : BaseTest() {
 
-    private val superTokens = superTokens(
-        connectionURI = "https://try.supertokens.com/",
-        appConfig = AppConfig(
-            name = "TestApp",
-        ),
-    ) {
-        recipe(Passwordless) {
-
-        }
+    override fun SuperTokensConfig.configure() {
+        recipe(Passwordless)
     }
 
     @Test
@@ -79,7 +71,11 @@ class PasswordlessRecipeTests {
         val code = superTokens.createPasswordlessEmailCode(TEST_USER)
         assertTrue(code.codeId.isNotEmpty())
 
-        val response = superTokens.consumePasswordlessUserInputCode(code.preAuthSessionId, code.deviceId, code.userInputCode)
+        val response = superTokens.consumePasswordlessUserInputCode(
+            code.preAuthSessionId,
+            code.deviceId,
+            code.userInputCode
+        )
         assertEquals(TEST_USER, response.user.email)
     }
 
@@ -90,7 +86,11 @@ class PasswordlessRecipeTests {
 
         val exception = assertThrows(SuperTokensStatusException::class.java) {
             runBlocking {
-                superTokens.consumePasswordlessUserInputCode(code.preAuthSessionId, code.deviceId, "wrong code")
+                superTokens.consumePasswordlessUserInputCode(
+                    code.preAuthSessionId,
+                    code.deviceId,
+                    "wrong code"
+                )
             }
         }
 
@@ -176,7 +176,6 @@ class PasswordlessRecipeTests {
     }
 
     companion object {
-        const val TEST_USER = "test@test.de"
         const val TEST_PHONE_NUMBER = "+491601234567"
     }
 

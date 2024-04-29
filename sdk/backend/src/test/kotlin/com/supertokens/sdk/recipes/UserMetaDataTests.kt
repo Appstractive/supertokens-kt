@@ -1,6 +1,6 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.core.getUsersByEMail
 import com.supertokens.sdk.recipe
@@ -9,7 +9,6 @@ import com.supertokens.sdk.recipes.usermetadata.UserMetaDataRecipe
 import com.supertokens.sdk.recipes.usermetadata.deleteUserMetaData
 import com.supertokens.sdk.recipes.usermetadata.getUserMetaData
 import com.supertokens.sdk.recipes.usermetadata.updateUserMetaData
-import com.supertokens.sdk.superTokens
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -18,7 +17,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class UserMetaDataTests {
+class UserMetaDataTests : BaseTest() {
 
     private enum class TestEnum {
         VALUE1,
@@ -34,12 +33,7 @@ class UserMetaDataTests {
         val enum: TestEnum,
     )
 
-    private val superTokens = superTokens(
-        connectionURI = "https://try.supertokens.com/",
-        appConfig = AppConfig(
-            name = "TestApp",
-        ),
-    ) {
+    override fun SuperTokensConfig.configure() {
         recipe(UserMetaData)
     }
 
@@ -78,7 +72,6 @@ class UserMetaDataTests {
     }
 
     companion object {
-        const val TEST_USER = "test@test.de"
 
         private val jsonEncoder = Json { encodeDefaults = true }
 

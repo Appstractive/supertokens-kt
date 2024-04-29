@@ -1,6 +1,6 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.AppConfig
+import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.thirdparty.ThirdParty
@@ -14,7 +14,6 @@ import com.supertokens.sdk.recipes.thirdparty.providers.github.Github
 import com.supertokens.sdk.recipes.thirdparty.providers.gitlab.GitLab
 import com.supertokens.sdk.recipes.thirdparty.providers.google.Google
 import com.supertokens.sdk.recipes.thirdparty.thirdPartySignInUp
-import com.supertokens.sdk.superTokens
 import io.fusionauth.jwt.Verifier
 import io.fusionauth.jwt.domain.Algorithm
 import io.fusionauth.jwt.domain.JWT
@@ -23,14 +22,9 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class ThirdPartyRecipeTests {
+class ThirdPartyRecipeTests : BaseTest() {
 
-    private val superTokens = superTokens(
-        connectionURI = "https://try.supertokens.com/",
-        appConfig = AppConfig(
-            name = "TestApp",
-        ),
-    ) {
+    override fun SuperTokensConfig.configure() {
         recipe(ThirdParty) {
 
             provider(Github) {
@@ -83,8 +77,8 @@ class ThirdPartyRecipeTests {
             github.getAccessTokenEndpoint("auth", "redirect://somewhere").fullUrl,
         )
         assertEquals(
-            "https://github.com/login/oauth/authorize?scope=read%3Auser+user%3Aemail&client_id=123456",
-            github.getAuthorizationEndpoint().fullUrl,
+            "https://github.com/login/oauth/authorize?scope=read%3Auser+user%3Aemail&client_id=123456&redirect_uri=app%3A%2F%2Fredirect",
+            github.getAuthorizationEndpoint("app://redirect").fullUrl,
         )
     }
 
@@ -95,15 +89,20 @@ class ThirdPartyRecipeTests {
         val apple = recipe.getProviderById(ThirdPartyProvider.APPLE) as? AppleProvider
         assertNotNull(apple)
         assertEquals(
-            "https://appleid.apple.com/auth/authorize?scope=email&client_id=123456&response_mode=form_post&response_type=code",
-            apple.getAuthorizationEndpoint().fullUrl,
+            "https://appleid.apple.com/auth/authorize?scope=email&client_id=123456&redirect_uri=app%3A%2F%2Fredirect&response_mode=form_post&response_type=code",
+            apple.getAuthorizationEndpoint("app://redirect").fullUrl,
         )
 
         val clientSecret = apple.clientSecret
-        val jwt = JWT.getDecoder().decode(clientSecret, object: Verifier {
+        val jwt = JWT.getDecoder().decode(clientSecret, object : Verifier {
             override fun canVerify(algorithm: Algorithm?) = true
 
-            override fun verify(algorithm: Algorithm?, message: ByteArray?, signature: ByteArray?) {}
+            override fun verify(
+                algorithm: Algorithm?,
+                message: ByteArray?,
+                signature: ByteArray?
+            ) {
+            }
         })
         assertEquals("https://appleid.apple.com", jwt.audience)
         assertEquals("teamid", jwt.issuer)
@@ -121,8 +120,8 @@ class ThirdPartyRecipeTests {
             facebook.getAccessTokenEndpoint("auth", "redirect://somewhere").fullUrl,
         )
         assertEquals(
-            "https://www.facebook.com/v9.0/dialog/oauth?scope=email&client_id=123456",
-            facebook.getAuthorizationEndpoint().fullUrl,
+            "https://www.facebook.com/v9.0/dialog/oauth?scope=email&client_id=123456&redirect_uri=app%3A%2F%2Fredirect",
+            facebook.getAuthorizationEndpoint("app://redirect").fullUrl,
         )
     }
 
@@ -137,8 +136,8 @@ class ThirdPartyRecipeTests {
             bitbucket.getAccessTokenEndpoint("auth", "redirect://somewhere").fullUrl,
         )
         assertEquals(
-            "https://bitbucket.org/site/oauth2/authorize?scope=account+email&client_id=123456&access_type=offline&response_type=code",
-            bitbucket.getAuthorizationEndpoint().fullUrl,
+            "https://bitbucket.org/site/oauth2/authorize?scope=account+email&client_id=123456&redirect_uri=app%3A%2F%2Fredirect&access_type=offline&response_type=code",
+            bitbucket.getAuthorizationEndpoint("app://redirect").fullUrl,
         )
     }
 
@@ -153,8 +152,8 @@ class ThirdPartyRecipeTests {
             gitlab.getAccessTokenEndpoint("auth", "redirect://somewhere").fullUrl,
         )
         assertEquals(
-            "https://gitlab.com/oauth/authorize?scope=read_user&client_id=123456&response_type=code",
-            gitlab.getAuthorizationEndpoint().fullUrl,
+            "https://gitlab.com/oauth/authorize?scope=read_user&client_id=123456&redirect_uri=app%3A%2F%2Fredirect&response_type=code",
+            gitlab.getAuthorizationEndpoint("app://redirect").fullUrl,
         )
     }
 
@@ -169,8 +168,8 @@ class ThirdPartyRecipeTests {
             google.getAccessTokenEndpoint("auth", "redirect://somewhere").fullUrl,
         )
         assertEquals(
-            "https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&client_id=123456&access_type=offline&response_type=code&include_granted_scopes=true",
-            google.getAuthorizationEndpoint().fullUrl,
+            "https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&client_id=123456&redirect_uri=app%3A%2F%2Fredirect&access_type=offline&response_type=code&include_granted_scopes=true",
+            google.getAuthorizationEndpoint("app://redirect").fullUrl,
         )
     }
 
@@ -182,8 +181,7 @@ class ThirdPartyRecipeTests {
     }
 
     companion object {
-        const val TEST_USER = "test@test.de"
-        
+
         const val privateKey = "-----BEGIN EC PRIVATE KEY-----\n" +
                 "MHcCAQEEIA15hjyZS/pWzMgI4SOlwKbbG4/c+3vQcFCfQaRhoFbzoAoGCCqGSM49\n" +
                 "AwEHoUQDQgAEkrYPIhuxDLQg8QKQnnto8JUFb13yWpY+venFhEzjhBwMgFl3oueT\n" +

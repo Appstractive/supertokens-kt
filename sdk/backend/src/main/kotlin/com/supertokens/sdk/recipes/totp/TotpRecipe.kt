@@ -1,18 +1,18 @@
 package com.supertokens.sdk.recipes.totp
 
-import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.HEADER_RECIPE_ID
 import com.supertokens.sdk.common.RECIPE_TOTP
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.get
 import com.supertokens.sdk.post
+import com.supertokens.sdk.put
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
-import com.supertokens.sdk.recipes.session.SessionRecipe
 import com.supertokens.sdk.recipes.totp.models.TotpDevice
 import com.supertokens.sdk.recipes.totp.requests.AddTotpDeviceRequest
 import com.supertokens.sdk.recipes.totp.requests.ChangeTotpDeviceNameRequest
@@ -20,14 +20,16 @@ import com.supertokens.sdk.recipes.totp.requests.RemoveTotpDeviceRequest
 import com.supertokens.sdk.recipes.totp.requests.VerifyTotpCodeRequest
 import com.supertokens.sdk.recipes.totp.requests.VerifyTotpDeviceRequest
 import com.supertokens.sdk.recipes.totp.responses.AddTotpDeviceResponseDTO
+import com.supertokens.sdk.recipes.totp.responses.ImportTotpDeviceResponseDTO
 import com.supertokens.sdk.recipes.totp.responses.RemoveTotpDeviceResponseDTO
 import com.supertokens.sdk.recipes.totp.responses.TotpDevicesResponseDTO
 import com.supertokens.sdk.recipes.totp.responses.VerifyTotpDeviceResponseDTO
 import com.supertokens.sdk.utils.parse
+import io.ktor.client.call.body
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 
-class TotpRecipeConfig: RecipeConfig {
+class TotpRecipeConfig : RecipeConfig {
 
     var defaultSkew: Int = 1
     var defaultPeriod: Int = 30
@@ -38,10 +40,10 @@ class TotpRecipeConfig: RecipeConfig {
 class TotpRecipe(
     private val superTokens: SuperTokens,
     private val config: TotpRecipeConfig
-): Recipe<TotpRecipeConfig> {
+) : Recipe<TotpRecipeConfig> {
 
-    val defaultSkew = config.defaultSkew
-    val defaultPeriod = config.defaultPeriod
+    private val defaultSkew = config.defaultSkew
+    private val defaultPeriod = config.defaultPeriod
     val issuer by lazy {
         config.issuer ?: superTokens.appConfig.name
     }
@@ -51,7 +53,13 @@ class TotpRecipe(
      *
      * @return the TOTP device secret
      */
-    suspend fun addDevice(userId: String, deviceName: String, skew: Int? = null, period: Int? = null): String {
+    @Throws(SuperTokensStatusException::class)
+    suspend fun addDevice(
+        userId: String,
+        deviceName: String,
+        skew: Int? = null,
+        period: Int? = null
+    ): String {
         val response = superTokens.post(PATH_TOTP_DEVICE, tenantId = null) {
 
             header(HEADER_RECIPE_ID, RECIPE_TOTP)
@@ -74,8 +82,13 @@ class TotpRecipe(
     /**
      * Update the name of a TOTP device for a user.
      */
-    suspend fun changeDeviceName(userId: String, oldDeviceName: String, newDeviceName: String): SuperTokensStatus {
-        val response = superTokens.post(PATH_TOTP_DEVICE, tenantId = null) {
+    @Throws(SuperTokensStatusException::class)
+    suspend fun changeDeviceName(
+        userId: String,
+        oldDeviceName: String,
+        newDeviceName: String
+    ): SuperTokensStatus {
+        val response = superTokens.put(PATH_TOTP_DEVICE, tenantId = null) {
 
             header(HEADER_RECIPE_ID, RECIPE_TOTP)
 
@@ -94,8 +107,42 @@ class TotpRecipe(
     }
 
     /**
+     * Add a TOTP device for a user and enable TOTP if not already enabled.
+     *
+     * @return the TOTP device name
+     */
+    @Throws(SuperTokensStatusException::class)
+    suspend fun importDevice(
+        userId: String,
+        deviceName: String,
+        secretKey: String,
+        skew: Int? = null,
+        period: Int? = null
+    ): String {
+        val response = superTokens.post(PATH_TOTP_DEVICE_IMPORT, tenantId = null) {
+
+            header(HEADER_RECIPE_ID, RECIPE_TOTP)
+
+            setBody(
+                AddTotpDeviceRequest(
+                    userId = userId,
+                    deviceName = deviceName,
+                    skew = skew ?: defaultSkew,
+                    period = period ?: defaultPeriod,
+                    secretKey = secretKey,
+                )
+            )
+        }
+
+        return response.parse<ImportTotpDeviceResponseDTO, String> {
+            checkNotNull(it.deviceName)
+        }
+    }
+
+    /**
      * Retrieve a list of TOTP devices for a user.
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun getDevices(userId: String): List<TotpDevice> {
         val response = superTokens.get(
             PATH_TOTP_DEVICES,
@@ -125,6 +172,7 @@ class TotpRecipe(
      *
      * @return true, if the device existed
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun removeDevice(userId: String, deviceName: String): Boolean {
         val response = superTokens.post(PATH_TOTP_DEVICE_REMOVE, tenantId = null) {
 
@@ -146,7 +194,13 @@ class TotpRecipe(
     /**
      * Check if a TOTP code is valid against any of the TOTP devices for a user.
      */
-    suspend fun verifyCode(userId: String, totp: String, tenantId: String?): Boolean {
+    @Throws(SuperTokensStatusException::class)
+    suspend fun verifyCode(
+        userId: String,
+        totp: String,
+        allowUnverifiedDevices: Boolean = false,
+        tenantId: String?
+    ): Boolean {
         val response = superTokens.post(PATH_TOTP_CODE_VERIFY, tenantId = tenantId) {
 
             header(HEADER_RECIPE_ID, RECIPE_TOTP)
@@ -155,13 +209,12 @@ class TotpRecipe(
                 VerifyTotpCodeRequest(
                     userId = userId,
                     totp = totp,
+                    allowUnverifiedDevices = allowUnverifiedDevices,
                 )
             )
         }
 
-        return response.parse<StatusResponseDTO, Boolean> {
-            it.status == SuperTokensStatus.OK.value
-        }
+        return response.parse() == SuperTokensStatus.OK
     }
 
     /**
@@ -169,7 +222,13 @@ class TotpRecipe(
      *
      * @return true, if the device was already verified
      */
-    suspend fun verifyDevice(userId: String, deviceName: String, totp: String, tenantId: String?): Boolean {
+    @Throws(SuperTokensStatusException::class)
+    suspend fun verifyDevice(
+        userId: String,
+        deviceName: String,
+        totp: String,
+        tenantId: String?,
+    ): Boolean {
         val response = superTokens.post(PATH_TOTP_DEVICE_VERIFY, tenantId = tenantId) {
 
             header(HEADER_RECIPE_ID, RECIPE_TOTP)
@@ -191,6 +250,7 @@ class TotpRecipe(
     companion object {
         const val PATH_TOTP_DEVICE = "/recipe/totp/device"
         const val PATH_TOTP_DEVICES = "/recipe/totp/device/list"
+        const val PATH_TOTP_DEVICE_IMPORT = "/recipe/totp/device/import"
         const val PATH_TOTP_DEVICE_REMOVE = "/recipe/totp/device/remove"
         const val PATH_TOTP_CODE_VERIFY = "/recipe/totp/verify"
         const val PATH_TOTP_DEVICE_VERIFY = "/recipe/totp/device/verify"
@@ -198,7 +258,7 @@ class TotpRecipe(
 
 }
 
-val Totp = object: RecipeBuilder<TotpRecipeConfig, TotpRecipe>() {
+val Totp = object : RecipeBuilder<TotpRecipeConfig, TotpRecipe>() {
 
     override fun install(configure: TotpRecipeConfig.() -> Unit): (SuperTokens) -> TotpRecipe {
         val config = TotpRecipeConfig().apply(configure)
@@ -224,7 +284,26 @@ suspend fun SuperTokens.addTotpDevice(
     userId = userId,
     deviceName = deviceName,
     skew = skew,
-    period = period
+    period = period,
+)
+
+/**
+ * Add a TOTP device for a user and enable TOTP if not already enabled.
+ *
+ * @return the TOTP device secret
+ */
+suspend fun SuperTokens.importTotpDevice(
+    userId: String,
+    deviceName: String,
+    secretKey: String,
+    skew: Int? = null,
+    period: Int? = null,
+) = getRecipe<TotpRecipe>().importDevice(
+    userId = userId,
+    deviceName = deviceName,
+    secretKey = secretKey,
+    skew = skew,
+    period = period,
 )
 
 /**
@@ -266,10 +345,12 @@ suspend fun SuperTokens.removeTotpDevice(
 suspend fun SuperTokens.verifyTotpCode(
     userId: String,
     totp: String,
+    allowUnverifiedDevices: Boolean = false,
     tenantId: String? = null,
 ) = getRecipe<TotpRecipe>().verifyCode(
     userId = userId,
     totp = totp,
+    allowUnverifiedDevices = allowUnverifiedDevices,
     tenantId = tenantId
 )
 

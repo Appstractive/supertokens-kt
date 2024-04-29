@@ -5,6 +5,7 @@ import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.HEADER_RECIPE_ID
 import com.supertokens.sdk.common.RECIPE_META_DATA
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.extractedContent
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toJsonElement
@@ -33,6 +34,7 @@ class UserMetaDataRecipe(
     /**
      * Gets the stored metadata object of the user
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun getMetaData(userId: String): Map<String, Any?> {
         val response = superTokens.get(
             PATH_META_DATA,
@@ -57,6 +59,7 @@ class UserMetaDataRecipe(
      *  update: { "notifications": { "sms": true }, "todos": null }
      *  result: { "preferences": { "theme":"dark" }, "notifications": { "sms": true } }
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun updateMetaData(userId: String, metaData: Map<String, Any?>): Map<String, Any?> {
         val response = superTokens.put(PATH_META_DATA, tenantId = null) {
 
@@ -78,6 +81,7 @@ class UserMetaDataRecipe(
     /**
      * Removes the entire metadata JSON stored about the user.
      */
+    @Throws(SuperTokensStatusException::class)
     suspend fun deleteMetaData(userId: String): SuperTokensStatus {
         val response = superTokens.post(PATH_META_DATA_REMOVE, tenantId = null) {
 
