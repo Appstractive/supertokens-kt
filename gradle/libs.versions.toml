@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.22" # https://kotlinlang.org/docs/releases.html#release-details
+kotlin = "1.9.23" # https://kotlinlang.org/docs/releases.html#release-details
 agp = "8.2.1" # https://developer.android.com/studio/releases/gradle-plugin
 
 compileSdk = "34"
@@ -8,9 +8,9 @@ minSdk = "24"
 android-startup = "1.1.1"
 android-crypto = "1.1.0-alpha06"
 
-ktor_version = "2.3.6"
+ktor_version = "2.3.9"
 
-kotlin-serialization = "1.6.0"
+kotlin-serialization = "1.6.2"
 kotlin-coroutines = "1.7.3"
 
 jwt = "5.2.4"

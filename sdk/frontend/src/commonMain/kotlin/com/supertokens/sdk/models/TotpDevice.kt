@@ -1,4 +1,5 @@
-package com.supertokens.sdk.recipes.totp.models
+package com.supertokens.sdk.models
+
 
 data class TotpDevice(
     val name: String,

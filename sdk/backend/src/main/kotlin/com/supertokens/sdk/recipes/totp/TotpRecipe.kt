@@ -5,6 +5,7 @@ import com.supertokens.sdk.common.HEADER_RECIPE_ID
 import com.supertokens.sdk.common.RECIPE_TOTP
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
+import com.supertokens.sdk.common.responses.GetTotpDevicesResponseDTO
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.get
@@ -155,7 +156,7 @@ class TotpRecipe(
             header(HEADER_RECIPE_ID, RECIPE_TOTP)
         }
 
-        return response.parse<TotpDevicesResponseDTO, List<TotpDevice>> {
+        return response.parse<GetTotpDevicesResponseDTO, List<TotpDevice>> {
             requireNotNull(it.devices).map { device ->
                 TotpDevice(
                     name = device.name,

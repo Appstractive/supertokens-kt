@@ -67,6 +67,10 @@ fun String.toStatus(): SuperTokensStatus {
         SuperTokensStatus.TotpDeviceUnknownError.value -> SuperTokensStatus.TotpDeviceUnknownError
         SuperTokensStatus.InvalidTotpCodeError.value -> SuperTokensStatus.InvalidTotpCodeError
         SuperTokensStatus.TotpLimitReachedError.value -> SuperTokensStatus.TotpLimitReachedError
+        SuperTokensStatus.AccountInfoAlreadyAssociatedError.value -> SuperTokensStatus.AccountInfoAlreadyAssociatedError
+        SuperTokensStatus.RecipeUserIdAlreadyLinkedWithAnotherPrimaryUserError.value -> SuperTokensStatus.RecipeUserIdAlreadyLinkedWithAnotherPrimaryUserError
+        SuperTokensStatus.RecipeUserIdAlreadyLinkedError.value -> SuperTokensStatus.RecipeUserIdAlreadyLinkedError
+        SuperTokensStatus.NotPrimaryUserError.value -> SuperTokensStatus.NotPrimaryUserError
         else -> SuperTokensStatus.UnknownError
     }
 }

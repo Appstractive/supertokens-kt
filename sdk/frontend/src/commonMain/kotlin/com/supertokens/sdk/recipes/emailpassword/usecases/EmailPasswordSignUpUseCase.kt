@@ -59,8 +59,6 @@ class EmailPasswordSignUpUseCase(
             )
 
             else -> throw SuperTokensStatusException(body.status.toStatus())
-        }.also { user ->
-            authRepository.setAuthenticated(user.id)
         }
     }
 

@@ -66,7 +66,7 @@ class SuperTokensClient(
     private val config: SuperTokensClientConfig,
 ) {
 
-    val scope: CoroutineScope
+    internal val scope: CoroutineScope
         get() = config.scope
 
     val tenantId: String?

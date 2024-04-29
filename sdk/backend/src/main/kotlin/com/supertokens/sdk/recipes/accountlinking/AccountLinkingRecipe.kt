@@ -33,7 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-typealias ShouldDoAccountLinking = suspend (User) -> ShouldDoAccountLinkingResult
+typealias ShouldDoAccountLinking = suspend (SuperTokens, User) -> ShouldDoAccountLinkingResult
 
 data class ShouldDoAccountLinkingResult(
     val shouldAutomaticallyLink: Boolean = false,
@@ -41,7 +41,7 @@ data class ShouldDoAccountLinkingResult(
 )
 
 class AccountLinkingRecipeConfig : RecipeConfig {
-    var shouldDoAutomaticAccountLinking: ShouldDoAccountLinking = { ShouldDoAccountLinkingResult() }
+    var shouldDoAutomaticAccountLinking: ShouldDoAccountLinking = { _, _ -> ShouldDoAccountLinkingResult() }
 
     var scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 }
@@ -87,7 +87,7 @@ class AccountLinkingRecipe(
     private suspend fun tryLinkAccounts(user: User, recipeId: String) {
         runCatching {
             // TODO verify handling
-            val result = config.shouldDoAutomaticAccountLinking(user)
+            val result = config.shouldDoAutomaticAccountLinking(superTokens, user)
 
             if (result.shouldAutomaticallyLink) {
                 val primaryUser = if (!user.isPrimaryUser) {

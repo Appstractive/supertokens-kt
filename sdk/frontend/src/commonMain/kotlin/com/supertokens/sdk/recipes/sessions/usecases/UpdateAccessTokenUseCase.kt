@@ -15,7 +15,10 @@ class UpdateAccessTokenUseCase(
         userRepository.setClaimsFromJwt(token)
 
         userRepository.getUserId()?.let {
-            authRepository.setAuthenticated(it)
+            authRepository.setAuthenticated(
+                userId = it,
+                multiFactorVerified = userRepository.isMultiFactorVerified(),
+            )
         }
     }
 

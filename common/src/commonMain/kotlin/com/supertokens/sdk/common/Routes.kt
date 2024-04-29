@@ -47,4 +47,14 @@ object Routes {
 
     }
 
+    object Totp {
+
+        const val GET_DEVICES = "totp/device/list"
+        const val CREATE_DEVICE = "totp/device"
+        const val REMOVE_DEVICE = "totp/device/remove"
+        const val VERIFY_DEVICE = "totp/device/verify"
+        const val VERIFY = "totp/verify"
+
+    }
+
 }

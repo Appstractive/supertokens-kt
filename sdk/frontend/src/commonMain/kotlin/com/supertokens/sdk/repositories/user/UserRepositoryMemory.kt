@@ -1,29 +1,18 @@
 package com.supertokens.sdk.repositories.user
 
+import com.supertokens.sdk.common.claims.AccessTokenClaims
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class UserRepositoryMemory: UserRepository {
 
-    private var myClaims: Map<String, Any?> = emptyMap()
+    override val claims: MutableStateFlow<AccessTokenClaims?> = MutableStateFlow(null)
 
-    override val userId: MutableStateFlow<String?> = MutableStateFlow(null)
-    override val roles: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
-    override val permissions: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
-    override val email: MutableStateFlow<String?> = MutableStateFlow(null)
-    override val emailVerified: MutableStateFlow<Boolean> = MutableStateFlow(false)
-
-    override suspend fun setClaims(claims: Map<String, Any?>?) {
-        myClaims = claims ?: emptyMap()
-
-        userId.value = claims.getUserID()
-        roles.value = claims.getRoles()
-        permissions.value = claims.getPermissions()
-        email.value = claims.getEmail()
-        emailVerified.value = claims.getEmailVerified()
+    override suspend fun setClaims(claims: AccessTokenClaims?) {
+        this.claims.value = claims
     }
 
-    override suspend fun getClaims(): Map<String, Any?> {
-        return myClaims
+    override suspend fun getClaims(): AccessTokenClaims? {
+        return claims.value
     }
 
 }
