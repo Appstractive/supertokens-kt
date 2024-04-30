@@ -1,7 +1,5 @@
 package com.supertokens.sdk.recipes.multifactor
 
-import com.supertokens.sdk.recipes.multifactor.AuthFactor.OTP_PHONE.equals
-
 sealed interface AuthFactor {
 
     fun isValidFor(factors: Map<String, Number>): Boolean
@@ -63,5 +61,9 @@ sealed interface AuthFactor {
         OTP_PHONE -> key == OTP_EMAIL.key
         TOTP -> key == OTP_PHONE.key
         else -> false
+    }
+
+    fun List<AuthFactor>.isValid(factors: Map<String, Number>): Boolean {
+        return all { it.isValidFor(factors) }
     }
 }

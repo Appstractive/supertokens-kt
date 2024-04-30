@@ -23,6 +23,7 @@ import com.supertokens.sdk.common.responses.StartPasswordlessSignInUpResponseDTO
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
+import com.supertokens.sdk.recipes.multifactor.AuthFactor
 import com.supertokens.sdk.recipes.passwordless.models.LoginMagicLinkOtpTemplate
 import com.supertokens.sdk.recipes.passwordless.models.LoginMagicLinkTemplate
 import com.supertokens.sdk.recipes.passwordless.models.LoginOtpTemplate
@@ -188,6 +189,11 @@ open class PasswordlessHandler(
         val body = call.receive<ConsumePasswordlessCodeRequestDTO>()
         val tenantId = call.tenantId
 
+        val codeData = passwordless.getCodesByPreAuthSessionId(
+            preAuthSessionId = body.preAuthSessionId,
+            tenantId = tenantId
+        )
+
         val response = when (passwordless.flowType) {
             PasswordlessMode.MAGIC_LINK -> passwordless.consumeLinkCode(
                 preAuthSessionId = body.preAuthSessionId,
@@ -231,10 +237,6 @@ open class PasswordlessHandler(
         }
 
         if (isEmailVerificationEnabled) {
-            val codeData = passwordless.getCodesByPreAuthSessionId(
-                preAuthSessionId = body.preAuthSessionId,
-                tenantId = tenantId
-            )
             codeData.forEach {
                 it.email?.let { email ->
                     emailVerification.setVerified(
@@ -261,6 +263,11 @@ open class PasswordlessHandler(
                     user = response.user,
                     tenantId = tenantId,
                     recipeId = RECIPE_PASSWORDLESS,
+                    multiAuthFactor = when {
+                        codeData.any { it.email != null } -> AuthFactor.OTP_EMAIL
+                        codeData.any { it.phoneNumber != null } -> AuthFactor.OTP_PHONE
+                        else -> null
+                    },
                     accessToken = accessToken,
                 ),
                 tenantId = tenantId,

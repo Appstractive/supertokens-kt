@@ -23,6 +23,7 @@ import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.post
 import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailTokenResponseDTO
+import com.supertokens.sdk.recipes.multifactor.AuthFactor
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
@@ -64,7 +65,13 @@ class EmailVerificationRecipe(
         } ?: true
     }
 
-    override suspend fun getExtraJwtData(user: User, tenantId: String?, recipeId: String, accessToken: String?): Map<String, Any?> {
+    override suspend fun getExtraJwtData(
+        user: User,
+        tenantId: String?,
+        recipeId: String,
+        authFactor: AuthFactor?,
+        accessToken: String?
+    ): Map<String, Any?> {
         return buildMap {
             set(Claims.EMAIL_VERIFIED, isVerified(user.id, user.email))
         }

@@ -11,7 +11,6 @@ import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.EndpointConfig
-import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
 import com.supertokens.sdk.common.RECIPE_EMAIL_VERIFICATION
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
@@ -26,7 +25,6 @@ import com.supertokens.sdk.recipes.emailverification.models.EmailVerificationTem
 import com.supertokens.sdk.recipes.session.getSessions
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
-import io.ktor.server.request.header
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
@@ -112,6 +110,7 @@ open class EmailVerificationHandler(
                     user = superTokens.getUserById(data.userId),
                     tenantId = tenantId,
                     recipeId = RECIPE_EMAIL_VERIFICATION,
+                    multiAuthFactor = null,
                     accessToken = accessToken,
                 )
 
@@ -164,6 +163,7 @@ open class EmailVerificationHandler(
                     user = superTokens.getUserById(user.id),
                     tenantId = call.tenantId,
                     recipeId = RECIPE_EMAIL_VERIFICATION,
+                    multiAuthFactor = null,
                     accessToken = accessToken,
                 ),
             )

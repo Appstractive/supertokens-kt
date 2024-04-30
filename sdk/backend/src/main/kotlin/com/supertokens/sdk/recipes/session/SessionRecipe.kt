@@ -18,6 +18,7 @@ import com.supertokens.sdk.recipes.CustomJwtData
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
+import com.supertokens.sdk.recipes.multifactor.AuthFactor
 import com.supertokens.sdk.recipes.session.models.GetSessionData
 import com.supertokens.sdk.recipes.session.models.VerifySessionData
 import com.supertokens.sdk.recipes.session.requests.CreateSessionRequest
@@ -116,7 +117,13 @@ class SessionRecipe(
         config.issuer ?: superTokens.appConfig.api.host
     }
 
-    suspend fun getJwtData(user: User, tenantId: String?, recipeId: String, accessToken: String?): Map<String, Any?> = buildMap {
+    suspend fun getJwtData(
+        user: User,
+        tenantId: String?,
+        recipeId: String,
+        multiAuthFactor: AuthFactor?,
+        accessToken: String?
+    ): Map<String, Any?> = buildMap {
         set(Claims.ISSUER, issuer)
         set(Claims.AUDIENCE, superTokens.appConfig.frontends.map { it.host })
 
@@ -132,6 +139,7 @@ class SessionRecipe(
                 user = user,
                 tenantId = tenantId,
                 recipeId = recipeId,
+                authFactor = multiAuthFactor,
                 accessToken = accessToken,
             ).forEach { entry ->
                 set(entry.key, entry.value)

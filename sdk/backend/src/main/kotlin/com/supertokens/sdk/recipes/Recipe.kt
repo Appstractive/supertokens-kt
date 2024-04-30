@@ -3,6 +3,7 @@ package com.supertokens.sdk.recipes
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.SuperTokensRecipeDslMarker
 import com.supertokens.sdk.common.models.User
+import com.supertokens.sdk.recipes.multifactor.AuthFactor
 
 @SuperTokensRecipeDslMarker
 interface RecipeConfig
@@ -12,6 +13,7 @@ interface Recipe<C: RecipeConfig> {
         user: User,
         tenantId: String?,
         recipeId: String,
+        authFactor: AuthFactor?,
         accessToken: String?,
     ): Map<String, Any?> = emptyMap()
 

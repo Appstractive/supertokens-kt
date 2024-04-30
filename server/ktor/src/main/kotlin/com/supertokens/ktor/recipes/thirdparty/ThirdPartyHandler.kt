@@ -79,6 +79,7 @@ open class ThirdPartyHandler(
                     user = response.user,
                     tenantId = null,
                     recipeId = RECIPE_THIRD_PARTY,
+                    multiAuthFactor = null,
                     accessToken = null,
                 ),
             )
@@ -154,6 +155,7 @@ open class ThirdPartyHandler(
                     user = response.user,
                     tenantId = null,
                     recipeId = RECIPE_THIRD_PARTY,
+                    multiAuthFactor = null,
                     accessToken = null,
                 ),
             )

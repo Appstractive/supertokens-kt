@@ -114,7 +114,8 @@ open class EmailPasswordHandler(
                     user = user,
                     tenantId = tenantId,
                     recipeId = RECIPE_EMAIL_PASSWORD,
-                    sessionHandle = null,
+                    multiAuthFactor = null,
+                    accessToken = null,
                 ),
                 tenantId = tenantId,
             )
@@ -159,7 +160,8 @@ open class EmailPasswordHandler(
                         user = user,
                         tenantId = tenantId,
                         recipeId = RECIPE_EMAIL_PASSWORD,
-                        sessionHandle = null,
+                        multiAuthFactor = null,
+                        accessToken = null,
                     ),
                     userDataInDatabase = buildMap {
                         additionalFormField.forEach {

@@ -2,6 +2,10 @@ package com.supertokens.sdk.recipes.multifactor
 
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.Claims
+import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
+import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
+import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
+import com.supertokens.sdk.common.RECIPE_TOTP
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
@@ -27,7 +31,13 @@ class MultiFactorAuthRecipe(
     val firstFactors = config.firstFactors
     val getRequiredMultiFactors = config.getRequiredMultiFactors
 
-    override suspend fun getExtraJwtData(user: User, tenantId: String?, recipeId: String, accessToken: String?): Map<String, Any?> {
+    override suspend fun getExtraJwtData(
+        user: User,
+        tenantId: String?,
+        recipeId: String,
+        multiAuthFactor: AuthFactor?,
+        accessToken: String?
+    ): Map<String, Any?> {
         val userDataInJWT = accessToken?.let { token ->
             runCatching {
                 superTokens.verifySession(
@@ -39,8 +49,30 @@ class MultiFactorAuthRecipe(
 
         val mfaData = (userDataInJWT[Claims.MFA] as? Map<String, Any?>) ?: emptyMap()
         val factors = mfaData.getFactors().toMutableMap().apply {
-            if(!contains(recipeId)) {
-                put(recipeId, System.currentTimeMillis())
+            when(recipeId) {
+                RECIPE_EMAIL_PASSWORD -> {
+                    if(!contains(recipeId)) {
+                        put(recipeId, System.currentTimeMillis())
+                    }
+                }
+                RECIPE_PASSWORDLESS -> {
+                    if(!contains(recipeId)) {
+                        put(recipeId, System.currentTimeMillis())
+                    }
+                    else if(contains(RECIPE_EMAIL_PASSWORD) || contains(RECIPE_THIRD_PARTY)) {
+                        when(multiAuthFactor) {
+                            AuthFactor.OTP_EMAIL -> put(AuthFactor.OTP_EMAIL.key, System.currentTimeMillis())
+                            AuthFactor.OTP_PHONE -> put(AuthFactor.OTP_PHONE.key, System.currentTimeMillis())
+                            else -> {}
+                        }
+
+                    }
+                }
+                RECIPE_TOTP -> {
+                    if(!contains(AuthFactor.TOTP.key)) {
+                        put(AuthFactor.TOTP.key, System.currentTimeMillis())
+                    }
+                }
             }
         }
 
