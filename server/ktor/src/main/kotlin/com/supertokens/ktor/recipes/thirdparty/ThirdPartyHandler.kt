@@ -1,12 +1,13 @@
 package com.supertokens.ktor.recipes.thirdparty
 
+import com.supertokens.ktor.recipes.session.isSessionsEnabled
 import com.supertokens.ktor.recipes.session.sessions
-import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.userHandler
 import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.NotFoundException
 import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
 import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequestDTO
 import com.supertokens.sdk.common.responses.AuthorizationUrlResponseDTO
@@ -23,13 +24,15 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
-import java.security.SecureRandom
 
 open class ThirdPartyHandler(
     protected val scope: CoroutineScope,
 ) {
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.handleMissingEmail(provider: Provider<*>, userInfo: ThirdPartyUserInfo): String {
+    open suspend fun PipelineContext<Unit, ApplicationCall>.handleMissingEmail(
+        provider: Provider<*>,
+        userInfo: ThirdPartyUserInfo
+    ): String {
         return "${userInfo.id}@${provider.id}.temp"
     }
 
@@ -68,13 +71,15 @@ open class ThirdPartyHandler(
             }
         }
 
-        if (sessionsEnabled) {
+        if (isSessionsEnabled) {
             val session = sessions.createSession(
                 userId = response.user.id,
                 tenantId = null,
                 userDataInJWT = sessions.getJwtData(
                     user = response.user,
                     tenantId = null,
+                    recipeId = RECIPE_THIRD_PARTY,
+                    accessToken = null,
                 ),
             )
 
@@ -99,13 +104,16 @@ open class ThirdPartyHandler(
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.getAuthorizationUrl() {
         val thirdPartyId = call.parameters["thirdPartyId"] ?: throw NotFoundException()
-        val redirectURIOnProviderDashboard = call.parameters["redirectURIOnProviderDashboard"] ?: throw NotFoundException()
+        val redirectURIOnProviderDashboard =
+            call.parameters["redirectURIOnProviderDashboard"] ?: throw NotFoundException()
 
         val provider = thirdParty.getProviderById(thirdPartyId) ?: throw NotFoundException()
 
         call.respond(
             AuthorizationUrlResponseDTO(
-                urlWithQueryParams = provider.getAuthorizationEndpoint(redirectURIOnProviderDashboard).fullUrl,
+                urlWithQueryParams = provider.getAuthorizationEndpoint(
+                    redirectURIOnProviderDashboard
+                ).fullUrl,
                 pkceCodeVerifier = generateCodeVerifier(),
             )
         )
@@ -116,9 +124,11 @@ open class ThirdPartyHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/ThirdParty%20Recipe/thirdPartyCallbackApple">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.appleAuthCallback() {
-        val provider = thirdParty.getProviderById(ThirdPartyProvider.APPLE) ?: throw NotFoundException()
+        val provider =
+            thirdParty.getProviderById(ThirdPartyProvider.APPLE) ?: throw NotFoundException()
         val formParameters = call.receiveParameters()
-        val code = formParameters["code"] ?: throw BadRequestException(message = "Form Param 'code' is required")
+        val code = formParameters["code"]
+            ?: throw BadRequestException(message = "Form Param 'code' is required")
         val state = formParameters["state"]
 
         val tokens = provider.getTokens(
@@ -136,13 +146,15 @@ open class ThirdPartyHandler(
             isVerified = userInfo.email?.isVerified == true,
         )
 
-        if (sessionsEnabled) {
+        if (isSessionsEnabled) {
             val session = sessions.createSession(
                 userId = response.user.id,
                 tenantId = null,
                 userDataInJWT = sessions.getJwtData(
-                    response.user,
+                    user = response.user,
                     tenantId = null,
+                    recipeId = RECIPE_THIRD_PARTY,
+                    accessToken = null,
                 ),
             )
 

@@ -48,7 +48,7 @@ class RolesRecipe(
     val addPermissionsToToken = config.addPermissionsToToken
     val defaultUserRoles = config.defaultUserRoles
 
-    override suspend fun getExtraJwtData(user: User, tenantId: String?): Map<String, Any?> {
+    override suspend fun getExtraJwtData(user: User, tenantId: String?, recipeId: String, accessToken: String?): Map<String, Any?> {
         if (!addRolesToToken && !addPermissionsToToken) {
             return emptyMap()
         }

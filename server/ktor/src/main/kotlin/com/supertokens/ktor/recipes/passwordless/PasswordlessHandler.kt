@@ -1,17 +1,19 @@
 package com.supertokens.ktor.recipes.passwordless
 
+import com.supertokens.ktor.plugins.accessToken
 import com.supertokens.ktor.recipes.emailverification.emailVerification
-import com.supertokens.ktor.recipes.emailverification.emailVerificationEnabled
+import com.supertokens.ktor.recipes.emailverification.isEmailVerificationEnabled
+import com.supertokens.ktor.recipes.session.isSessionsEnabled
 import com.supertokens.ktor.recipes.session.sessions
-import com.supertokens.ktor.recipes.session.sessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.userHandler
 import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.EndpointConfig
-import com.supertokens.sdk.common.SuperTokensStatusException
+import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequestDTO
 import com.supertokens.sdk.common.requests.ResendPasswordlessCodeRequestDTO
@@ -40,21 +42,29 @@ open class PasswordlessHandler(
     /**
      * Override this to convert to localized duration
      */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.convertToTimeString(duration: Long) = "${(duration / 1000 / 60).toInt()} minutes"
+    open suspend fun PipelineContext<Unit, ApplicationCall>.convertToTimeString(duration: Long) =
+        "${(duration / 1000 / 60).toInt()} minutes"
 
     /**
      * Override this to send localized mails
      */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.getTemplateName(emailService: EmailService) = when (passwordless.flowType) {
-        PasswordlessMode.MAGIC_LINK -> emailService.magicLinkLoginTemplateName
-        PasswordlessMode.USER_INPUT_CODE -> emailService.otpLoginTemplateName
-        PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK -> emailService.magicLinkOtpLoginTemplateName
-    }
+    open suspend fun PipelineContext<Unit, ApplicationCall>.getTemplateName(emailService: EmailService) =
+        when (passwordless.flowType) {
+            PasswordlessMode.MAGIC_LINK -> emailService.magicLinkLoginTemplateName
+            PasswordlessMode.USER_INPUT_CODE -> emailService.otpLoginTemplateName
+            PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK -> emailService.magicLinkOtpLoginTemplateName
+        }
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(frontend: EndpointConfig, codeData: PasswordlessCodeData): String =
+    open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(
+        frontend: EndpointConfig,
+        codeData: PasswordlessCodeData
+    ): String =
         "${frontend.fullUrl}verify?preAuthSessionId=${codeData.preAuthSessionId}#${codeData.linkCode}"
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginMail(email: String, codeData: PasswordlessCodeData): PasswordlessCodeData {
+    open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginMail(
+        email: String,
+        codeData: PasswordlessCodeData
+    ): PasswordlessCodeData {
         val frontend = call.frontend
         passwordless.emailService?.let {
             // launch the email sending in another scope, so the call is not blocked
@@ -114,7 +124,10 @@ open class PasswordlessHandler(
         return codeData
     }
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginSms(phoneNumber: String, codeData: PasswordlessCodeData): PasswordlessCodeData {
+    open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginSms(
+        phoneNumber: String,
+        codeData: PasswordlessCodeData
+    ): PasswordlessCodeData {
         // TODO send sms
         return codeData
     }
@@ -152,9 +165,10 @@ open class PasswordlessHandler(
         val body = call.receive<ResendPasswordlessCodeRequestDTO>()
         val tenantId = call.tenantId
 
-        val session = passwordless.getCodesByPreAuthSessionId(body.preAuthSessionId, tenantId).firstOrNull {
-            it.preAuthSessionId == body.preAuthSessionId
-        } ?: throw SuperTokensStatusException(SuperTokensStatus.PasswordlessRestartFlowError)
+        val session =
+            passwordless.getCodesByPreAuthSessionId(body.preAuthSessionId, tenantId).firstOrNull {
+                it.preAuthSessionId == body.preAuthSessionId
+            } ?: throw SuperTokensStatusException(SuperTokensStatus.PasswordlessRestartFlowError)
 
         val data = passwordless.recreateCode(body.deviceId, tenantId)
         session.email?.let {
@@ -177,14 +191,18 @@ open class PasswordlessHandler(
         val response = when (passwordless.flowType) {
             PasswordlessMode.MAGIC_LINK -> passwordless.consumeLinkCode(
                 preAuthSessionId = body.preAuthSessionId,
-                linkCode = body.linkCode ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
+                linkCode = body.linkCode
+                    ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
                 tenantId = tenantId,
             )
 
             PasswordlessMode.USER_INPUT_CODE -> passwordless.consumeUserInputCode(
                 preAuthSessionId = body.preAuthSessionId,
-                deviceId = body.deviceId ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
-                userInputCode = body.userInputCode ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
+                deviceId = body.deviceId
+                    ?: throw SuperTokensStatusException(SuperTokensStatus.FormFieldError),
+                userInputCode = body.userInputCode ?: throw SuperTokensStatusException(
+                    SuperTokensStatus.FormFieldError
+                ),
                 tenantId = tenantId,
             )
 
@@ -212,7 +230,7 @@ open class PasswordlessHandler(
             }
         }
 
-        if (emailVerificationEnabled) {
+        if (isEmailVerificationEnabled) {
             val codeData = passwordless.getCodesByPreAuthSessionId(
                 preAuthSessionId = body.preAuthSessionId,
                 tenantId = tenantId
@@ -229,20 +247,21 @@ open class PasswordlessHandler(
         }
 
         with(userHandler) {
-            if(response.createdNewUser) {
+            if (response.createdNewUser) {
                 onUserSignedUp(response.user)
-            }
-            else {
+            } else {
                 onUserSignedIn(response.user)
             }
         }
 
-        if (sessionsEnabled) {
+        if (isSessionsEnabled) {
             val session = sessions.createSession(
                 userId = response.user.id,
                 userDataInJWT = sessions.getJwtData(
                     user = response.user,
-                    tenantId = tenantId
+                    tenantId = tenantId,
+                    recipeId = RECIPE_PASSWORDLESS,
+                    accessToken = accessToken,
                 ),
                 tenantId = tenantId,
             )

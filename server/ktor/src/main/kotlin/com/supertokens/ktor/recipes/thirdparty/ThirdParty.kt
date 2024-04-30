@@ -18,12 +18,12 @@ val Route.thirdParty: ThirdPartyRecipe
     get() =
         application.attributes[SuperTokensAttributeKey].getRecipe()
 
-val ApplicationCall.thirdPartyEnabled: Boolean
+val ApplicationCall.isThirdPartyEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<ThirdPartyRecipe>()
-val PipelineContext<Unit, ApplicationCall>.thirdPartyEnabled: Boolean
+val PipelineContext<Unit, ApplicationCall>.isThirdPartyEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<ThirdPartyRecipe>()
-val Route.thirdPartyEnabled: Boolean
+val Route.isThirdPartyEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<ThirdPartyRecipe>()

@@ -18,12 +18,12 @@ val Route.emailVerification: EmailVerificationRecipe
     get() =
         application.attributes[SuperTokensAttributeKey].getRecipe()
 
-val ApplicationCall.emailVerificationEnabled: Boolean
+val ApplicationCall.isEmailVerificationEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<EmailVerificationRecipe>()
-val PipelineContext<Unit, ApplicationCall>.emailVerificationEnabled: Boolean
+val PipelineContext<Unit, ApplicationCall>.isEmailVerificationEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<EmailVerificationRecipe>()
-val Route.emailVerificationEnabled: Boolean
+val Route.isEmailVerificationEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<EmailVerificationRecipe>()

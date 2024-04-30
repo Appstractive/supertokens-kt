@@ -71,4 +71,4 @@ inline fun <reified P : Principal> ApplicationCall.requirePrincipal(provider: St
 val AccessTokenAttributeKey = AttributeKey<String>("AccessToken")
 
 val ApplicationCall.accessToken: String get() = attributes[AccessTokenAttributeKey]
-val PipelineContext<Unit, ApplicationCall>.accessToken: String get() = call.attributes[AccessTokenAttributeKey]
+val PipelineContext<Unit, ApplicationCall>.accessToken: String? get() = call.attributes.getOrNull(AccessTokenAttributeKey)

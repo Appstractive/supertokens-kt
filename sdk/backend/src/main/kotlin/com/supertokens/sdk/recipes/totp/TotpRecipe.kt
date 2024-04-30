@@ -23,10 +23,8 @@ import com.supertokens.sdk.recipes.totp.requests.VerifyTotpDeviceRequest
 import com.supertokens.sdk.recipes.totp.responses.AddTotpDeviceResponseDTO
 import com.supertokens.sdk.recipes.totp.responses.ImportTotpDeviceResponseDTO
 import com.supertokens.sdk.recipes.totp.responses.RemoveTotpDeviceResponseDTO
-import com.supertokens.sdk.recipes.totp.responses.TotpDevicesResponseDTO
 import com.supertokens.sdk.recipes.totp.responses.VerifyTotpDeviceResponseDTO
 import com.supertokens.sdk.utils.parse
-import io.ktor.client.call.body
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 

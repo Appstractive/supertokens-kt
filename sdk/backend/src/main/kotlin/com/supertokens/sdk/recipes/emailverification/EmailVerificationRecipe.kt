@@ -64,7 +64,7 @@ class EmailVerificationRecipe(
         } ?: true
     }
 
-    override suspend fun getExtraJwtData(user: User, tenantId: String?): Map<String, Any?> {
+    override suspend fun getExtraJwtData(user: User, tenantId: String?, recipeId: String, accessToken: String?): Map<String, Any?> {
         return buildMap {
             set(Claims.EMAIL_VERIFIED, isVerified(user.id, user.email))
         }

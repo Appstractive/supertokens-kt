@@ -33,6 +33,8 @@ object Claims {
     const val ROLES = "st-role"
     const val PERMISSIONS = "st-perm"
     const val MFA = "st-mfa"
+    const val MFA_FACTORS = "c"
+    const val MFA_VERIFIED = "v"
 
 }
 

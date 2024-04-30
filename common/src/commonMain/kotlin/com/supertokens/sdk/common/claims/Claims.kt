@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ClaimMFA(
-    @SerialName("c")
+    @SerialName(Claims.MFA_FACTORS)
     val factors: Map<String, Long>,
-    @SerialName("v")
+    @SerialName(Claims.MFA_VERIFIED)
     val verified: Boolean,
 )
 

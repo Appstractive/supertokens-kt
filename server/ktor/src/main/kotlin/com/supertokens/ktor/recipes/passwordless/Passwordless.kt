@@ -18,12 +18,12 @@ val Route.passwordless: PasswordlessRecipe
     get() =
         application.attributes[SuperTokensAttributeKey].getRecipe()
 
-val ApplicationCall.passwordlessEnabled: Boolean
+val ApplicationCall.isPasswordlessEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<PasswordlessRecipe>()
-val PipelineContext<Unit, ApplicationCall>.passwordlessEnabled: Boolean
+val PipelineContext<Unit, ApplicationCall>.isPasswordlessEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<PasswordlessRecipe>()
-val Route.passwordlessEnabled: Boolean
+val Route.isPasswordlessEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<PasswordlessRecipe>()

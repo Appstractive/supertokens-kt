@@ -4,7 +4,7 @@ import com.supertokens.ktor.plugins.AuthenticatedUser
 import com.supertokens.ktor.plugins.accessToken
 import com.supertokens.ktor.plugins.requirePrincipal
 import com.supertokens.ktor.recipes.session.sessions
-import com.supertokens.ktor.recipes.session.sessionsEnabled
+import com.supertokens.ktor.recipes.session.isSessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.frontend
@@ -12,6 +12,7 @@ import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
+import com.supertokens.sdk.common.RECIPE_EMAIL_VERIFICATION
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.VerifyEmailTokenRequestDTO
@@ -109,7 +110,9 @@ open class EmailVerificationHandler(
                 // update email verification state in existing sessions
                 val jwtData = sessions.getJwtData(
                     user = superTokens.getUserById(data.userId),
-                    tenantId = tenantId
+                    tenantId = tenantId,
+                    recipeId = RECIPE_EMAIL_VERIFICATION,
+                    accessToken = accessToken,
                 )
 
                 val userSessions = superTokens.getSessions(data.userId)
@@ -123,7 +126,7 @@ open class EmailVerificationHandler(
 
                 // update token if present and from same user
                 runCatching {
-                    call.request.header(HEADER_ACCESS_TOKEN)?.let { token ->
+                    accessToken?.let { token ->
                         val session = sessions.verifySession(token, checkDatabase = true)
 
                         if(session.session.userId == data.userId) {
@@ -154,12 +157,14 @@ open class EmailVerificationHandler(
         val email = superTokens.getUserById(user.id).email
         val isVerified = emailVerification.isVerified(user.id, email)
 
-        if (sessionsEnabled && isVerified) {
+        if (isSessionsEnabled && isVerified) {
             val session = sessions.regenerateSession(
                 accessToken = call.accessToken,
                 userDataInJWT = sessions.getJwtData(
                     user = superTokens.getUserById(user.id),
-                    tenantId = call.tenantId
+                    tenantId = call.tenantId,
+                    recipeId = RECIPE_EMAIL_VERIFICATION,
+                    accessToken = accessToken,
                 ),
             )
             setSessionInResponse(

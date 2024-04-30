@@ -8,7 +8,12 @@ import com.supertokens.sdk.common.models.User
 interface RecipeConfig
 interface Recipe<C: RecipeConfig> {
 
-    suspend fun getExtraJwtData(user: User, tenantId: String?): Map<String, Any?> = emptyMap()
+    suspend fun getExtraJwtData(
+        user: User,
+        tenantId: String?,
+        recipeId: String,
+        accessToken: String?,
+    ): Map<String, Any?> = emptyMap()
 
 }
 

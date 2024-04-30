@@ -18,12 +18,12 @@ val Route.sessions: SessionRecipe
     get() =
         application.attributes[SuperTokensAttributeKey].getRecipe()
 
-val ApplicationCall.sessionsEnabled: Boolean
+val ApplicationCall.isSessionsEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<SessionRecipe>()
-val PipelineContext<Unit, ApplicationCall>.sessionsEnabled: Boolean
+val PipelineContext<Unit, ApplicationCall>.isSessionsEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<SessionRecipe>()
-val Route.sessionsEnabled: Boolean
+val Route.isSessionsEnabled: Boolean
     get() =
         application.attributes[SuperTokensAttributeKey].hasRecipe<SessionRecipe>()

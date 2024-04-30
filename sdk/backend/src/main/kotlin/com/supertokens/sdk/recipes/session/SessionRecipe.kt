@@ -1,6 +1,5 @@
 package com.supertokens.sdk.recipes.session
 
-import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.Claims
 import com.supertokens.sdk.common.HEADER_RECIPE_ID
@@ -8,11 +7,11 @@ import com.supertokens.sdk.common.RECIPE_SESSION
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.extractedContent
+import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.common.toJsonElement
+import com.supertokens.sdk.get
 import com.supertokens.sdk.models.CreateSessionData
 import com.supertokens.sdk.models.RegenerateSessionData
-import com.supertokens.sdk.common.models.User
-import com.supertokens.sdk.get
 import com.supertokens.sdk.post
 import com.supertokens.sdk.put
 import com.supertokens.sdk.recipes.CustomJwtData
@@ -117,7 +116,7 @@ class SessionRecipe(
         config.issuer ?: superTokens.appConfig.api.host
     }
 
-    suspend fun getJwtData(user: User, tenantId: String?): Map<String, Any?> = buildMap {
+    suspend fun getJwtData(user: User, tenantId: String?, recipeId: String, accessToken: String?): Map<String, Any?> = buildMap {
         set(Claims.ISSUER, issuer)
         set(Claims.AUDIENCE, superTokens.appConfig.frontends.map { it.host })
 
@@ -129,7 +128,12 @@ class SessionRecipe(
         }
 
         superTokens.recipes.forEach {
-            it.getExtraJwtData(user = user, tenantId = tenantId).forEach { entry ->
+            it.getExtraJwtData(
+                user = user,
+                tenantId = tenantId,
+                recipeId = recipeId,
+                accessToken = accessToken,
+            ).forEach { entry ->
                 set(entry.key, entry.value)
             }
         }
@@ -215,7 +219,7 @@ class SessionRecipe(
         val response = superTokens.get(
             PATH_SESSIONS,
             tenantId = tenantId,
-            queryParams =  mapOf(
+            queryParams = mapOf(
                 "userId" to userId,
                 "fetchAcrossAllTenants" to (tenantId == null).toString(),
             ),
@@ -364,8 +368,10 @@ class SessionRecipe(
 
         return response.parse<RegenerateSessionResponseDTO, RegenerateSessionData> {
             RegenerateSessionData(
-                session = it.session?.toData() ?: throw RuntimeException("RegenerateSession returned OK but no session"),
-                accessToken = it.accessToken ?: throw RuntimeException("RegenerateSession returned OK but no accessToken"),
+                session = it.session?.toData()
+                    ?: throw RuntimeException("RegenerateSession returned OK but no session"),
+                accessToken = it.accessToken
+                    ?: throw RuntimeException("RegenerateSession returned OK but no accessToken"),
             )
         }
     }
@@ -374,7 +380,10 @@ class SessionRecipe(
      * Change session data
      */
     @Throws(SuperTokensStatusException::class)
-    suspend fun updateSessionData(sessionHandle: String, userDataInDatabase: Map<String, Any?>): SuperTokensStatus {
+    suspend fun updateSessionData(
+        sessionHandle: String,
+        userDataInDatabase: Map<String, Any?>
+    ): SuperTokensStatus {
         val response = superTokens.put(PATH_SESSION_DATA, tenantId = null) {
 
             header(HEADER_RECIPE_ID, RECIPE_SESSION)
@@ -394,7 +403,11 @@ class SessionRecipe(
      * Change JWT data for a session
      */
     @Throws(SuperTokensStatusException::class)
-    suspend fun updateJwtData(sessionHandle: String, userDataInJWT: Map<String, Any?>, tenantId: String?): SuperTokensStatus {
+    suspend fun updateJwtData(
+        sessionHandle: String,
+        userDataInJWT: Map<String, Any?>,
+        tenantId: String?
+    ): SuperTokensStatus {
         val response = superTokens.put(PATH_JWT_DATA, tenantId = tenantId) {
 
             header(HEADER_RECIPE_ID, RECIPE_SESSION)

@@ -3,7 +3,7 @@ package com.supertokens.ktor.recipes.emailpassword
 import com.supertokens.ktor.plugins.AuthenticatedUser
 import com.supertokens.ktor.plugins.requirePrincipal
 import com.supertokens.ktor.recipes.session.sessions
-import com.supertokens.ktor.recipes.session.sessionsEnabled
+import com.supertokens.ktor.recipes.session.isSessionsEnabled
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.userHandler
 import com.supertokens.ktor.utils.frontend
@@ -16,9 +16,9 @@ import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.common.FORM_FIELD_EMAIL_ID
 import com.supertokens.sdk.common.FORM_FIELD_PASSWORD_ID
+import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.common.requests.FormFieldDTO
 import com.supertokens.sdk.common.requests.FormFieldRequestDTO
 import com.supertokens.sdk.common.requests.PasswordChangeRequestDTO
@@ -107,10 +107,15 @@ open class EmailPasswordHandler(
             onUserSignedIn(user)
         }
 
-        if (sessionsEnabled) {
+        if (isSessionsEnabled) {
             val session = sessions.createSession(
                 userId = user.id,
-                userDataInJWT = sessions.getJwtData(user, tenantId),
+                userDataInJWT = sessions.getJwtData(
+                    user = user,
+                    tenantId = tenantId,
+                    recipeId = RECIPE_EMAIL_PASSWORD,
+                    sessionHandle = null,
+                ),
                 tenantId = tenantId,
             )
 
@@ -123,11 +128,7 @@ open class EmailPasswordHandler(
 
         call.respond(
             SignInResponseDTO(
-                user = User(
-                    id = user.id,
-                    emails = user.emails,
-                    timeJoined = user.timeJoined,
-                )
+                user = user,
             )
         )
     }
@@ -147,14 +148,19 @@ open class EmailPasswordHandler(
                 onUserSignedUp(user)
             }
 
-            if (sessionsEnabled) {
+            if (isSessionsEnabled) {
                 val additionalFormField = body.formFields.filter {
                     it.id != FORM_FIELD_EMAIL_ID && it.id != FORM_FIELD_PASSWORD_ID
                 }
 
                 val session = sessions.createSession(
                     userId = user.id,
-                    userDataInJWT = sessions.getJwtData(user, tenantId),
+                    userDataInJWT = sessions.getJwtData(
+                        user = user,
+                        tenantId = tenantId,
+                        recipeId = RECIPE_EMAIL_PASSWORD,
+                        sessionHandle = null,
+                    ),
                     userDataInDatabase = buildMap {
                         additionalFormField.forEach {
                             set(it.id, it.value)
@@ -172,11 +178,7 @@ open class EmailPasswordHandler(
 
             call.respond(
                 SignInResponseDTO(
-                    user = User(
-                        id = user.id,
-                        emails = user.emails,
-                        timeJoined = user.timeJoined,
-                    )
+                    user = user,
                 )
             )
         }
