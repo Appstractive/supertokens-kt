@@ -56,16 +56,12 @@ class MultiFactorAuthRecipe(
                     put(recipeId, System.currentTimeMillis())
                 }
                 RECIPE_PASSWORDLESS -> {
-                    if(!contains(recipeId)) {
-                        put(recipeId, System.currentTimeMillis())
-                    }
-                    else if(contains(RECIPE_EMAIL_PASSWORD) || contains(RECIPE_THIRD_PARTY)) {
-                        when(multiAuthFactor) {
-                            AuthFactor.OTP_EMAIL -> put(AuthFactor.OTP_EMAIL.key, System.currentTimeMillis())
-                            AuthFactor.OTP_PHONE -> put(AuthFactor.OTP_PHONE.key, System.currentTimeMillis())
-                            else -> {}
-                        }
-
+                    when(multiAuthFactor) {
+                        AuthFactor.OTP_EMAIL -> put(AuthFactor.OTP_EMAIL.key, System.currentTimeMillis())
+                        AuthFactor.OTP_EMAIL -> put(AuthFactor.LINK_EMAIL.key, System.currentTimeMillis())
+                        AuthFactor.OTP_PHONE -> put(AuthFactor.OTP_PHONE.key, System.currentTimeMillis())
+                        AuthFactor.OTP_PHONE -> put(AuthFactor.LINK_PHONE.key, System.currentTimeMillis())
+                        else -> {}
                     }
                 }
                 RECIPE_TOTP -> {

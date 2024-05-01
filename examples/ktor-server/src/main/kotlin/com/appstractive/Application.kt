@@ -164,9 +164,9 @@ fun Application.module() {
             recipe(AccountLinking)
             recipe(Totp)
             recipe(MultiFactorAuth) {
-                firstFactors = listOf(RECIPE_EMAIL_PASSWORD, RECIPE_PASSWORDLESS, RECIPE_THIRD_PARTY)
+                firstFactors = listOf(RECIPE_EMAIL_PASSWORD, RECIPE_THIRD_PARTY)
                 getRequiredMultiFactors = { superTokens: SuperTokens, user: User, tenantId: String? ->
-                    listOf(AuthFactor.TOTP)
+                    listOf(AuthFactor.AnyOf(AuthFactor.TOTP, AuthFactor.LINK_EMAIL, AuthFactor.OTP_EMAIL))
                 }
             }
         }

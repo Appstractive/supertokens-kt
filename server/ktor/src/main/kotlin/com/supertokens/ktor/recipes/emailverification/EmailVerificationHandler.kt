@@ -158,7 +158,7 @@ open class EmailVerificationHandler(
 
         if (isSessionsEnabled && isVerified) {
             val session = sessions.regenerateSession(
-                accessToken = call.accessToken,
+                accessToken = user.accessToken,
                 userDataInJWT = sessions.getJwtData(
                     user = superTokens.getUserById(user.id),
                     tenantId = call.tenantId,

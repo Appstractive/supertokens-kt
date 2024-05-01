@@ -1,8 +1,11 @@
 package com.supertokens.ktor.recipes.passwordless
 
+import com.supertokens.ktor.plugins.AuthenticatedUser
 import com.supertokens.ktor.plugins.accessToken
 import com.supertokens.ktor.recipes.emailverification.emailVerification
 import com.supertokens.ktor.recipes.emailverification.isEmailVerificationEnabled
+import com.supertokens.ktor.recipes.multifactor.isMultiFactorAuthEnabled
+import com.supertokens.ktor.recipes.multifactor.multiFactorAuth
 import com.supertokens.ktor.recipes.session.isSessionsEnabled
 import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.superTokens
@@ -12,6 +15,7 @@ import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
+import com.supertokens.sdk.common.RECIPE_TOTP
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.models.PasswordlessMode
@@ -21,15 +25,20 @@ import com.supertokens.sdk.common.requests.StartPasswordlessSignInUpRequestDTO
 import com.supertokens.sdk.common.responses.SignInUpResponseDTO
 import com.supertokens.sdk.common.responses.StartPasswordlessSignInUpResponseDTO
 import com.supertokens.sdk.common.responses.StatusResponseDTO
+import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
+import com.supertokens.sdk.recipes.common.models.SignInUpData
 import com.supertokens.sdk.recipes.multifactor.AuthFactor
 import com.supertokens.sdk.recipes.passwordless.models.LoginMagicLinkOtpTemplate
 import com.supertokens.sdk.recipes.passwordless.models.LoginMagicLinkTemplate
 import com.supertokens.sdk.recipes.passwordless.models.LoginOtpTemplate
 import com.supertokens.sdk.recipes.passwordless.models.PasswordlessCodeData
+import com.supertokens.sdk.recipes.passwordless.responses.PasswordlessDevices
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
+import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
@@ -194,6 +203,121 @@ open class PasswordlessHandler(
             tenantId = tenantId
         )
 
+        if (isMultiFactorAuthEnabled && !multiFactorAuth.firstFactors.contains(RECIPE_PASSWORDLESS)) {
+            consumeCodeSecondFactorFactor(
+                body = body,
+                tenantId = tenantId,
+                codeData = codeData,
+            )
+        } else {
+            consumeCodeFirstFactor(
+                body = body,
+                tenantId = tenantId,
+                codeData = codeData,
+            )
+        }
+    }
+
+    protected open suspend fun PipelineContext<Unit, ApplicationCall>.consumeCodeFirstFactor(
+        body: ConsumePasswordlessCodeRequestDTO,
+        tenantId: String?,
+        codeData: List<PasswordlessDevices>,
+    ) {
+        val response = exchangeCode(
+            body = body,
+            codeData = codeData,
+            tenantId = tenantId,
+        )
+
+        if (isSessionsEnabled) {
+            val session = sessions.createSession(
+                userId = response.user.id,
+                userDataInJWT = sessions.getJwtData(
+                    user = response.user,
+                    tenantId = tenantId,
+                    recipeId = RECIPE_PASSWORDLESS,
+                    multiAuthFactor = null,
+                    accessToken = null,
+                ),
+                tenantId = tenantId,
+            )
+            setSessionInResponse(
+                accessToken = session.accessToken,
+                refreshToken = session.refreshToken,
+                antiCsrfToken = session.antiCsrfToken,
+            )
+        }
+
+        call.respond(
+            SignInUpResponseDTO(
+                createdNewUser = response.createdNewUser,
+                user = response.user,
+            )
+        )
+    }
+
+    protected open suspend fun PipelineContext<Unit, ApplicationCall>.consumeCodeSecondFactorFactor(
+        body: ConsumePasswordlessCodeRequestDTO,
+        tenantId: String?,
+        codeData: List<PasswordlessDevices>,
+    ) {
+        val user =
+            call.principal<AuthenticatedUser>() ?: return call.respond(HttpStatusCode.Unauthorized)
+
+        val response = exchangeCode(
+            body = body,
+            codeData = codeData,
+            tenantId = tenantId,
+        )
+
+        val session = sessions.verifySession(user.accessToken, checkDatabase = true)
+
+        if (session.session.userId == user.id) {
+            val isInputCode = body.userInputCode != null
+
+            val newSession = sessions.regenerateSession(
+                accessToken = user.accessToken,
+                userDataInJWT = sessions.getJwtData(
+                    user = superTokens.getUserById(user.id),
+                    tenantId = null,
+                    recipeId = RECIPE_PASSWORDLESS,
+                    multiAuthFactor = when {
+                        codeData.any { it.email != null } -> if (isInputCode) {
+                            AuthFactor.OTP_EMAIL
+                        } else {
+                            AuthFactor.LINK_EMAIL
+                        }
+
+                        codeData.any { it.phoneNumber != null } -> if (isInputCode) {
+                            AuthFactor.OTP_PHONE
+                        } else {
+                            AuthFactor.LINK_PHONE
+                        }
+
+                        else -> null
+                    },
+                    accessToken = user.accessToken,
+                )
+            )
+
+            setSessionInResponse(
+                accessToken = newSession.accessToken,
+            )
+        }
+
+        call.respond(
+            SignInUpResponseDTO(
+                createdNewUser = response.createdNewUser,
+                user = response.user,
+            )
+        )
+    }
+
+    private suspend fun PipelineContext<Unit, ApplicationCall>.exchangeCode(
+        body: ConsumePasswordlessCodeRequestDTO,
+        tenantId: String?,
+        codeData: List<PasswordlessDevices>,
+    ): SignInUpData {
         val response = when (passwordless.flowType) {
             PasswordlessMode.MAGIC_LINK -> passwordless.consumeLinkCode(
                 preAuthSessionId = body.preAuthSessionId,
@@ -239,11 +363,15 @@ open class PasswordlessHandler(
         if (isEmailVerificationEnabled) {
             codeData.forEach {
                 it.email?.let { email ->
-                    emailVerification.setVerified(
-                        userId = response.user.id,
-                        email = email,
-                        tenantId = tenantId,
-                    )
+                    if (response.user.loginMethods?.any { method ->
+                            method.email == email && !method.verified
+                        } == true) {
+                        emailVerification.setVerified(
+                            userId = response.user.id,
+                            email = email,
+                            tenantId = tenantId,
+                        )
+                    }
                 }
             }
         }
@@ -256,35 +384,7 @@ open class PasswordlessHandler(
             }
         }
 
-        if (isSessionsEnabled) {
-            val session = sessions.createSession(
-                userId = response.user.id,
-                userDataInJWT = sessions.getJwtData(
-                    user = response.user,
-                    tenantId = tenantId,
-                    recipeId = RECIPE_PASSWORDLESS,
-                    multiAuthFactor = when {
-                        codeData.any { it.email != null } -> AuthFactor.OTP_EMAIL
-                        codeData.any { it.phoneNumber != null } -> AuthFactor.OTP_PHONE
-                        else -> null
-                    },
-                    accessToken = accessToken,
-                ),
-                tenantId = tenantId,
-            )
-            setSessionInResponse(
-                accessToken = session.accessToken,
-                refreshToken = session.refreshToken,
-                antiCsrfToken = session.antiCsrfToken,
-            )
-        }
-
-        call.respond(
-            SignInUpResponseDTO(
-                createdNewUser = response.createdNewUser,
-                user = response.user,
-            )
-        )
+        return response
     }
 
 }

@@ -19,6 +19,16 @@ sealed interface AuthFactor {
         override fun isValidFor(factors: Map<String, Number>) = factors.containsKey(key)
     }
 
+    data object LINK_EMAIL : AuthFactor {
+        val key = "link-email"
+        override fun isValidFor(factors: Map<String, Number>) = factors.containsKey(key)
+    }
+
+    data object LINK_PHONE : AuthFactor {
+        val key = "link-phone"
+        override fun isValidFor(factors: Map<String, Number>) = factors.containsKey(key)
+    }
+
     class AnyOf(vararg factors: AuthFactor) : AuthFactor {
         val factors: List<AuthFactor> = factors.toList()
 
@@ -59,6 +69,8 @@ sealed interface AuthFactor {
     fun AuthFactor.equalsTo(key: String): Boolean = when(this) {
         OTP_EMAIL -> key == TOTP.key
         OTP_PHONE -> key == OTP_EMAIL.key
+        LINK_EMAIL -> key == LINK_EMAIL.key
+        LINK_PHONE -> key == LINK_PHONE.key
         TOTP -> key == OTP_PHONE.key
         else -> false
     }
