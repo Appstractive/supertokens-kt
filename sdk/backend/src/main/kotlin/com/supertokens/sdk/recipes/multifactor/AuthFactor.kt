@@ -1,36 +1,40 @@
 package com.supertokens.sdk.recipes.multifactor
 
+internal interface Factor: AuthFactor {
+    val key: String
+}
+
 sealed interface AuthFactor {
 
     fun isValidFor(factors: Map<String, Number>): Boolean
 
-    data object TOTP : AuthFactor {
-        val key = "totp"
+    data object TOTP : Factor {
+        override val key = "totp"
         override fun isValidFor(factors: Map<String, Number>) = factors.containsKey(key)
     }
 
-    data object OTP_EMAIL : AuthFactor {
-        val key = "otp-email"
+    data object OTP_EMAIL : Factor {
+        override val key = "otp-email"
         override fun isValidFor(factors: Map<String, Number>) = factors.containsKey(key)
     }
 
-    data object OTP_PHONE : AuthFactor {
-        val key = "otp-phone"
+    data object OTP_PHONE : Factor {
+        override val key = "otp-phone"
         override fun isValidFor(factors: Map<String, Number>) = factors.containsKey(key)
     }
 
-    data object LINK_EMAIL : AuthFactor {
-        val key = "link-email"
+    data object LINK_EMAIL : Factor {
+        override val key = "link-email"
         override fun isValidFor(factors: Map<String, Number>) = factors.containsKey(key)
     }
 
-    data object LINK_PHONE : AuthFactor {
-        val key = "link-phone"
+    data object LINK_PHONE : Factor {
+        override val key = "link-phone"
         override fun isValidFor(factors: Map<String, Number>) = factors.containsKey(key)
     }
 
     class AnyOf(vararg factors: AuthFactor) : AuthFactor {
-        val factors: List<AuthFactor> = factors.toList()
+        private val factors: List<AuthFactor> = factors.toList()
 
         override fun isValidFor(factors: Map<String, Number>): Boolean {
             return this.factors.any { it.isValidFor(factors) }
@@ -38,7 +42,7 @@ sealed interface AuthFactor {
     }
 
     class AllOf(vararg factors: AuthFactor, val anyOrder: Boolean = true) : AuthFactor {
-        val factors: List<AuthFactor> = factors.toList()
+        private val factors: List<AuthFactor> = factors.toList()
 
         override fun isValidFor(factors: Map<String, Number>): Boolean {
             val allValid = this.factors.all { it.isValidFor(factors) }
@@ -47,7 +51,7 @@ sealed interface AuthFactor {
                 return true
             }
 
-            val sorted = factors.entries.sortedByDescending { it.value.toLong() }.map { it.key }.toMutableList()
+            val sorted = factors.entries.sortedBy { it.value.toLong() }.map { it.key }.toMutableList()
 
             this.factors.forEach { authFactor ->
                 if(sorted.isEmpty()) {
@@ -67,11 +71,7 @@ sealed interface AuthFactor {
     }
 
     fun AuthFactor.equalsTo(key: String): Boolean = when(this) {
-        OTP_EMAIL -> key == TOTP.key
-        OTP_PHONE -> key == OTP_EMAIL.key
-        LINK_EMAIL -> key == LINK_EMAIL.key
-        LINK_PHONE -> key == LINK_PHONE.key
-        TOTP -> key == OTP_PHONE.key
+        is Factor -> key == this.key
         else -> false
     }
 

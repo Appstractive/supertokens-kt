@@ -123,7 +123,7 @@ class TotpTests : BaseTest() {
             totp = totp,
             allowUnverifiedDevices = true,
         )
-        assertTrue(response)
+        assertEquals(SuperTokensStatus.OK, response)
     }
 
     @Test
@@ -142,7 +142,7 @@ class TotpTests : BaseTest() {
             totp = totp,
             allowUnverifiedDevices = true,
         )
-        assertTrue(response)
+        assertEquals(SuperTokensStatus.OK, response)
     }
 
     private fun getTotpGenerator(secret: String): GoogleAuthenticator {
