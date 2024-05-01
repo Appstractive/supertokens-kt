@@ -69,7 +69,7 @@ class EmailVerificationRecipe(
         user: User,
         tenantId: String?,
         recipeId: String,
-        authFactor: AuthFactor?,
+        multiAuthFactor: AuthFactor?,
         accessToken: String?
     ): Map<String, Any?> {
         return buildMap {

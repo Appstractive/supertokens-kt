@@ -1,8 +1,16 @@
 package com.supertokens.ktor.recipes.totp
 
 import com.supertokens.ktor.plugins.AuthenticatedUser
+import com.supertokens.ktor.plugins.accessToken
 import com.supertokens.ktor.plugins.requirePrincipal
+import com.supertokens.ktor.recipes.session.isSessionsEnabled
+import com.supertokens.ktor.recipes.session.sessions
+import com.supertokens.ktor.superTokens
+import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
+import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
+import com.supertokens.sdk.common.RECIPE_TOTP
+import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.TotpDeviceRequestDTO
 import com.supertokens.sdk.common.requests.VerifyTotpDeviceRequestDTO
 import com.supertokens.sdk.common.requests.VerifyTotpRequestDTO
@@ -11,6 +19,8 @@ import com.supertokens.sdk.common.responses.GetTotpDevicesResponseDTO
 import com.supertokens.sdk.common.responses.RemoveTotpDeviceResponseDTO
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.responses.TotpDeviceDTO
+import com.supertokens.sdk.core.getUserById
+import com.supertokens.sdk.recipes.multifactor.AuthFactor
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.request.receive
@@ -99,7 +109,29 @@ open class TotpHandler(
             tenantId = call.tenantId,
         )
 
-        // TODO update session
+        if (isSessionsEnabled) {
+            accessToken?.let { token ->
+                val session = sessions.verifySession(token, checkDatabase = true)
+
+                if(session.session.userId == user.id) {
+
+                    val newSession = sessions.regenerateSession(
+                        accessToken = token,
+                        userDataInJWT = sessions.getJwtData(
+                            user = superTokens.getUserById(user.id),
+                            tenantId = null,
+                            recipeId = RECIPE_TOTP,
+                            multiAuthFactor = AuthFactor.TOTP,
+                            accessToken = token,
+                        )
+                    )
+
+                    setSessionInResponse(
+                        accessToken = newSession.accessToken,
+                    )
+                }
+            }
+        }
 
         call.respond(StatusResponseDTO())
     }
@@ -111,15 +143,37 @@ open class TotpHandler(
         val user = call.requirePrincipal<AuthenticatedUser>()
         val body = call.receive<VerifyTotpRequestDTO>()
 
-        totp.verifyCode(
+        val result = totp.verifyCode(
             userId = user.id,
             totp = body.totp,
             tenantId = call.tenantId,
         )
 
-        // TODO update session
+        if (result == SuperTokensStatus.OK && isSessionsEnabled) {
+            accessToken?.let { token ->
+                val session = sessions.verifySession(token, checkDatabase = true)
 
-        call.respond(StatusResponseDTO())
+                if(session.session.userId == user.id) {
+
+                    val newSession = sessions.regenerateSession(
+                        accessToken = token,
+                        userDataInJWT = sessions.getJwtData(
+                            user = superTokens.getUserById(user.id),
+                            tenantId = null,
+                            recipeId = RECIPE_TOTP,
+                            multiAuthFactor = AuthFactor.TOTP,
+                            accessToken = token,
+                        )
+                    )
+
+                    setSessionInResponse(
+                        accessToken = newSession.accessToken,
+                    )
+                }
+            }
+        }
+
+        call.respond(StatusResponseDTO(status = result.value))
     }
 
 }

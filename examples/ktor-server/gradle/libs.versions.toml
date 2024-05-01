@@ -1,10 +1,10 @@
 [versions]
-kotlin = "1.9.22" # https://kotlinlang.org/docs/releases.html#release-details
+kotlin = "1.9.23" # https://kotlinlang.org/docs/releases.html#release-details
 
-ktor_version = "2.3.6"
+ktor_version = "2.3.9"
 
-kotlin-datetime = "0.4.0"
-kotlin-serialization = "1.6.0"
+kotlin-datetime = "0.5.0"
+kotlin-serialization = "1.6.2"
 kotlin-coroutines = "1.7.3"
 
 jwt = "5.2.4"

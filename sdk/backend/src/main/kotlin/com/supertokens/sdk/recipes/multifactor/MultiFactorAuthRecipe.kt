@@ -10,6 +10,7 @@ import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
+import com.supertokens.sdk.recipes.multifactor.AuthFactor.OTP_PHONE.isValid
 import com.supertokens.sdk.recipes.session.verifySession
 
 typealias GetRequiredMultiFactors = suspend (superTokens: SuperTokens, user: User, tenantId: String?) -> List<AuthFactor>
@@ -25,7 +26,7 @@ class MultiFactorRecipeConfig : RecipeConfig {
 
 class MultiFactorAuthRecipe(
     private val superTokens: SuperTokens,
-    private val config: MultiFactorRecipeConfig
+    private val config: MultiFactorRecipeConfig,
 ) : Recipe<MultiFactorRecipeConfig> {
 
     val firstFactors = config.firstFactors
@@ -40,10 +41,11 @@ class MultiFactorAuthRecipe(
     ): Map<String, Any?> {
         val userDataInJWT = accessToken?.let { token ->
             runCatching {
-                superTokens.verifySession(
+                val sessionData = superTokens.verifySession(
                     accessToken = token,
                     checkDatabase = true,
-                ).session
+                )
+                sessionData.session
             }.getOrNull()?.userDataInJWT
         } ?: emptyMap()
 
@@ -51,9 +53,7 @@ class MultiFactorAuthRecipe(
         val factors = mfaData.getFactors().toMutableMap().apply {
             when(recipeId) {
                 RECIPE_EMAIL_PASSWORD -> {
-                    if(!contains(recipeId)) {
-                        put(recipeId, System.currentTimeMillis())
-                    }
+                    put(recipeId, System.currentTimeMillis())
                 }
                 RECIPE_PASSWORDLESS -> {
                     if(!contains(recipeId)) {
@@ -69,9 +69,7 @@ class MultiFactorAuthRecipe(
                     }
                 }
                 RECIPE_TOTP -> {
-                    if(!contains(AuthFactor.TOTP.key)) {
-                        put(AuthFactor.TOTP.key, System.currentTimeMillis())
-                    }
+                    put(AuthFactor.TOTP.key, System.currentTimeMillis())
                 }
             }
         }
@@ -82,10 +80,7 @@ class MultiFactorAuthRecipe(
             user,
             tenantId,
         )
-        val hasSecondFactor = hasRequiredSecondsFactors(
-            factors = factors,
-            requiredFactors = requiredSecondFactors,
-        )
+        val hasSecondFactor = requiredSecondFactors.isValid(factors)
 
         return mapOf(
             Claims.MFA to mapOf<String, Any?>(
@@ -98,17 +93,14 @@ class MultiFactorAuthRecipe(
     private fun Map<String, Any?>.getFactors(): Map<String, Number> {
         return get(Claims.MFA_FACTORS) as? Map<String, Number> ?: emptyMap()
     }
-
-    private fun hasRequiredSecondsFactors(factors: Map<String, Number>, requiredFactors: List<AuthFactor>): Boolean {
-        return requiredFactors.all { it.isValidFor(factors) }
-    }
-
 }
 
 val MultiFactorAuth = object : RecipeBuilder<MultiFactorRecipeConfig, MultiFactorAuthRecipe>() {
 
     override fun install(configure: MultiFactorRecipeConfig.() -> Unit): (SuperTokens) -> MultiFactorAuthRecipe {
         val config = MultiFactorRecipeConfig().apply(configure)
+
+        check(config.firstFactors.isNotEmpty()) { "firstFactors may not be empty" }
 
         return {
             MultiFactorAuthRecipe(it, config)

@@ -139,7 +139,7 @@ class SessionRecipe(
                 user = user,
                 tenantId = tenantId,
                 recipeId = recipeId,
-                authFactor = multiAuthFactor,
+                multiAuthFactor = multiAuthFactor,
                 accessToken = accessToken,
             ).forEach { entry ->
                 set(entry.key, entry.value)
@@ -414,7 +414,7 @@ class SessionRecipe(
     suspend fun updateJwtData(
         sessionHandle: String,
         userDataInJWT: Map<String, Any?>,
-        tenantId: String?
+        tenantId: String?,
     ): SuperTokensStatus {
         val response = superTokens.put(PATH_JWT_DATA, tenantId = tenantId) {
 

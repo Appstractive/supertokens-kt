@@ -64,6 +64,6 @@ sealed interface AuthFactor {
     }
 
     fun List<AuthFactor>.isValid(factors: Map<String, Number>): Boolean {
-        return all { it.isValidFor(factors) }
+        return isEmpty() || all { it.isValidFor(factors) }
     }
 }

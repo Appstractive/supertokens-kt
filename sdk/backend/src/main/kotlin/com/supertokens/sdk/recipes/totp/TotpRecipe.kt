@@ -199,7 +199,7 @@ class TotpRecipe(
         totp: String,
         allowUnverifiedDevices: Boolean = false,
         tenantId: String?
-    ): Boolean {
+    ): SuperTokensStatus {
         val response = superTokens.post(PATH_TOTP_CODE_VERIFY, tenantId = tenantId) {
 
             header(HEADER_RECIPE_ID, RECIPE_TOTP)
@@ -213,7 +213,7 @@ class TotpRecipe(
             )
         }
 
-        return response.parse() == SuperTokensStatus.OK
+        return response.parse()
     }
 
     /**

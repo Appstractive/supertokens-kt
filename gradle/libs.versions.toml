@@ -56,6 +56,7 @@ ktor-server-contentnegotiation = {module = "io.ktor:ktor-server-content-negotiat
 ktor-server-statuspages = {module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor_version"}
 ktor-server-auth = {module = "io.ktor:ktor-server-auth", version.ref = "ktor_version"}
 ktor-server-auth-jwt = {module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor_version"}
+ktor-server-logging = {module = "io.ktor:ktor-server-call-logging", version.ref = "ktor_version"}
 
 settings = {module = "com.russhwolf:multiplatform-settings", version.ref = "settings"}
 

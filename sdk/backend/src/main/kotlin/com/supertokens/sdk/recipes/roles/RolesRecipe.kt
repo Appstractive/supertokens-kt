@@ -53,7 +53,7 @@ class RolesRecipe(
         user: User,
         tenantId: String?,
         recipeId: String,
-        authFactor: AuthFactor?,
+        multiAuthFactor: AuthFactor?,
         accessToken: String?
     ): Map<String, Any?> {
         if (!addRolesToToken && !addPermissionsToToken) {

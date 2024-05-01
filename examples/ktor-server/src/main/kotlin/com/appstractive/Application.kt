@@ -9,12 +9,20 @@ import com.supertokens.ktor.plugins.withPermission
 import com.supertokens.ktor.plugins.withRole
 import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.EndpointConfig
+import com.supertokens.sdk.SuperTokens
+import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
+import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
+import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
 import com.supertokens.sdk.common.models.PasswordlessMode
+import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.ingredients.email.smtp.SmtpConfig
 import com.supertokens.sdk.ingredients.email.smtp.SmtpEmailService
 import com.supertokens.sdk.recipe
+import com.supertokens.sdk.recipes.accountlinking.AccountLinking
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailverification.EmailVerification
+import com.supertokens.sdk.recipes.multifactor.AuthFactor
+import com.supertokens.sdk.recipes.multifactor.MultiFactorAuth
 import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.roles.Roles
 import com.supertokens.sdk.recipes.session.Sessions
@@ -26,6 +34,7 @@ import com.supertokens.sdk.recipes.thirdparty.providers.facebook.Facebook
 import com.supertokens.sdk.recipes.thirdparty.providers.github.Github
 import com.supertokens.sdk.recipes.thirdparty.providers.gitlab.GitLab
 import com.supertokens.sdk.recipes.thirdparty.providers.google.Google
+import com.supertokens.sdk.recipes.totp.Totp
 import com.supertokens.sdk.superTokens
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.*
@@ -150,8 +159,15 @@ fun Application.module() {
                 mode = PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK
             }
 
-            recipe(Roles) {
+            recipe(Roles)
 
+            recipe(AccountLinking)
+            recipe(Totp)
+            recipe(MultiFactorAuth) {
+                firstFactors = listOf(RECIPE_EMAIL_PASSWORD, RECIPE_PASSWORDLESS, RECIPE_THIRD_PARTY)
+                getRequiredMultiFactors = { superTokens: SuperTokens, user: User, tenantId: String? ->
+                    listOf(AuthFactor.TOTP)
+                }
             }
         }
 
