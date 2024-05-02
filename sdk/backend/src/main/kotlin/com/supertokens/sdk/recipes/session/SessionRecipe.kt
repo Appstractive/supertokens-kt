@@ -125,7 +125,8 @@ class SessionRecipe(
         accessToken: String?
     ): Map<String, Any?> = buildMap {
         set(Claims.ISSUER, issuer)
-        set(Claims.AUDIENCE, superTokens.appConfig.frontends.map { it.host })
+
+        set(Claims.AUDIENCE, superTokens.audience(user, tenantId))
 
         user.email?.let {
             set(Claims.EMAIL, it)

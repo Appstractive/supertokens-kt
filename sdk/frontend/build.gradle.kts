@@ -50,6 +50,7 @@ kotlin {
                 api(projects.supertokensSdkCommon)
 
                 implementation(libs.kotlin.serialization)
+                implementation(libs.kotlin.serialization.json)
                 implementation(libs.kotlin.coroutines)
 
                 implementation(libs.ktor.serialization)

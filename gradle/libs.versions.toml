@@ -1,7 +1,13 @@
 [versions]
 kotlin = "1.9.23" # https://kotlinlang.org/docs/releases.html#release-details
 agp = "8.2.1" # https://developer.android.com/studio/releases/gradle-plugin
+compose = "1.6.2" # https://github.com/JetBrains/compose-jb
 
+coreKtx = "1.13.0" # https://developer.android.com/jetpack/androidx/releases/core
+appcompat = "1.6.1" # https://developer.android.com/jetpack/androidx/releases/appcompat
+activity = "1.9.0" # https://developer.android.com/jetpack/androidx/releases/activity
+
+targetSdk = "34"
 compileSdk = "34"
 minSdk = "24"
 
@@ -20,6 +26,7 @@ slf4j = "1.6.1"
 mail = "1.6.0"
 freemarker = "2.3.32"
 
+circuit = "0.20.0"
 settings = "1.1.1"
 
 totp = "2.4.0"
@@ -28,15 +35,18 @@ random = "0.2.0"
 hash = "0.4.0"
 
 [libraries]
-androidGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
-kotlinGradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
 android-startup = {module = "androidx.startup:startup-runtime", version.ref = "android-startup"}
 android-crypto = {module = "androidx.security:security-crypto-ktx", version.ref = "android-crypto"}
+androidx-coreKtx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 
 kotlin-serialization = {module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization"}
 kotlin-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization"}
 kotlin-coroutines = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines"}
+kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
+kotlin-coroutines-swing = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlin-coroutines"}
 kotlin-random = {module = "org.kotlincrypto:secure-random", version.ref = "random"}
 kotlin-hash-sha = {module = "org.kotlincrypto.hash:sha2", version.ref = "hash"}
 
@@ -65,9 +75,20 @@ freemarker = {module = "org.freemarker:freemarker", version.ref = "freemarker"}
 
 jwt = {module = "io.fusionauth:fusionauth-jwt", version.ref = "jwt"}
 
+circuit-core = {module = "com.slack.circuit:circuit-foundation", version.ref = "circuit"}
+circuit-overlays = {module = "com.slack.circuit:circuit-overlay", version.ref = "circuit"}
+circuitx-android = {module = "com.slack.circuit:circuitx-android", version.ref = "circuit"}
+circuitx-overlays = {module = "com.slack.circuit:circuitx-overlays", version.ref = "circuit"}
+
 slf4j = {module = "org.slf4j:slf4j-simple", version.ref = "slf4j"}
 
 test-kotlin = {module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin"}
 test-totp = {module = "dev.turingcomplete:kotlin-onetimepassword", version.ref = "totp"}
 
 junit = "junit:junit:4.13.2"
+
+[plugins]
+android = { id = "com.android.library", version.ref = "agp" }
+kotlin = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }

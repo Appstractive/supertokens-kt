@@ -14,12 +14,16 @@ data class ClaimMFA(
 
 @Serializable
 data class AccessTokenClaims(
+    @SerialName(Claims.EXPIRES_AT)
+    val expiresAt: Long,
+    @SerialName(Claims.ISSUED_AT)
+    val issuedAt: Long,
     @SerialName(Claims.USER_ID)
     val sub: String,
     @SerialName(Claims.ISSUER)
     val issuer: String,
     @SerialName(Claims.AUDIENCE)
-    val audience: String? = null,
+    val audience: List<String>? = null,
     @SerialName(Claims.EMAIL)
     val email: String? = null,
     @SerialName(Claims.EMAIL_VERIFIED)

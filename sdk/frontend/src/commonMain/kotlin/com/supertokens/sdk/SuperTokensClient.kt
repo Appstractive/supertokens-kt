@@ -119,9 +119,9 @@ class SuperTokensClient(
      *  It essentially means, there is a refresh token present, but no access token yet, e.g. during startup
      *  when a new access token hasn't been fetched yet.
      */
-    suspend fun isLoggedIn(): Boolean = authRepository.authState.value !is AuthState.Unauthenticated
+    fun isLoggedIn(): Boolean = authRepository.authState.value !is AuthState.Unauthenticated
     // true, if the user was authenticated from the backend (an access token is present)
-    suspend fun isAuthenticated():Boolean = authRepository.authState.value is AuthState.Authenticated
+    fun isAuthenticated():Boolean = authRepository.authState.value is AuthState.Authenticated
 
     init {
         scope.launch {

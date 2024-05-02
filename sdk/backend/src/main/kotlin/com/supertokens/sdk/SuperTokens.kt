@@ -1,5 +1,6 @@
 package com.supertokens.sdk
 
+import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.core.CoreHandler
 import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.recipes.BuildRecipe
@@ -68,6 +69,10 @@ class SuperTokensConfig(
     var recipes: List<BuildRecipe> = emptyList()
         private set
 
+    var audience: (user: User, tenantId: String?) -> List<String> = { _, _ ->
+        listOf(appConfig.api.host)
+    }
+
     operator fun BuildRecipe.unaryPlus() {
         recipes = recipes + this
     }
@@ -85,6 +90,8 @@ class SuperTokens(
     val jwksUrl: String = "${config.connectionUrl}/.well-known/jwks.json"
 
     val appId by lazy { config.appId }
+
+    val audience by lazy { config.audience }
 
     internal val core: CoreHandler = CoreHandler()
 

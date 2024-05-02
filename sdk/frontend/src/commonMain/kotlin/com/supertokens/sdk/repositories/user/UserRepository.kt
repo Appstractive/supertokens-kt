@@ -8,6 +8,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 interface UserRepository {
 
+    val decoder: Json
+
     val claims: StateFlow<AccessTokenClaims?>
 
     suspend fun setClaims(claims: AccessTokenClaims?)
@@ -17,8 +19,9 @@ interface UserRepository {
         setClaims(null)
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     suspend fun setClaimsFromJwt(jwt: String) {
-        setClaims(jwt.parseJwtClaims())
+        setClaims(decoder.decodeFromString<AccessTokenClaims>(Base64.decode(jwt.split(".")[1]).decodeToString()))
     }
 
     suspend fun getUserId(): String? = getClaims()?.sub
@@ -29,11 +32,4 @@ interface UserRepository {
     suspend fun getFactors(): Map<String, Long> = getClaims()?.multiFactor?.factors ?: emptyMap()
     suspend fun isMultiFactorVerified(): Boolean = getClaims()?.multiFactor?.verified == true
 
-}
-
-@OptIn(ExperimentalEncodingApi::class)
-fun String.parseJwtClaims(): AccessTokenClaims {
-    val payload =
-        Json.decodeFromString<AccessTokenClaims>(Base64.decode(split(".")[1]).decodeToString())
-    return payload
 }

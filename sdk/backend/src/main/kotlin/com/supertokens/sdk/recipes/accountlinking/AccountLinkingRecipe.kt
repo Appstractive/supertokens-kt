@@ -165,7 +165,7 @@ class AccountLinkingRecipe(
 
     private suspend fun getPrimaryEmailUser(email: String, requireVerified: Boolean): User? {
         return superTokens.getUsersByEMail(email = email).firstOrNull {
-            it.isPrimaryUser && it.loginMethods?.any { method ->
+            it.isPrimaryUser == true && it.loginMethods?.any { method ->
                 (!requireVerified || method.verified) && method.email == email
             } == true
         }
@@ -173,7 +173,7 @@ class AccountLinkingRecipe(
 
     private suspend fun getPrimaryPhoneUser(phoneNumber: String, requireVerified: Boolean): User? {
         return superTokens.getUsersByPhoneNumber(phoneNumber = phoneNumber).firstOrNull {
-            it.isPrimaryUser && it.loginMethods?.any { method ->
+            it.isPrimaryUser == true && it.loginMethods?.any { method ->
                 (!requireVerified || method.verified) && method.phoneNumber == phoneNumber
             } == true
         }

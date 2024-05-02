@@ -16,6 +16,13 @@ class UserRepositorySettings(
     private val json: Json = Json,
 ): UserRepository {
 
+    override val decoder: Json = Json {
+        isLenient = true
+        explicitNulls = false
+        encodeDefaults = true
+        ignoreUnknownKeys = true
+    }
+
     override val claims: MutableStateFlow<AccessTokenClaims?> = MutableStateFlow(null)
 
     init {

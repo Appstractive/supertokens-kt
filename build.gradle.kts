@@ -1,11 +1,4 @@
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://jitpack.io")
-        mavenLocal()
-    }
-
     ext {
         val keyPropertiesFile = rootDir.resolve("key.properties")
         if (keyPropertiesFile.exists()) {
@@ -26,18 +19,9 @@ allprojects {
     }
 }
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://jitpack.io")
-    }
-
-    dependencies {
-        classpath(libs.androidGradle)
-
-        classpath(libs.kotlinGradle)
-
-        classpath((kotlin("serialization", version = libs.versions.kotlin.serialization.get())))
-    }
+plugins {
+    alias(libs.plugins.android).apply(false)
+    alias(libs.plugins.kotlin).apply(false)
+    alias(libs.plugins.serialization).apply(false)
+    alias(libs.plugins.compose).apply(false)
 }

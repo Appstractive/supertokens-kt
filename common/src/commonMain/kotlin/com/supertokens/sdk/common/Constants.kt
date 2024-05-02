@@ -24,6 +24,8 @@ const val RECIPE_ACCOUNT_LINKING = "accountlinking"
 
 object Claims {
 
+    const val ISSUED_AT = "iat"
+    const val EXPIRES_AT = "exp"
     const val ISSUER = "iss"
     const val AUDIENCE = "aud"
     const val USER_ID = "sub"
