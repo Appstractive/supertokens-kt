@@ -1,6 +1,7 @@
 package com.supertokens.sdk.common.claims
 
 import com.supertokens.sdk.common.Claims
+import com.supertokens.sdk.common.util.StringListSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -23,6 +24,7 @@ data class AccessTokenClaims(
     @SerialName(Claims.ISSUER)
     val issuer: String,
     @SerialName(Claims.AUDIENCE)
+    @Serializable(with = StringListSerializer::class)
     val audience: List<String>? = null,
     @SerialName(Claims.EMAIL)
     val email: String? = null,
