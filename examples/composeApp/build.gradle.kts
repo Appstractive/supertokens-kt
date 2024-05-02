@@ -27,6 +27,8 @@ kotlin {
         }
     }
 
+    jvm()
+
     sourceSets {
         commonMain.dependencies {
             implementation(project(":sdk:frontend"))
@@ -52,6 +54,11 @@ kotlin {
             implementation(libs.kotlin.coroutines.android)
 
             implementation(libs.circuitx.android)
+        }
+
+        jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(compose.desktop.common)
         }
     }
 }
