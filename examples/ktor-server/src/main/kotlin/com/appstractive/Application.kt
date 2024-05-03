@@ -21,6 +21,7 @@ import com.supertokens.sdk.recipes.accountlinking.AccountLinking
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailverification.EmailVerification
 import com.supertokens.sdk.common.models.AuthFactor
+import com.supertokens.sdk.recipes.accountlinking.ShouldDoAccountLinkingResult
 import com.supertokens.sdk.recipes.multifactor.MultiFactorAuth
 import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.roles.Roles
@@ -160,7 +161,13 @@ fun Application.module() {
 
             recipe(Roles)
 
-            recipe(AccountLinking)
+            recipe(AccountLinking) {
+                shouldDoAutomaticAccountLinking = { _, _ ->
+                    ShouldDoAccountLinkingResult(
+                        shouldAutomaticallyLink = true
+                    )
+                }
+            }
             recipe(Totp)
             recipe(MultiFactorAuth) {
                 firstFactors = listOf(RECIPE_EMAIL_PASSWORD, RECIPE_THIRD_PARTY)

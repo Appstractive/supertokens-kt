@@ -221,6 +221,13 @@ class PasswordlessRecipe(
                 user = it.user ?: throw RuntimeException("OK StatusResponse without user"),
                 createdNewUser = it.createdNewUser ?: throw RuntimeException("OK StatusResponse without createdNewUser"),
             )
+        }.also {
+            if(it.createdNewUser) {
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignUp(it.user, RECIPE_PASSWORDLESS))
+            }
+            else {
+                superTokens._events.tryEmit(SuperTokensEvent.UserSignIn(it.user, RECIPE_PASSWORDLESS))
+            }
         }
     }
 

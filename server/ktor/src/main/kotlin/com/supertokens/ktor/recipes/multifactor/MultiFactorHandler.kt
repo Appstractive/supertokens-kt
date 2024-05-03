@@ -49,6 +49,7 @@ open class MultiFactorHandler(
         "$basePath${Routes.Totp.VERIFY_DEVICE}",
         "$basePath${Routes.Passwordless.SIGNUP_CODE_CONSUME}",
         "$basePath${Routes.Session.REFRESH}",
+        "$basePath${Routes.EmailVerification.VERIFY_TOKEN}",
     )
 
     /**

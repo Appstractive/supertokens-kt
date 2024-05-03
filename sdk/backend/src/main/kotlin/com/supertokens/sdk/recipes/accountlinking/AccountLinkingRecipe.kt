@@ -28,6 +28,7 @@ import com.supertokens.sdk.recipes.accountlinking.responses.CheckPrimaryUserResp
 import com.supertokens.sdk.recipes.accountlinking.responses.CreatePrimaryUserResponseDTO
 import com.supertokens.sdk.recipes.accountlinking.responses.LinkAccountsResponseDTO
 import com.supertokens.sdk.recipes.accountlinking.responses.UnlinkAccountsResponseDTO
+import com.supertokens.sdk.recipes.emailverification.checkEmailVerified
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
@@ -96,6 +97,10 @@ class AccountLinkingRecipe(
             val result = config.shouldDoAutomaticAccountLinking(superTokens, user)
 
             if (result.shouldAutomaticallyLink) {
+                user.loginMethods?.firstOrNull {
+                    it.recipeId == recipeId && (!result.shouldRequireVerification || it.verified)
+                } ?:return
+
                 user.emails?.forEach {
                     createOrLinkPrimary(
                         primaryUser = getPrimaryEmailUser(
@@ -117,9 +122,15 @@ class AccountLinkingRecipe(
                 }
             }
         }
+            .onFailure {
+                it.printStackTrace()
+            }
     }
 
-    private suspend fun createOrLinkPrimary(primaryUser: User?, recipeUserId: String) {
+    private suspend fun createOrLinkPrimary(
+        primaryUser: User?,
+        recipeUserId: String,
+    ) {
         if (primaryUser != null) {
             if (canLink(
                     primaryUserId = primaryUser.id,
@@ -131,7 +142,6 @@ class AccountLinkingRecipe(
                     recipeUserId = recipeUserId,
                 )
             }
-
         } else {
             if (canCreatePrimary(recipeUserId = recipeUserId)) {
                 superTokens.createPrimaryUser(
@@ -157,7 +167,7 @@ class AccountLinkingRecipe(
         recipeUserId: String,
     ): Boolean {
         return runCatching {
-            canCreatePrimary(
+            checkCanCreatePrimaryUser(
                 recipeUserId = recipeUserId,
             )
         }.isSuccess
@@ -165,9 +175,10 @@ class AccountLinkingRecipe(
 
     private suspend fun getPrimaryEmailUser(email: String, requireVerified: Boolean): User? {
         return superTokens.getUsersByEMail(email = email).firstOrNull {
-            it.isPrimaryUser == true && it.loginMethods?.any { method ->
-                (!requireVerified || method.verified) && method.email == email
-            } == true
+            it.isPrimaryUser == true && (!requireVerified || superTokens.checkEmailVerified(
+                userId = it.id,
+                email = email,
+            ))
         }
     }
 

@@ -3,17 +3,16 @@ package com.supertokens.ktor.recipes.emailverification
 import com.supertokens.ktor.plugins.AuthenticatedUser
 import com.supertokens.ktor.plugins.accessToken
 import com.supertokens.ktor.plugins.requirePrincipal
-import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.recipes.session.isSessionsEnabled
+import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.EndpointConfig
+import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
 import com.supertokens.sdk.common.RECIPE_EMAIL_VERIFICATION
-import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.VerifyEmailTokenRequestDTO
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.responses.VerifyEmailResponseDTO
@@ -35,13 +34,18 @@ open class EmailVerificationHandler(
     protected val scope: CoroutineScope,
 ) {
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(frontend: EndpointConfig, token: String) =
+    open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(
+        frontend: EndpointConfig,
+        token: String
+    ) =
         "${frontend.fullUrl}verify-email?token=$token"
 
     /**
      * Override this to send localized mails
      */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.getResetPasswordTemplateName(emailService: EmailService) =
+    open suspend fun PipelineContext<Unit, ApplicationCall>.getResetPasswordTemplateName(
+        emailService: EmailService
+    ) =
         emailService.emailVerificationTemplateName
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendVerificationMail(email: String) {
@@ -85,10 +89,16 @@ open class EmailVerificationHandler(
      * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailVerification%20Recipe/verifyEmailToken">Frontend Driver Interface</a>
      */
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendEmailVerification() {
-        val user = call.requirePrincipal<AuthenticatedUser>()
-        val email = superTokens.getUserById(user.id).email ?: throw SuperTokensStatusException(SuperTokensStatus.UnknownEMailError)
+        val principal = call.requirePrincipal<AuthenticatedUser>()
+        val user = superTokens.getUserById(principal.id)
 
-        sendVerificationMail(email)
+        user.loginMethods?.forEach {
+            if (it.recipeId == RECIPE_EMAIL_PASSWORD && !it.verified) {
+                it.email?.let { email ->
+                    sendVerificationMail(email)
+                }
+            }
+        }
 
         call.respond(StatusResponseDTO())
     }
@@ -128,7 +138,7 @@ open class EmailVerificationHandler(
                     accessToken?.let { token ->
                         val session = sessions.verifySession(token, checkDatabase = true)
 
-                        if(session.session.userId == data.userId) {
+                        if (session.session.userId == data.userId) {
 
                             val newSession = sessions.regenerateSession(token, jwtData)
 
