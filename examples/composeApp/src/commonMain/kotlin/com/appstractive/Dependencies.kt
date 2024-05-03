@@ -27,7 +27,7 @@ interface Dependencies {
 }
 
 var dependencies = object: Dependencies {
-    override val superTokensClient = superTokensClient("https://api.anschulz.de") {
+    override val superTokensClient = superTokensClient("https://auth.appstractive.com") {
         recipe(Session)
         recipe(EmailPassword)
         recipe(Passwordless)
