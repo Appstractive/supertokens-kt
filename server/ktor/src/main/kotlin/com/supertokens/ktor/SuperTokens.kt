@@ -13,6 +13,10 @@ import com.supertokens.ktor.recipes.emailpassword.isEmailPasswordEnabled
 import com.supertokens.ktor.recipes.emailverification.EmailVerificationHandler
 import com.supertokens.ktor.recipes.emailverification.emailVerificationRoutes
 import com.supertokens.ktor.recipes.emailverification.isEmailVerificationEnabled
+import com.supertokens.ktor.recipes.multifactor.MfaHandlerAttributeKey
+import com.supertokens.ktor.recipes.multifactor.MultiFactorHandler
+import com.supertokens.ktor.recipes.multifactor.isMultiFactorAuthEnabled
+import com.supertokens.ktor.recipes.multifactor.multiFactorRoutes
 import com.supertokens.ktor.recipes.passwordless.PasswordlessHandler
 import com.supertokens.ktor.recipes.passwordless.isPasswordlessEnabled
 import com.supertokens.ktor.recipes.passwordless.passwordlessRoutes
@@ -26,13 +30,9 @@ import com.supertokens.ktor.recipes.totp.TotpHandler
 import com.supertokens.ktor.recipes.totp.isTotpEnabled
 import com.supertokens.ktor.recipes.totp.totpRoutes
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.recipes.emailpassword.EmailPasswordRecipe
-import com.supertokens.sdk.recipes.emailverification.EmailVerificationRecipe
-import com.supertokens.sdk.recipes.passwordless.PasswordlessRecipe
+import com.supertokens.sdk.recipes.multifactor.MultiFactorAuthRecipe
 import com.supertokens.sdk.recipes.roles.RolesRecipe
 import com.supertokens.sdk.recipes.session.SessionRecipe
-import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
-import com.supertokens.sdk.recipes.totp.TotpRecipe
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.application
@@ -88,6 +88,8 @@ class SuperTokensConfig {
     // Handler for Totp APIs
     var totpHandler: TotpHandler = TotpHandler(scope = scope)
 
+    var mfaHandler: MultiFactorHandler = MultiFactorHandler(scope = scope)
+
     // Allows you to perform additional validations on the JWT payload.
     var jwtValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = TokenValidator
 
@@ -110,6 +112,10 @@ val SuperTokens =
 
         application.attributes.put(SuperTokensAttributeKey, superTokens)
         application.attributes.put(UserHandlerAttributeKey, config.userHandler)
+
+        if (superTokens.hasRecipe<MultiFactorAuthRecipe>()) {
+            application.attributes.put(MfaHandlerAttributeKey, config.mfaHandler)
+        }
 
         application.routing {
 
@@ -186,6 +192,10 @@ private fun Route.recipeRoutes(superTokens: SuperTokens, config: SuperTokensConf
 
     if (isTotpEnabled) {
         totpRoutes(config.totpHandler)
+    }
+
+    if (isMultiFactorAuthEnabled) {
+        multiFactorRoutes(config.mfaHandler)
     }
 }
 

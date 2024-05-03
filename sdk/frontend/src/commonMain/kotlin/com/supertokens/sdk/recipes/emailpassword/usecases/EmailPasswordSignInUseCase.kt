@@ -54,8 +54,6 @@ class EmailPasswordSignInUseCase(
         return when (body.status) {
             SuperTokensStatus.OK.value -> checkNotNull(body.user)
             else -> throw SuperTokensStatusException(body.status.toStatus())
-        }.also { user ->
-            authRepository.setAuthenticated(user.id)
         }
     }
 

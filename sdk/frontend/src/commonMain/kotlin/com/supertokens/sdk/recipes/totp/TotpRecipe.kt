@@ -5,6 +5,7 @@ import com.supertokens.sdk.recipes.BuildRecipe
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
+import com.supertokens.sdk.recipes.totp.usecases.CreateTotpDeviceResult
 import com.supertokens.sdk.recipes.totp.usecases.CreateTotpDeviceUseCase
 import com.supertokens.sdk.recipes.totp.usecases.GetTotpDevicesUseCase
 import com.supertokens.sdk.recipes.totp.usecases.RemoveTotpDeviceUseCase
@@ -49,7 +50,7 @@ class TotpRecipe(
     }
 
     suspend fun getDevices() = getTotpDevicesUseCase.getTotpDevices()
-    suspend fun createDevice(name: String) = createDeviceUseCase.createDevice(name = name)
+    suspend fun createDevice(name: String): CreateTotpDeviceResult = createDeviceUseCase.createDevice(name = name)
     suspend fun removeDevice(name: String) = removeDeviceUseCase.removeDevice(name = name)
     suspend fun verifyDevice(name: String, totp: String) =
         verifyDeviceUseCase.verifyDevice(deviceName = name, totp = totp)

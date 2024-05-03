@@ -18,7 +18,7 @@ import com.supertokens.sdk.recipes.CustomJwtData
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
-import com.supertokens.sdk.recipes.multifactor.AuthFactor
+import com.supertokens.sdk.common.models.AuthFactor
 import com.supertokens.sdk.recipes.session.models.GetSessionData
 import com.supertokens.sdk.recipes.session.models.VerifySessionData
 import com.supertokens.sdk.recipes.session.requests.CreateSessionRequest

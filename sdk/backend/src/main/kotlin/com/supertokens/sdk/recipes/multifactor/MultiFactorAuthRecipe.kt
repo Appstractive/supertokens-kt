@@ -4,13 +4,13 @@ import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.Claims
 import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
 import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
-import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
 import com.supertokens.sdk.common.RECIPE_TOTP
+import com.supertokens.sdk.common.models.AuthFactor
 import com.supertokens.sdk.common.models.User
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
-import com.supertokens.sdk.recipes.multifactor.AuthFactor.OTP_PHONE.isValid
+import com.supertokens.sdk.common.models.AuthFactor.OTP_PHONE.isValid
 import com.supertokens.sdk.recipes.session.verifySession
 
 typealias GetRequiredMultiFactors = suspend (superTokens: SuperTokens, user: User, tenantId: String?) -> List<AuthFactor>
@@ -49,8 +49,7 @@ class MultiFactorAuthRecipe(
             }.getOrNull()?.userDataInJWT
         } ?: emptyMap()
 
-        val mfaData = (userDataInJWT[Claims.MFA] as? Map<String, Any?>) ?: emptyMap()
-        val factors = mfaData.getFactors().toMutableMap().apply {
+        val factors = getFactorsFromJwtData(userDataInJWT).toMutableMap().apply {
             when(recipeId) {
                 RECIPE_EMAIL_PASSWORD -> {
                     put(recipeId, System.currentTimeMillis())
@@ -86,9 +85,14 @@ class MultiFactorAuthRecipe(
         )
     }
 
-    private fun Map<String, Any?>.getFactors(): Map<String, Number> {
-        return get(Claims.MFA_FACTORS) as? Map<String, Number> ?: emptyMap()
+    fun getFactorsFromJwtData(userDataInJWT: Map<String, Any?>): Map<String, Number> {
+        val mfaData = (userDataInJWT[Claims.MFA] as? Map<String, Any?>) ?: emptyMap()
+        return mfaData.getFactors()
     }
+}
+
+internal fun Map<String, Any?>.getFactors(): Map<String, Number> {
+    return get(Claims.MFA_FACTORS) as? Map<String, Number> ?: emptyMap()
 }
 
 val MultiFactorAuth = object : RecipeBuilder<MultiFactorRecipeConfig, MultiFactorAuthRecipe>() {

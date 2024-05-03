@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import com.appstractive.LocalDependencies
 import com.appstractive.screens.home.HomeScreen
 import com.appstractive.util.CommonParcelize
+import com.appstractive.util.getHomeScreen
 import com.appstractive.util.rememberApiCallController
 import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.CircuitUiEvent
@@ -72,7 +73,7 @@ fun PasswordlessScreenPresenter(
                     this.deviceId = deviceId
                     this.userInputCode = it.code
                 }
-                navigator.goTo(HomeScreen)
+                navigator.resetRoot(superTokensClient.getHomeScreen())
             }
 
             PasswordlessScreen.Event.GoBack -> navigator.pop()

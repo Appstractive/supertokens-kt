@@ -1,7 +1,6 @@
 package com.supertokens.ktor.recipes.passwordless
 
 import com.supertokens.ktor.plugins.AuthenticatedUser
-import com.supertokens.ktor.plugins.accessToken
 import com.supertokens.ktor.recipes.emailverification.emailVerification
 import com.supertokens.ktor.recipes.emailverification.isEmailVerificationEnabled
 import com.supertokens.ktor.recipes.multifactor.isMultiFactorAuthEnabled
@@ -15,7 +14,6 @@ import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
-import com.supertokens.sdk.common.RECIPE_TOTP
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.models.PasswordlessMode
@@ -29,7 +27,7 @@ import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.common.models.SignInUpData
-import com.supertokens.sdk.recipes.multifactor.AuthFactor
+import com.supertokens.sdk.common.models.AuthFactor
 import com.supertokens.sdk.recipes.passwordless.models.LoginMagicLinkOtpTemplate
 import com.supertokens.sdk.recipes.passwordless.models.LoginMagicLinkTemplate
 import com.supertokens.sdk.recipes.passwordless.models.LoginOtpTemplate

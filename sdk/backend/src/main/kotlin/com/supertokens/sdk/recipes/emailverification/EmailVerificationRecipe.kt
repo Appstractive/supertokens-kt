@@ -1,6 +1,5 @@
 package com.supertokens.sdk.recipes.emailverification
 
-import com.supertokens.sdk.Constants
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.Claims
 import com.supertokens.sdk.common.HEADER_RECIPE_ID
@@ -23,7 +22,7 @@ import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.models.SuperTokensEvent
 import com.supertokens.sdk.post
 import com.supertokens.sdk.recipes.emailverification.responses.VerifyEmailTokenResponseDTO
-import com.supertokens.sdk.recipes.multifactor.AuthFactor
+import com.supertokens.sdk.common.models.AuthFactor
 import com.supertokens.sdk.utils.parse
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody

@@ -4,6 +4,7 @@ import com.supertokens.sdk.recipes.passwordless.models.TemplateProvider
 import freemarker.cache.TemplateLoader
 import freemarker.cache.URLTemplateLoader
 import freemarker.template.Configuration
+import freemarker.template.Configuration.VERSION_2_3_32
 import freemarker.template.Template
 import java.io.StringWriter
 import java.net.URL
@@ -25,7 +26,7 @@ abstract class EmailService(
     val emailVerificationTemplateName: String = "email-verification.html",
 ) {
 
-    private val cfg = Configuration().apply {
+    private val cfg = Configuration(VERSION_2_3_32).apply {
         this.localizedLookup = localizedLookup
     }
 

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.appstractive.LocalDependencies
 import com.appstractive.screens.home.HomeScreen
 import com.appstractive.util.CommonParcelize
+import com.appstractive.util.getHomeScreen
 import com.appstractive.util.rememberApiCallController
 import com.slack.circuit.runtime.CircuitUiEvent
 import com.slack.circuit.runtime.CircuitUiState
@@ -41,14 +42,14 @@ fun EmailPasswordScreenPresenter(
                     email = it.email
                     password = it.password
                 }
-                navigator.goTo(HomeScreen)
+                navigator.resetRoot(superTokensClient.getHomeScreen())
             }
             is EmailPasswordScreen.Event.SignUp -> apiCallController.call {
                 superTokensClient.signUpWith(EmailPassword) {
                     email = it.email
                     password = it.password
                 }
-                navigator.goTo(HomeScreen)
+                navigator.resetRoot(superTokensClient.getHomeScreen())
             }
 
             EmailPasswordScreen.Event.GoBack -> navigator.pop()

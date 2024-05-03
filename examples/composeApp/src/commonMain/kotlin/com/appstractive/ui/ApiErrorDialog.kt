@@ -41,7 +41,7 @@ class ApiErrorDialog(
         when (exception) {
             is SuperTokensStatusException ->
                 when (exception.status) {
-                    else -> "TODO Error Message"
+                    else -> exception.status.value
                 }
 
             is IOException,

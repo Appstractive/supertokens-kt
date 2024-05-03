@@ -8,7 +8,6 @@ import com.supertokens.ktor.recipes.session.sessions
 import com.supertokens.ktor.superTokens
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
-import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
 import com.supertokens.sdk.common.RECIPE_TOTP
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.requests.TotpDeviceRequestDTO
@@ -20,11 +19,15 @@ import com.supertokens.sdk.common.responses.RemoveTotpDeviceResponseDTO
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.responses.TotpDeviceDTO
 import com.supertokens.sdk.core.getUserById
-import com.supertokens.sdk.recipes.multifactor.AuthFactor
+import com.supertokens.sdk.common.models.AuthFactor
+import io.ktor.http.URLProtocol
+import io.ktor.http.parameters
+import io.ktor.http.path
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.util.url
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 
@@ -71,7 +74,15 @@ open class TotpHandler(
             CreateTotpDeviceResponseDTO(
                 deviceName = body.deviceName,
                 secret = secret,
-                qrCodeString = "otpauth://totp/$issuer?secret=$secret&issuer=$issuer",
+                qrCodeString = url {
+                    protocol = URLProtocol.createOrDefault("otpauth")
+                    host = "totp"
+                    path("/")
+                    parameters {
+                        append("secret", secret)
+                        append("issuer", issuer)
+                    }
+                },
             )
         )
     }

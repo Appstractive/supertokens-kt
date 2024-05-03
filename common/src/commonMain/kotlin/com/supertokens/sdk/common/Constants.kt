@@ -21,6 +21,7 @@ const val RECIPE_ROLES = "userroles"
 const val RECIPE_TOTP = "totp"
 const val RECIPE_META_DATA = "usermetadata"
 const val RECIPE_ACCOUNT_LINKING = "accountlinking"
+const val RECIPE_MULTI_FACTOR_AUTH = "multifactorauth"
 
 object Claims {
 

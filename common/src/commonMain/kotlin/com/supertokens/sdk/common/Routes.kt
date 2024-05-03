@@ -57,4 +57,8 @@ object Routes {
 
     }
 
+    object Mfa {
+        const val CHECK = "mfa/info"
+    }
+
 }

@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes
 
-import com.supertokens.sdk.recipes.multifactor.AuthFactor
-import com.supertokens.sdk.recipes.multifactor.AuthFactor.OTP_PHONE.isValid
+import com.supertokens.sdk.common.models.AuthFactor
+import com.supertokens.sdk.common.models.AuthFactor.OTP_PHONE.isValid
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

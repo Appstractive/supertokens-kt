@@ -3,7 +3,7 @@ package com.supertokens.sdk.recipes
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.SuperTokensRecipeDslMarker
 import com.supertokens.sdk.common.models.User
-import com.supertokens.sdk.recipes.multifactor.AuthFactor
+import com.supertokens.sdk.common.models.AuthFactor
 
 @SuperTokensRecipeDslMarker
 interface RecipeConfig

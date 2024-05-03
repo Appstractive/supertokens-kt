@@ -30,6 +30,6 @@ interface UserRepository {
     suspend fun getRoles(): List<String> = getClaims()?.roles ?: emptyList()
     suspend fun getPermissions(): List<String> = getClaims()?.permissions ?: emptyList()
     suspend fun getFactors(): Map<String, Long> = getClaims()?.multiFactor?.factors ?: emptyMap()
-    suspend fun isMultiFactorVerified(): Boolean = getClaims()?.multiFactor?.verified == true
+    suspend fun isMultiFactorVerified(): Boolean = getClaims()?.multiFactor == null || getClaims()?.multiFactor?.verified == true
 
 }

@@ -11,7 +11,6 @@ import com.supertokens.sdk.AppConfig
 import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
-import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
 import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.common.models.User
@@ -21,7 +20,7 @@ import com.supertokens.sdk.recipe
 import com.supertokens.sdk.recipes.accountlinking.AccountLinking
 import com.supertokens.sdk.recipes.emailpassword.EmailPassword
 import com.supertokens.sdk.recipes.emailverification.EmailVerification
-import com.supertokens.sdk.recipes.multifactor.AuthFactor
+import com.supertokens.sdk.common.models.AuthFactor
 import com.supertokens.sdk.recipes.multifactor.MultiFactorAuth
 import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.roles.Roles

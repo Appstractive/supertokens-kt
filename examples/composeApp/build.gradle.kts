@@ -41,6 +41,8 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.components.resources)
 
+            implementation(libs.compose.qr)
+
             implementation(libs.circuit.core)
             implementation(libs.circuit.overlays)
             implementation(libs.circuitx.overlays)

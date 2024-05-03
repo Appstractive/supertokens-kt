@@ -48,7 +48,7 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
         }
 
         call.response.headers.append(
-            HttpHeaders.AccessControlAllowHeaders,
+            HttpHeaders.AccessControlExposeHeaders,
             exposeHeaders.joinToString(", "),
         )
     }

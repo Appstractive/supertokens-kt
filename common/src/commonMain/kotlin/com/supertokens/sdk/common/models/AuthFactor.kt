@@ -1,4 +1,4 @@
-package com.supertokens.sdk.recipes.multifactor
+package com.supertokens.sdk.common.models
 
 internal interface Factor: AuthFactor {
     val key: String
@@ -34,7 +34,7 @@ sealed interface AuthFactor {
     }
 
     class AnyOf(vararg factors: AuthFactor) : AuthFactor {
-        private val factors: List<AuthFactor> = factors.toList()
+        internal val factors: List<AuthFactor> = factors.toList()
 
         override fun isValidFor(factors: Map<String, Number>): Boolean {
             return this.factors.any { it.isValidFor(factors) }
@@ -42,7 +42,7 @@ sealed interface AuthFactor {
     }
 
     class AllOf(vararg factors: AuthFactor, val anyOrder: Boolean = true) : AuthFactor {
-        private val factors: List<AuthFactor> = factors.toList()
+        internal val factors: List<AuthFactor> = factors.toList()
 
         override fun isValidFor(factors: Map<String, Number>): Boolean {
             val allValid = this.factors.all { it.isValidFor(factors) }
@@ -77,5 +77,15 @@ sealed interface AuthFactor {
 
     fun List<AuthFactor>.isValid(factors: Map<String, Number>): Boolean {
         return isEmpty() || all { it.isValidFor(factors) }
+    }
+
+    fun List<AuthFactor>.missing(factors: Map<String, Number>): List<String> {
+        return filter { !it.isValidFor(factors) }.flatMap {
+            when(it) {
+                is AllOf -> it.factors.missing(factors)
+                is AnyOf -> it.factors.missing(factors)
+                is Factor -> listOf(it.key)
+            }
+        }.distinct()
     }
 }

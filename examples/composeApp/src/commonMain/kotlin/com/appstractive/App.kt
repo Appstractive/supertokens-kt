@@ -20,10 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.appstractive.screens.auth.AuthScreen
-import com.appstractive.screens.home.HomeScreen
 import com.appstractive.util.ApiCallLoading
 import com.appstractive.util.CommonParcelize
+import com.appstractive.util.getHomeScreen
 import com.slack.circuit.backstack.SaveableBackStack
 import com.slack.circuit.backstack.rememberSaveableBackStack
 import com.slack.circuit.foundation.CircuitCompositionLocals
@@ -83,13 +82,7 @@ fun AppScreenPresenter(
     if (isInitialized) {
         val backstack =
             rememberSaveableBackStack(
-                buildList {
-                    if (superTokensClient.isAuthenticated()) {
-                        add(HomeScreen)
-                    } else {
-                        add(AuthScreen)
-                    }
-                },
+                listOf(superTokensClient.getHomeScreen()),
             )
         val navigator = getNavigator(backstack)
 
