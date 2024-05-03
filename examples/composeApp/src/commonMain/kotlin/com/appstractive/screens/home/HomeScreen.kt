@@ -51,8 +51,10 @@ fun HomeScreenPresenter(
     val claims by superTokensClient.userRepository.claims.collectAsState()
 
     LaunchedEffect(superTokensClient) {
-        val response = superTokensClient.apiClient.get("/private")
-        privateApiResponse = response.bodyAsText()
+        apiCallController.call {
+            val response = superTokensClient.apiClient.get("/private")
+            privateApiResponse = response.bodyAsText()
+        }
     }
 
     return HomeScreen.State(

@@ -3,6 +3,7 @@ package com.supertokens.sdk.recipes.sessions
 import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
 import com.supertokens.sdk.common.HEADER_REFRESH_TOKEN
+import com.supertokens.sdk.common.Routes
 import com.supertokens.sdk.getDefaultSettings
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
@@ -25,6 +26,7 @@ import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.fullPath
 
 class SessionRecipeConfig: RecipeConfig {
 
@@ -116,7 +118,7 @@ class SessionRecipe(
                     if(token.isNotBlank()) {
                         updateAccessTokenUseCase.updateAccessToken(token)
                     }
-                    else {
+                    else if(!it.request.url.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
                         signOut()
                     }
                 }
@@ -125,7 +127,7 @@ class SessionRecipe(
                     if(token.isNotBlank()) {
                         updateRefreshTokenUseCase.updateRefreshToken(token)
                     }
-                    else {
+                    else if(!it.request.url.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
                         signOut()
                     }
                 }
