@@ -9,7 +9,7 @@ plugins {
 kotlin {
     cocoapods {
         version = "1.0"
-        summary = "Compose app"
+        summary = "app"
         homepage = "not published"
         ios.deploymentTarget = "13.0"
     }
@@ -24,6 +24,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "app"
             isStatic = true
+            export(project(":sdk:frontend"))
         }
     }
 
@@ -31,7 +32,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":sdk:frontend"))
+            api(project(":sdk:frontend"))
 
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)
