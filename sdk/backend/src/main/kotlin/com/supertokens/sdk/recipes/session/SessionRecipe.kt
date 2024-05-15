@@ -53,6 +53,8 @@ class SessionConfig : RecipeConfig {
 
     var cookieDomain: String? = null
 
+    var cookiePath: String? = null
+
     // the JWT issuer to use
     var issuer: String? = null
 
@@ -86,6 +88,10 @@ class SessionRecipe(
 
     val cookieDomain by lazy {
         config.cookieDomain ?: superTokens.appConfig.api.host
+    }
+
+    val cookiePath by lazy {
+        config.cookiePath ?: superTokens.appConfig.api.path
     }
 
     val secureCookies by lazy {

@@ -56,10 +56,15 @@ fun Application.module() {
 
     val superTokensUrl = environment.config.propertyOrNull("supertokens.url")?.getString() ?: throw IllegalStateException("supertokens.url not configured")
     val superTokensIssuer = environment.config.propertyOrNull("supertokens.issuer")?.getString() ?: "localhost"
+    val superTokensDomain = environment.config.propertyOrNull("supertokens.domain")?.getString() ?: "localhost"
 
     val frontendScheme = environment.config.propertyOrNull("supertokens.frontend.scheme")?.getString() ?: throw IllegalStateException("supertokens.frontend.scheme not configured")
     val frontendHost = environment.config.propertyOrNull("supertokens.frontend.host")?.getString() ?: throw IllegalStateException("supertokens.frontend.host not configured")
     val frontendPath = environment.config.propertyOrNull("supertokens.frontend.path")?.getString() ?: throw IllegalStateException("supertokens.frontend.path not configured")
+
+    val apiScheme = environment.config.propertyOrNull("supertokens.api.scheme")?.getString() ?: throw IllegalStateException("supertokens.api.scheme not configured")
+    val apiHost = environment.config.propertyOrNull("supertokens.api.host")?.getString() ?: throw IllegalStateException("supertokens.api.host not configured")
+    val apiPath = environment.config.propertyOrNull("supertokens.api.path")?.getString() ?: throw IllegalStateException("supertokens.api.path not configured")
 
     val smtpUser = environment.config.propertyOrNull("smtp.user")?.getString() ?: throw IllegalStateException("smtp.user not configured")
     val smtpPassword = environment.config.propertyOrNull("smtp.password")?.getString() ?: throw IllegalStateException("smtp.password not configured")
@@ -82,7 +87,11 @@ fun Application.module() {
             connectionURI = superTokensUrl,
             appConfig = AppConfig(
                 name = "Ktor Example Server",
-                api = EndpointConfig(),
+                api = EndpointConfig(
+                    scheme = apiScheme,
+                    host = apiHost,
+                    path = apiPath,
+                ),
                 frontends = listOf(
                     EndpointConfig(
                         scheme = frontendScheme,
@@ -103,6 +112,7 @@ fun Application.module() {
             recipe(Sessions) {
 
                 issuer = superTokensIssuer
+                cookieDomain = superTokensDomain
 
                 customJwtData { _, _ ->
                     mapOf(
