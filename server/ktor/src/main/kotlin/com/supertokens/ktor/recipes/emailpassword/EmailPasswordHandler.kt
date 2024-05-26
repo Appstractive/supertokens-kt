@@ -51,7 +51,13 @@ suspend fun ApplicationCall.validateFormFields(
         return respond(
             HttpStatusCode.BadRequest,
             SignInResponseDTO(
-                status = SuperTokensStatus.FormFieldError.value,
+                status = when {
+                    invalidFormFields.any {
+                        it.id == FORM_FIELD_PASSWORD_ID
+                    } -> SuperTokensStatus.PasswordPolicyViolatedError
+
+                    else -> SuperTokensStatus.FormFieldError
+                }.value,
                 formFields = invalidFormFields.map {
                     FormFieldErrorDTO(
                         id = it.id,
@@ -65,7 +71,7 @@ suspend fun ApplicationCall.validateFormFields(
     val email = fields.getEmailField()?.value
     val password = fields.getPasswordField()?.value
 
-    if(email == null || password == null) {
+    if (email == null || password == null) {
         return respond(
             HttpStatusCode.Unauthorized,
             SignInResponseDTO(
@@ -92,7 +98,7 @@ open class EmailPasswordHandler(
         val email = body.formFields.getEmailField()?.value
         val password = body.formFields.getPasswordField()?.value
 
-        if(email == null || password == null) {
+        if (email == null || password == null) {
             return call.respond(
                 HttpStatusCode.Unauthorized,
                 SignInResponseDTO(
@@ -192,7 +198,9 @@ open class EmailPasswordHandler(
     /**
      * Override this to send localized mails
      */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.getResetPasswordTemplateName(emailService: EmailService) =
+    open suspend fun PipelineContext<Unit, ApplicationCall>.getResetPasswordTemplateName(
+        emailService: EmailService
+    ) =
         emailService.passwordResetTemplateName
 
     open suspend fun PipelineContext<Unit, ApplicationCall>.sendPasswordResetMail(email: String) {
@@ -206,7 +214,7 @@ open class EmailPasswordHandler(
                     val token = emailPassword.createResetPasswordToken(
                         userId = user.id,
                         email = email,
-                        tenantId =  call.tenantId,
+                        tenantId = call.tenantId,
                     )
 
                     val body = it.processTemplate(
@@ -320,7 +328,8 @@ open class EmailPasswordHandler(
                 )
             )
 
-        val email = user.email ?: throw SuperTokensStatusException(SuperTokensStatus.UnknownEMailError)
+        val email =
+            user.email ?: throw SuperTokensStatusException(SuperTokensStatus.UnknownEMailError)
         // will throw an exception if wrong
         user = emailPassword.signIn(
             email = email,
@@ -330,7 +339,7 @@ open class EmailPasswordHandler(
 
         val status = superTokens.updatePassword(user.id, newPassword)
 
-        if(status != SuperTokensStatus.OK) {
+        if (status != SuperTokensStatus.OK) {
             throw SuperTokensStatusException(status)
         }
 
