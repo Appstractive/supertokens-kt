@@ -11,7 +11,7 @@ version = "1.0.8"
 group = "com.appstractive"
 
 dependencies {
-    implementation(projects.server.ktor)
+    implementation(projects.server.supertokensSdkBackendKtor)
 
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.coroutines)

@@ -27,7 +27,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "app"
             isStatic = true
-            export(project(":sdk:frontend"))
+            export(projects.sdk.supertokensSdkFrontend)
         }
     }
 
@@ -42,7 +42,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":sdk:frontend"))
+            api(projects.sdk.supertokensSdkFrontend)
 
             implementation(libs.kotlin.serialization)
             implementation(libs.kotlin.serialization.json)

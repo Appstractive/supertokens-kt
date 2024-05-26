@@ -41,7 +41,10 @@ class RefreshTokensUseCase(
         }
 
         if(response.status != HttpStatusCode.OK) {
-            logoutUseCase.signOut()
+            if(response.status == HttpStatusCode.Unauthorized) {
+                logoutUseCase.signOut()
+            }
+
             return null
         }
 

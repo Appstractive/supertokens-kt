@@ -80,7 +80,9 @@ class SessionRecipe(
         superTokens.apiClient.plugin(HttpSend).intercept(tokenHeaderInterceptor())
 
         if(config.refreshTokensOnStart) {
-            refreshTokens()
+            runCatching {
+                refreshTokens()
+            }
         }
     }
 

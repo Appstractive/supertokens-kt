@@ -21,7 +21,7 @@ java {
 }
 
 dependencies {
-    api(projects.sdk.backend)
+    api(projects.sdk.supertokensSdkBackend)
 
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.coroutines)

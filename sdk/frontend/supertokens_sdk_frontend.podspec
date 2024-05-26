@@ -1,24 +1,39 @@
 Pod::Spec.new do |spec|
-    spec.name                     = 'supertokens_frontend_sdk'
-    spec.version                  = '1.0'
-    spec.homepage                 = 'Link to the Shared Module homepage'
+    spec.name                     = 'supertokens_sdk_frontend'
+    spec.version                  = '1.4.0'
+    spec.homepage                 = 'https://github.com/Appstractive/supertokens-kt'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'Some description for the Shared Module'
+    spec.summary                  = 'SuperTokens frontend SDK'
     spec.vendored_frameworks      = 'build/cocoapods/framework/frontend_sdk.framework'
     spec.libraries                = 'c++'
-    spec.ios.deployment_target = '14.1'
+    spec.ios.deployment_target    = '14.1'
                 
+                
+    if !Dir.exist?('build/cocoapods/framework/frontend_sdk.framework') || Dir.empty?('build/cocoapods/framework/frontend_sdk.framework')
+        raise "
+
+        Kotlin framework 'frontend_sdk' doesn't exist yet, so a proper Xcode project can't be generated.
+        'pod install' should be executed after running ':generateDummyFramework' Gradle task:
+
+            ./gradlew :sdk:supertokens-sdk-frontend:generateDummyFramework
+
+        Alternatively, proper pod installation is performed during Gradle sync in the IDE (if Podfile location is set)"
+    end
+                
+    spec.xcconfig = {
+        'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
+    }
                 
     spec.pod_target_xcconfig = {
-        'KOTLIN_PROJECT_PATH' => ':sdk:supertokens_frontend_sdk',
+        'KOTLIN_PROJECT_PATH' => ':sdk:supertokens-sdk-frontend',
         'PRODUCT_MODULE_NAME' => 'frontend_sdk',
     }
                 
     spec.script_phases = [
         {
-            :name => 'Build supertokens_frontend_sdk',
+            :name => 'Build supertokens_sdk_frontend',
             :execution_position => :before_compile,
             :shell_path => '/bin/sh',
             :script => <<-SCRIPT
