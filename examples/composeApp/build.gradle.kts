@@ -3,10 +3,13 @@ plugins {
     id("com.android.application")
     kotlin("native.cocoapods")
     alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     kotlin("plugin.parcelize")
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
+
     cocoapods {
         version = "1.0"
         summary = "app"
@@ -30,6 +33,13 @@ kotlin {
 
     jvm()
 
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-P",
+            "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=com.appstractive.util.CommonParcelize",
+        )
+    }
+
     sourceSets {
         commonMain.dependencies {
             api(project(":sdk:frontend"))
@@ -40,7 +50,6 @@ kotlin {
 
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.components.resources)
 
             implementation(libs.compose.qr)
 

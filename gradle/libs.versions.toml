@@ -1,7 +1,7 @@
 [versions]
-kotlin = "1.9.23" # https://kotlinlang.org/docs/releases.html#release-details
+kotlin = "2.0.0" # https://kotlinlang.org/docs/releases.html#release-details
 agp = "8.2.1" # https://developer.android.com/studio/releases/gradle-plugin
-compose = "1.6.2" # https://github.com/JetBrains/compose-jb
+compose = "1.6.10" # https://github.com/JetBrains/compose-jb
 
 coreKtx = "1.13.0" # https://developer.android.com/jetpack/androidx/releases/core
 appcompat = "1.6.1" # https://developer.android.com/jetpack/androidx/releases/appcompat
@@ -94,3 +94,4 @@ android = { id = "com.android.library", version.ref = "agp" }
 kotlin = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
