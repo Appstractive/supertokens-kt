@@ -86,7 +86,7 @@ class SessionRecipe(
         }
     }
 
-    suspend fun refreshTokens() = refreshTokensUseCase.refreshTokens(superTokens.apiClient)
+    suspend fun refreshTokens(): BearerTokens? = refreshTokensUseCase.refreshTokens(superTokens.apiClient)
 
     override fun HttpClientConfig<*>.configureClient() {
         install(HttpCookies) {
