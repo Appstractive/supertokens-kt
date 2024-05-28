@@ -1,18 +1,18 @@
-package com.supertokens.sdk.repositories.user
+package com.supertokens.sdk.recipes.sessions.repositories
 
 import com.supertokens.sdk.common.claims.AccessTokenClaims
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.StringFormat
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-interface UserRepository {
+interface ClaimsRepository {
 
-    val decoder: Json
+    val decoder: StringFormat
 
     val claims: StateFlow<AccessTokenClaims?>
 
-    suspend fun setClaims(claims: AccessTokenClaims?)
+    suspend fun setClaims(claims: String?)
     suspend fun getClaims(): AccessTokenClaims?
 
     suspend fun clear() {
@@ -21,7 +21,7 @@ interface UserRepository {
 
     @OptIn(ExperimentalEncodingApi::class)
     suspend fun setClaimsFromJwt(jwt: String) {
-        setClaims(decoder.decodeFromString<AccessTokenClaims>(Base64.decode(jwt.split(".")[1]).decodeToString()))
+        setClaims(Base64.decode(jwt.split(".")[1]).decodeToString())
     }
 
     suspend fun getUserId(): String? = getClaims()?.sub

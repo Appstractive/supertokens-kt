@@ -10,7 +10,7 @@ import com.supertokens.sdk.common.requests.FormFieldDTO
 import com.supertokens.sdk.common.requests.FormFieldRequestDTO
 import com.supertokens.sdk.common.responses.SignInResponseDTO
 import com.supertokens.sdk.common.toStatus
-import com.supertokens.sdk.repositories.AuthRepository
+import com.supertokens.sdk.recipes.sessions.repositories.AuthRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post

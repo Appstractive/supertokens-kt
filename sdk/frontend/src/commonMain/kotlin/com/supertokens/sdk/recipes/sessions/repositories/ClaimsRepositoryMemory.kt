@@ -1,10 +1,10 @@
-package com.supertokens.sdk.repositories.user
+package com.supertokens.sdk.recipes.sessions.repositories
 
 import com.supertokens.sdk.common.claims.AccessTokenClaims
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.json.Json
 
-class UserRepositoryMemory: UserRepository {
+class ClaimsRepositoryMemory: ClaimsRepository {
 
     override val claims: MutableStateFlow<AccessTokenClaims?> = MutableStateFlow(null)
 
@@ -15,8 +15,10 @@ class UserRepositoryMemory: UserRepository {
         ignoreUnknownKeys = true
     }
 
-    override suspend fun setClaims(claims: AccessTokenClaims?) {
-        this.claims.value = claims
+    override suspend fun setClaims(claims: String?) {
+        this.claims.value = claims?.let {
+            decoder.decodeFromString<AccessTokenClaims>(it)
+        }
     }
 
     override suspend fun getClaims(): AccessTokenClaims? {

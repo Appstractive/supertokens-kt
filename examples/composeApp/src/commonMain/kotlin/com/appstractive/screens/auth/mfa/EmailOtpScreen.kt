@@ -44,7 +44,7 @@ fun EmailOtpScreenPresenter(
     superTokensClient: SuperTokensClient = LocalDependencies.current.superTokensClient,
 ): EmailOtpScreen.State {
     val apiCallController = rememberApiCallController()
-    val claims by superTokensClient.userRepository.claims.collectAsState()
+    val claims by superTokensClient.claimsRepository.claims.collectAsState()
     var signUpData by remember { mutableStateOf<PasswordlessSignUpData?>(null) }
 
     return EmailOtpScreen.State(

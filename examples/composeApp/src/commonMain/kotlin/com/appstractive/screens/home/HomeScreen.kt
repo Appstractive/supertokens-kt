@@ -48,7 +48,7 @@ fun HomeScreenPresenter(
     var privateApiResponse: String? by rememberRetained() {
         mutableStateOf(null)
     }
-    val claims by superTokensClient.userRepository.claims.collectAsState()
+    val claims by superTokensClient.claimsRepository.claims.collectAsState()
 
     LaunchedEffect(superTokensClient) {
         apiCallController.call {

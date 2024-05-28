@@ -1,15 +1,15 @@
 package com.supertokens.sdk.recipes.sessions.usecases
 
 import com.supertokens.sdk.common.Routes
-import com.supertokens.sdk.repositories.AuthRepository
+import com.supertokens.sdk.recipes.sessions.repositories.AuthRepository
 import com.supertokens.sdk.recipes.sessions.repositories.TokensRepository
-import com.supertokens.sdk.repositories.user.UserRepository
+import com.supertokens.sdk.recipes.sessions.repositories.ClaimsRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 
 class LogoutUseCase(
     private val tokensRepository: TokensRepository,
-    private val userRepository: UserRepository,
+    private val claimsRepository: ClaimsRepository,
     private val authRepository: AuthRepository,
 ) {
 
@@ -21,7 +21,7 @@ class LogoutUseCase(
         }
         tokensRepository.setAccessToken(null)
         tokensRepository.setRefreshToken(null)
-        userRepository.clear()
+        claimsRepository.clear()
         authRepository.setUnauthenticated()
     }
 

@@ -5,11 +5,12 @@ import com.supertokens.sdk.recipes.BuildRecipe
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
-import com.supertokens.sdk.repositories.AuthRepository
-import com.supertokens.sdk.repositories.AuthState
-import com.supertokens.sdk.repositories.user.UserRepository
-import com.supertokens.sdk.repositories.user.UserRepositorySettings
-import com.supertokens.sdk.repositories.AuthRepositoryImpl
+import com.supertokens.sdk.recipes.sessions.SessionRecipe
+import com.supertokens.sdk.recipes.sessions.repositories.ClaimsRepository
+import com.supertokens.sdk.recipes.sessions.repositories.AuthRepository
+import com.supertokens.sdk.recipes.sessions.repositories.AuthState
+import com.supertokens.sdk.recipes.sessions.repositories.AuthRepositoryImpl
+import com.supertokens.sdk.recipes.sessions.repositories.TokensRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -40,10 +41,6 @@ class SuperTokensClientConfig(
 
     // Modify the http client config used by the SDK
     var clientConfig: HttpClientConfig<*>.() -> Unit = {}
-
-    var userRepository: UserRepository? = null
-
-    var authRepository: AuthRepository? = null
 
     var clientName: String = "MyMobileApp"
 
@@ -104,8 +101,12 @@ class SuperTokensClient(
     }
 
 
-    val userRepository by lazy { config.userRepository ?: UserRepositorySettings(getDefaultSettings()) }
-    val authRepository by lazy { config.authRepository ?: AuthRepositoryImpl() }
+    val authRepository: AuthRepository
+        get() = getRecipe<SessionRecipe>().authRepository
+    val tokenRepository: TokensRepository
+        get() = getRecipe<SessionRecipe>().tokensRepository
+    val claimsRepository: ClaimsRepository
+        get() = getRecipe<SessionRecipe>().claimsRepository
 
     private val _isInitialized = MutableStateFlow(false)
     val isInitialized = _isInitialized.asStateFlow()

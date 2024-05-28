@@ -1,4 +1,4 @@
-package com.supertokens.sdk.repositories
+package com.supertokens.sdk.recipes.sessions.repositories
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
