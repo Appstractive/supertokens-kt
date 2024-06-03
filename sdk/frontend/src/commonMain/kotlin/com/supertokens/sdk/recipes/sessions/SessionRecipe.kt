@@ -45,7 +45,7 @@ class SessionRecipeConfig : RecipeConfig {
 }
 
 class SessionRecipe(
-    private val superTokens: SuperTokensClient,
+    internal val superTokens: SuperTokensClient,
     private val config: SessionRecipeConfig,
 ) : Recipe<SessionRecipeConfig> {
 
@@ -59,43 +59,42 @@ class SessionRecipe(
         config.claimsRepository ?: ClaimsRepositorySettings(getDefaultSettings())
     }
 
-    private val refreshTokensUseCase by lazy {
+    internal val refreshTokensUseCase by lazy {
         RefreshTokensUseCase(
-            tokensRepository = tokensRepository,
-            updateAccessTokenUseCase = updateAccessTokenUseCase,
-            updateRefreshTokenUseCase = updateRefreshTokenUseCase,
-            logoutUseCase = logoutUseCase,
+            sessionRecipe = this,
         )
     }
 
-    private val updateAccessTokenUseCase by lazy {
+    internal val updateAccessTokenUseCase by lazy {
         UpdateAccessTokenUseCase(
-            tokensRepository = tokensRepository,
-            claimsRepository = claimsRepository,
-            authRepository = authRepository,
+            sessionRecipe = this,
         )
     }
 
-    private val updateRefreshTokenUseCase by lazy {
+    internal val updateRefreshTokenUseCase by lazy {
         UpdateRefreshTokenUseCase(
-            tokensRepository = tokensRepository,
+            sessionRecipe = this,
         )
     }
 
-    private val logoutUseCase by lazy {
+    internal val logoutUseCase by lazy {
         LogoutUseCase(
-            tokensRepository = tokensRepository,
-            claimsRepository = claimsRepository,
-            authRepository = authRepository,
+            sessionRecipe = this,
         )
     }
 
     override suspend fun postInit() {
         superTokens.apiClient.plugin(HttpSend).intercept(tokenHeaderInterceptor())
 
-        if (config.refreshTokensOnStart) {
-            runCatching {
-                refreshTokens()
+        tokensRepository.getRefreshToken()?.let {
+            claimsRepository.getClaims()?.let { claims ->
+                authRepository.setLoggedIn(claims.sub)
+            }
+
+            if (config.refreshTokensOnStart) {
+                runCatching {
+                    refreshTokens()
+                }
             }
         }
     }
@@ -106,10 +105,7 @@ class SessionRecipe(
     override fun HttpClientConfig<*>.configureClient() {
         install(HttpCookies) {
             storage = config.cookiesStorage ?: defaultCookieStorage(
-                logoutUseCase = logoutUseCase,
-                updateAccessTokenUseCase = updateAccessTokenUseCase,
-                updateRefreshTokenUseCase = updateRefreshTokenUseCase,
-                tokensRepository = tokensRepository,
+                sessionRecipe = this@SessionRecipe,
             )
         }
 
@@ -151,7 +147,7 @@ class SessionRecipe(
             }
         }
 
-    suspend fun signOut() = logoutUseCase.signOut(superTokens.apiClient)
+    suspend fun signOut() = logoutUseCase.signOut()
 
 }
 

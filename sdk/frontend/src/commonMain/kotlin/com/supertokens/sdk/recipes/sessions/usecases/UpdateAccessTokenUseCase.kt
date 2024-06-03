@@ -1,23 +1,19 @@
 package com.supertokens.sdk.recipes.sessions.usecases
 
-import com.supertokens.sdk.recipes.sessions.repositories.AuthRepository
-import com.supertokens.sdk.recipes.sessions.repositories.TokensRepository
-import com.supertokens.sdk.recipes.sessions.repositories.ClaimsRepository
+import com.supertokens.sdk.recipes.sessions.SessionRecipe
 
 class UpdateAccessTokenUseCase(
-    private val tokensRepository: TokensRepository,
-    private val claimsRepository: ClaimsRepository,
-    private val authRepository: AuthRepository,
+    private val sessionRecipe: SessionRecipe,
 ) {
 
     suspend fun updateAccessToken(token: String) {
-        tokensRepository.setAccessToken(token)
-        claimsRepository.setClaimsFromJwt(token)
+        sessionRecipe.tokensRepository.setAccessToken(token)
+        sessionRecipe.claimsRepository.setClaimsFromJwt(token)
 
-        claimsRepository.getUserId()?.let {
-            authRepository.setAuthenticated(
+        sessionRecipe.claimsRepository.getUserId()?.let {
+            sessionRecipe.authRepository.setAuthenticated(
                 userId = it,
-                multiFactorVerified = claimsRepository.isMultiFactorVerified(),
+                multiFactorVerified = sessionRecipe.claimsRepository.isMultiFactorVerified(),
             )
         }
     }

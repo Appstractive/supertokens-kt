@@ -1,13 +1,13 @@
 package com.supertokens.sdk.recipes.sessions.usecases
 
-import com.supertokens.sdk.recipes.sessions.repositories.TokensRepository
+import com.supertokens.sdk.recipes.sessions.SessionRecipe
 
 class UpdateRefreshTokenUseCase(
-    private val tokensRepository: TokensRepository,
+    private val sessionRecipe: SessionRecipe,
 ) {
 
     suspend fun updateRefreshToken(token: String) {
-        tokensRepository.setRefreshToken(token)
+        sessionRecipe.tokensRepository.setRefreshToken(token)
     }
 
 }

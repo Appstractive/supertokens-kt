@@ -5,7 +5,7 @@ import com.supertokens.sdk.common.COOKIE_REFRESH_TOKEN
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
 import com.supertokens.sdk.common.HEADER_REFRESH_TOKEN
 import com.supertokens.sdk.common.Routes
-import com.supertokens.sdk.recipes.sessions.repositories.TokensRepository
+import com.supertokens.sdk.recipes.sessions.SessionRecipe
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -16,20 +16,18 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.setCookie
 
 class RefreshTokensUseCase(
-    private val tokensRepository: TokensRepository,
-    private val updateAccessTokenUseCase: UpdateAccessTokenUseCase,
-    private val updateRefreshTokenUseCase: UpdateRefreshTokenUseCase,
-    private val logoutUseCase: LogoutUseCase,
+    private val sessionRecipe: SessionRecipe,
 ) {
 
     suspend fun refreshTokens(client: HttpClient): BearerTokens? {
-        return tokensRepository.getRefreshToken()?.let {
+        return sessionRecipe.tokensRepository.getRefreshToken()?.let {
             refreshTokens(client, it)
         }
     }
 
     suspend fun refreshTokens(params: RefreshTokensParams): BearerTokens? {
-        return (params.oldTokens?.refreshToken ?: tokensRepository.getRefreshToken())?.let {
+        return (params.oldTokens?.refreshToken
+            ?: sessionRecipe.tokensRepository.getRefreshToken())?.let {
             refreshTokens(params.client, it)
         }
     }
@@ -40,9 +38,9 @@ class RefreshTokensUseCase(
             attributes.put(Auth.AuthCircuitBreaker, Unit)
         }
 
-        if(response.status != HttpStatusCode.OK) {
-            if(response.status == HttpStatusCode.Unauthorized) {
-                logoutUseCase.signOut()
+        if (response.status != HttpStatusCode.OK) {
+            if (response.status == HttpStatusCode.Unauthorized) {
+                sessionRecipe.signOut()
             }
 
             return null
@@ -51,14 +49,14 @@ class RefreshTokensUseCase(
         val cookies = response.setCookie()
 
         val newRefreshToken = response.headers[HEADER_REFRESH_TOKEN]
-            ?: cookies.firstOrNull {it.name == COOKIE_REFRESH_TOKEN}?.value
+            ?: cookies.firstOrNull { it.name == COOKIE_REFRESH_TOKEN }?.value
             ?: return null
         val newAccessToken = response.headers[HEADER_ACCESS_TOKEN]
-            ?: cookies.firstOrNull {it.name == COOKIE_ACCESS_TOKEN}?.value
+            ?: cookies.firstOrNull { it.name == COOKIE_ACCESS_TOKEN }?.value
             ?: return null
 
-        updateAccessTokenUseCase.updateAccessToken(newAccessToken)
-        updateRefreshTokenUseCase.updateRefreshToken(newRefreshToken)
+        sessionRecipe.updateAccessTokenUseCase.updateAccessToken(newAccessToken)
+        sessionRecipe.updateRefreshTokenUseCase.updateRefreshToken(newRefreshToken)
 
         return BearerTokens(newAccessToken, newRefreshToken)
     }

@@ -13,37 +13,34 @@ import io.ktor.http.Url
 import io.ktor.http.fullPath
 
 internal fun defaultCookieStorage(
-    logoutUseCase: LogoutUseCase,
-    updateAccessTokenUseCase: UpdateAccessTokenUseCase,
-    updateRefreshTokenUseCase: UpdateRefreshTokenUseCase,
-    tokensRepository: TokensRepository,
+    sessionRecipe: SessionRecipe,
 ) = object : CookiesStorage {
     override suspend fun addCookie(requestUrl: Url, cookie: Cookie) {
         when(cookie.name) {
             COOKIE_ACCESS_TOKEN -> {
                 val token = cookie.value
                 if(token.isNotBlank()) {
-                    updateAccessTokenUseCase.updateAccessToken(token)
+                    sessionRecipe.updateAccessTokenUseCase.updateAccessToken(token)
                 }
             }
             COOKIE_REFRESH_TOKEN -> {
                 val token = cookie.value
                 if(token.isBlank() && !requestUrl.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
-                    logoutUseCase.signOut()
+                    sessionRecipe.signOut()
                 }
                 else {
-                    updateRefreshTokenUseCase.updateRefreshToken(token)
+                    sessionRecipe.updateRefreshTokenUseCase.updateRefreshToken(token)
                 }
             }
         }
     }
 
     override suspend fun get(requestUrl: Url): List<Cookie> = buildList {
-        tokensRepository.getAccessToken()?.let {
+        sessionRecipe.tokensRepository.getAccessToken()?.let {
             add(Cookie(COOKIE_ACCESS_TOKEN, it))
         }
         if(requestUrl.fullPath.endsWith(Routes.Session.REFRESH)) {
-            tokensRepository.getRefreshToken()?.let {
+            sessionRecipe.tokensRepository.getRefreshToken()?.let {
                 add(Cookie(COOKIE_REFRESH_TOKEN, it))
             }
         }
