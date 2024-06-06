@@ -49,3 +49,5 @@ bin/
 
 key.properties
 key.txt
+/examples/ios/iosApp.xcworkspace/xcuserdata/
+/examples/ios/iosApp.xcodeproj/xcuserdata/

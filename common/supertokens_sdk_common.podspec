@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'supertokens_sdk_common'
-    spec.version                  = '1.4.0'
+    spec.version                  = '1.4.1'
     spec.homepage                 = 'Link to the Shared Module homepage'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
