@@ -32,6 +32,7 @@ sealed class SuperTokensStatus(
     data object RecipeUserIdAlreadyLinkedWithAnotherPrimaryUserError: SuperTokensStatus("RECIPE_USER_ID_ALREADY_LINKED_WITH_ANOTHER_PRIMARY_USER_ID_ERROR")
     data object RecipeUserIdAlreadyLinkedError: SuperTokensStatus("RECIPE_USER_ID_ALREADY_LINKED_WITH_PRIMARY_USER_ID_ERROR")
     data object NotPrimaryUserError: SuperTokensStatus("INPUT_USER_IS_NOT_A_PRIMARY_USER")
+    data object UnknownRole: SuperTokensStatus("UNKNOWN_ROLE_ERROR")
     class AppIdOrTenantIdNotFoundError(message: String): SuperTokensStatus(message)
 
     data object UnknownError: SuperTokensStatus("UNKNOWN_ERROR")

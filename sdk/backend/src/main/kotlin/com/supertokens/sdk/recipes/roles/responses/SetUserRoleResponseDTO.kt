@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SetUserRoleResponseDTO(
     override val status: String,
-    val didUserAlreadyHaveRole: Boolean,
+    val didUserAlreadyHaveRole: Boolean? = null,
 ): BaseResponseDTO

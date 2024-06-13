@@ -247,7 +247,7 @@ class RolesRecipe(
         }
 
         return response.parse<SetUserRoleResponseDTO, Boolean> {
-            it.didUserAlreadyHaveRole
+            it.didUserAlreadyHaveRole == true
         }
     }
 
@@ -271,7 +271,7 @@ class RolesRecipe(
         }
 
         return response.parse<RemoveUserRoleResponseDTO, Boolean> {
-            it.didUserHaveRole
+            it.didUserHaveRole == true
         }
     }
 
