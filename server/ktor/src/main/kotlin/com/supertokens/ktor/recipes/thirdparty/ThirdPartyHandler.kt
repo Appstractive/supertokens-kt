@@ -7,6 +7,7 @@ import com.supertokens.ktor.utils.BadRequestException
 import com.supertokens.ktor.utils.NotFoundException
 import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
+import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
 import com.supertokens.sdk.common.ThirdPartyProvider
 import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequestDTO
@@ -59,7 +60,7 @@ open class ThirdPartyHandler(
             thirdPartyId = body.thirdPartyId,
             thirdPartyUserId = userInfo.id,
             email = userInfo.email?.id ?: handleMissingEmail(provider, userInfo),
-            tenantId = null,
+            tenantId = call.tenantId,
             isVerified = userInfo.email?.isVerified == true,
         )
 
