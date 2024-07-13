@@ -19,7 +19,7 @@ import kotlin.test.assertTrue
 @Ignore()
 class PasswordlessTests {
 
-    private val client = superTokensClient("https://auth.appstractive.com") {
+    private val client = superTokensClient("https://auth.appstractive.cloud") {
         recipe(Passwordless)
         recipe(Session) {
             tokensRepository = TokensRepositoryMemory()

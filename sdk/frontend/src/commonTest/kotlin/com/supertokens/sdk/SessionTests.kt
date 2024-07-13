@@ -20,7 +20,7 @@ import kotlin.test.assertNotEquals
 @Ignore
 class SessionTests {
 
-    private val client = superTokensClient("https://auth.appstractive.com") {
+    private val client = superTokensClient("https://auth.appstractive.cloud") {
         recipe(EmailPassword)
         recipe(Session) {
             tokensRepository = TokensRepositoryMemory()

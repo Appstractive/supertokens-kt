@@ -41,7 +41,7 @@ ktor {
 
         externalRegistry.set(object : io.ktor.plugin.features.DockerImageRegistry {
             override val toImage: Provider<String>
-                get() = provider { "hub.appstractive.com/supertokens-ktor-example" }
+                get() = provider { "hub.appstractive.cloud/supertokens-ktor-example" }
             override val username: Provider<String>
                 get() = providers.environmentVariable("DOCKER_HUB_USERNAME")
             override val password: Provider<String>
@@ -57,5 +57,18 @@ ktor {
                 )
             )
         )
+
+        jib.from {
+            platforms {
+                platform {
+                    architecture = "amd64"
+                    os = "linux"
+                }
+                platform {
+                    architecture = "arm64"
+                    os = "linux"
+                }
+            }
+        }
     }
 }

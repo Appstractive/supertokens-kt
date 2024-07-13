@@ -11,7 +11,7 @@ implementation("com.appstractive:supertokens-sdk-frontend:1.4.1")
 
 ### Client creation
 ``` kotlin
-val client = superTokensClient("https://auth.appstractive.com") {
+val client = superTokensClient("https://auth.appstractive.cloud") {
     recipe(EmailPassword)
     
     recipe(Session) {
@@ -31,7 +31,7 @@ val client = superTokensClient("https://auth.appstractive.com") {
 #### SignUp
 
 ``` kotlin
-val client = superTokensClient("https://auth.appstractive.com") {
+val client = superTokensClient("https://auth.appstractive.cloud") {
     recipe(EmailPassword)
 }
 
@@ -44,7 +44,7 @@ val user = client.signUpWith(EmailPassword) {
 #### SignIn
 
 ``` kotlin
-val client = superTokensClient("https://auth.appstractive.com") {
+val client = superTokensClient("https://auth.appstractive.cloud") {
     recipe(EmailPassword)
 }
 
@@ -57,7 +57,7 @@ val user = client.signInWith(EmailPassword) {
 ### Passwordless
 
 ``` kotlin
-val client = superTokensClient("https://auth.appstractive.com") {
+val client = superTokensClient("https://auth.appstractive.cloud") {
     recipe(Passwordless)
 }
 
@@ -77,7 +77,7 @@ val userData = client.signInWith(PasswordlessInputCode) {
 ### ThirdParty
 
 ``` kotlin
-val client = superTokensClient("https://auth.appstractive.com") {
+val client = superTokensClient("https://auth.appstractive.cloud") {
     recipe(ThirdParty) {
         provider(Google) {
             redirectUri = "localhost"
@@ -94,7 +94,7 @@ val signInData = client.signInWith(Google.Tokens) {
 ### Authenticated API Calls
 
 ``` kotlin
-val client = superTokensClient("https://auth.appstractive.com") {
+val client = superTokensClient("https://auth.appstractive.cloud") {
     recipe(EmailPassword)
     recipe(Session) {
         tokensRepository = TokensRepositoryMemory()

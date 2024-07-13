@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 
 class CoreTests {
 
-    private val client = superTokensClient("https://auth.appstractive.com") {
+    private val client = superTokensClient("https://auth.appstractive.cloud") {
         recipe(EmailPassword)
         recipe(Passwordless)
     }

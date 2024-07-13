@@ -21,7 +21,7 @@ import kotlin.test.assertTrue
 @Ignore()
 class ThirdPartySignInTests {
 
-    private val client = superTokensClient("https://auth.appstractive.com") {
+    private val client = superTokensClient("https://auth.appstractive.cloud") {
         recipe(ThirdParty) {
             provider(Apple) {
                 redirectUri = "localhost"
