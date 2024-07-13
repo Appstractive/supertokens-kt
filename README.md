@@ -14,16 +14,16 @@ Both SDKs are written in pure Kotlin. The backend SDK has some Java dependencies
 
 ## Documentation
 
-Please refer to the respective directories for installation and usage instructions:
+Please refer to the respective SDK directories for installation and usage instructions. For SuperTokens specifics, please visit the official documentation at [supertokens.com](https://supertokens.com/docs/guides)
 
 ### SDKs
 
-- [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-backend?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-backend)[Backend SDK](https://github.com/Appstractive/supertokens-kt/tree/main/sdk/backend)
-- [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-frontend?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-frontend)[KTOR Server Plugin](https://github.com/Appstractive/supertokens-kt/tree/main/server/ktor)
-- [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-backend-ktor?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-backend-ktor)[Frontend SDK](https://github.com/Appstractive/supertokens-kt/tree/main/sdk/frontend)
+- [Backend SDK](https://github.com/Appstractive/supertokens-kt/tree/main/sdk/backend) [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-backend?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-backend)
+- [KTOR Server Plugin](https://github.com/Appstractive/supertokens-kt/tree/main/server/ktor) [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-frontend?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-frontend)
+- [Frontend SDK](https://github.com/Appstractive/supertokens-kt/tree/main/sdk/frontend) [![Maven Central](https://img.shields.io/maven-central/v/com.appstractive/supertokens-sdk-backend-ktor?label=Maven%20Central)](https://central.sonatype.com/artifact/com.appstractive/supertokens-sdk-backend-ktor)
 
 
 ### Examples
 
 - [KTOR Server Example](https://github.com/Appstractive/supertokens-kt/tree/main/examples/ktor-server)
-- [Multiplatform App Example](https://github.com/Appstractive/supertokens-kt/tree/main/examples/app)
+- [Multiplatform App Example](https://github.com/Appstractive/supertokens-kt/tree/main/examples/composeApp)

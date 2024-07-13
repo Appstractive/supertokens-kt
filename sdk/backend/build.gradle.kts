@@ -62,9 +62,9 @@ publishing {
         create<MavenPublication>("SupertokensSdkBackend") {
             artifact(javadocJar)
 
-            groupId = "com.appstractive"
+            groupId = rootProject.group.toString()
             artifactId = "supertokens-sdk-backend"
-            version = properties["version"].toString()
+            version = rootProject.version.toString()
 
             from(components["java"])
 

@@ -10,7 +10,7 @@ implementation("com.appstractive:supertokens-sdk-frontend:1.4.1")
 ## Usage
 
 ### Client creation
-```
+``` kotlin
 val client = superTokensClient("https://auth.appstractive.com") {
     recipe(EmailPassword)
     
@@ -30,7 +30,7 @@ val client = superTokensClient("https://auth.appstractive.com") {
 
 #### SignUp
 
-```
+``` kotlin
 val client = superTokensClient("https://auth.appstractive.com") {
     recipe(EmailPassword)
 }
@@ -43,7 +43,7 @@ val user = client.signUpWith(EmailPassword) {
 
 #### SignIn
 
-```
+``` kotlin
 val client = superTokensClient("https://auth.appstractive.com") {
     recipe(EmailPassword)
 }
@@ -56,7 +56,7 @@ val user = client.signInWith(EmailPassword) {
 
 ### Passwordless
 
-```
+``` kotlin
 val client = superTokensClient("https://auth.appstractive.com") {
     recipe(Passwordless)
 }
@@ -76,7 +76,7 @@ val userData = client.signInWith(PasswordlessInputCode) {
 
 ### ThirdParty
 
-```
+``` kotlin
 val client = superTokensClient("https://auth.appstractive.com") {
     recipe(ThirdParty) {
         provider(Google) {
@@ -93,7 +93,7 @@ val signInData = client.signInWith(Google.Tokens) {
 
 ### Authenticated API Calls
 
-```
+``` kotlin
 val client = superTokensClient("https://auth.appstractive.com") {
     recipe(EmailPassword)
     recipe(Session) {

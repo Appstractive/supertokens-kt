@@ -9,7 +9,7 @@ implementation("com.appstractive:supertokens-sdk-backend:1.4.1")
 
 ## Usage
 
-```
+``` kotlin
 val mailService = SmtpEmailService(
     SmtpConfig(
         host = "localhost",

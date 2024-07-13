@@ -9,7 +9,7 @@ implementation("com.appstractive:supertokens-sdk-backend-ktor:1.4.1")
 
 ## Usage
 
-```
+``` kotlin
 import com.supertokens.ktor.SuperTokens
 
 fun Application.module() {

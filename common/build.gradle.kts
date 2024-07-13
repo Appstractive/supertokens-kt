@@ -8,8 +8,8 @@ plugins {
     signing
 }
 
-group = "com.appstractive"
-version = properties["version"].toString()
+group = rootProject.group
+version = rootProject.version
 
 val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
 

@@ -8,8 +8,8 @@ plugins {
     signing
 }
 
-group = "com.appstractive"
-version = properties["version"].toString()
+group = rootProject.group
+version = rootProject.version
 
 val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
 
@@ -36,7 +36,7 @@ kotlin {
     cocoapods {
         summary = "SuperTokens frontend SDK"
         homepage = "https://github.com/Appstractive/supertokens-kt"
-        version = properties["version"].toString()
+        version = rootProject.version.toString()
         ios.deploymentTarget = "14.1"
         framework {
             baseName = "frontend_sdk"

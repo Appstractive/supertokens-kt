@@ -26,3 +26,6 @@ plugins {
     alias(libs.plugins.compose).apply(false)
     alias(libs.plugins.compose.compiler).apply(false)
 }
+
+group = "com.appstractive"
+version = "1.4.1"
