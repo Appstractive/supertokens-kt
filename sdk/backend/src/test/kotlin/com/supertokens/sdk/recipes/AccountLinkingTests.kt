@@ -42,7 +42,7 @@ class AccountLinkingTests: BaseTest() {
 
         val createPrimaryUserResult = superTokens.createPrimaryUser(recipeUserId = user.recipeUserId ?: user.id)
         assertFalse(createPrimaryUserResult.wasAlreadyAPrimaryUser)
-        assertTrue(createPrimaryUserResult.user.isPrimaryUser)
+        assertTrue(createPrimaryUserResult.user.isPrimaryUser == true)
     }
 
     @Test

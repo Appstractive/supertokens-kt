@@ -1,5 +1,6 @@
 package com.supertokens.sdk.recipes
 
+import com.auth0.jwt.JWT
 import com.supertokens.sdk.SuperTokensConfig
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.core.createJwt
@@ -13,9 +14,6 @@ import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignUp
 import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.passwordless.consumePasswordlessUserInputCode
 import com.supertokens.sdk.recipes.passwordless.createPasswordlessPhoneNumberCode
-import io.fusionauth.jwt.JWTDecoder
-import io.fusionauth.jwt.Verifier
-import io.fusionauth.jwt.domain.Algorithm
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -80,19 +78,11 @@ class CoreTests : BaseTest() {
             payload = jwtData,
         )
 
-        val decoded = JWTDecoder().decode(jwt, object : Verifier {
-            override fun canVerify(algorithm: Algorithm?) = true
-            override fun verify(
-                algorithm: Algorithm?,
-                message: ByteArray?,
-                signature: ByteArray?
-            ) {
-            }
-        })
+        val decoded = JWT.decode(jwt)
 
         assertEquals("Test", decoded.issuer)
         for (data in jwtData) {
-            assertTrue(decoded.allClaims.contains(data.key))
+            assertTrue(decoded.claims.contains(data.key))
         }
     }
 

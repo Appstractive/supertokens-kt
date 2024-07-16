@@ -6,6 +6,8 @@ build/
 
 .kotlin
 
+*.podspec
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml

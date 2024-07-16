@@ -38,6 +38,7 @@ dependencies {
 
     implementation(libs.slf4j)
     implementation(libs.jwt)
+    implementation(libs.jwt.rsa)
 
     testImplementation(libs.test.kotlin)
     testImplementation(libs.test.totp)

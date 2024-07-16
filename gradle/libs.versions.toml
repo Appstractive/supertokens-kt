@@ -19,7 +19,8 @@ ktor_version = "2.3.9"
 kotlin-serialization = "1.6.3"
 kotlin-coroutines = "1.8.0"
 
-jwt = "5.2.4"
+jwt = "4.4.0"
+jwt-rsa = "0.22.1"
 
 slf4j = "1.6.1"
 
@@ -73,7 +74,8 @@ settings = {module = "com.russhwolf:multiplatform-settings", version.ref = "sett
 javax-mail = {module = "org.apache.commons:commons-email", version.ref = "mail"}
 freemarker = {module = "org.freemarker:freemarker", version.ref = "freemarker"}
 
-jwt = {module = "io.fusionauth:fusionauth-jwt", version.ref = "jwt"}
+jwt = {module = "com.auth0:java-jwt", version.ref = "jwt"}
+jwt-rsa = {module = "com.auth0:jwks-rsa", version.ref = "jwt-rsa"}
 
 circuit-core = {module = "com.slack.circuit:circuit-foundation", version.ref = "circuit"}
 circuit-overlays = {module = "com.slack.circuit:circuit-overlay", version.ref = "circuit"}

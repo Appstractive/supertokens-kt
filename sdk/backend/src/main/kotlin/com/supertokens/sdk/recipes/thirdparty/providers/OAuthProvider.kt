@@ -41,6 +41,7 @@ abstract class OAuthProvider<out C: OAuthProviderConfig>(
     open val authParams: Map<String, String>? = null
     open val tokenParams: Map<String, String>? = null
 
+
     override fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?) = ProviderEndpoint(
         url = tokenUrl,
         params = buildMap {
