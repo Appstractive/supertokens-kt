@@ -17,30 +17,20 @@ fun Route.sessionRoutes(
     handler: SessionHandler,
 ) {
 
-    authenticate(SuperTokensAuth) {
-        post(Routes.Session.SIGN_OUT) {
-            with(handler) {
-                signOut()
-            }
-        }
-    }
+  authenticate(SuperTokensAuth) { post(Routes.Session.SIGN_OUT) { with(handler) { signOut() } } }
 
-    post(Routes.Session.REFRESH) {
-        with(handler) {
-            refresh()
-        }
-    }
+  post(Routes.Session.REFRESH) { with(handler) { refresh() } }
 
-    get(Routes.Session.JWKS) {
-        call.respond(superTokens.getJwks())
-    }
+  get(Routes.Session.JWKS) { call.respond(superTokens.getJwks()) }
 
-    get(Routes.Session.OIDC) {
-        call.respond(JsonObject(
+  get(Routes.Session.OIDC) {
+    call.respond(
+        JsonObject(
             mapOf(
                 "issuer" to JsonPrimitive(sessions.issuer),
-                "jwks_uri" to JsonPrimitive("${superTokens.appConfig.api.scheme}://${superTokens.appConfig.api.host}${superTokens.appConfig.api.path}jwt/jwks.json"),
-            )
-        ))
-    }
+                "jwks_uri" to
+                    JsonPrimitive(
+                        "${superTokens.appConfig.api.scheme}://${superTokens.appConfig.api.host}${superTokens.appConfig.api.path}jwt/jwks.json"),
+            )))
+  }
 }

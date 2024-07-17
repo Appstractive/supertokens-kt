@@ -9,35 +9,15 @@ import io.ktor.server.routing.post
 
 fun Route.totpRoutes(handler: TotpHandler) {
 
-    authenticate(SuperTokensAuth) {
-        get(Routes.Totp.GET_DEVICES) {
-            with(handler) {
-                getDevices()
-            }
-        }
+  authenticate(SuperTokensAuth) {
+    get(Routes.Totp.GET_DEVICES) { with(handler) { getDevices() } }
 
-        post(Routes.Totp.CREATE_DEVICE) {
-            with(handler) {
-                createDevice()
-            }
-        }
+    post(Routes.Totp.CREATE_DEVICE) { with(handler) { createDevice() } }
 
-        post(Routes.Totp.REMOVE_DEVICE) {
-            with(handler) {
-                removeDevice()
-            }
-        }
+    post(Routes.Totp.REMOVE_DEVICE) { with(handler) { removeDevice() } }
 
-        post(Routes.Totp.VERIFY_DEVICE) {
-            with(handler) {
-                verifyDevice()
-            }
-        }
+    post(Routes.Totp.VERIFY_DEVICE) { with(handler) { verifyDevice() } }
 
-        post(Routes.Totp.VERIFY) {
-            with(handler) {
-                verify()
-            }
-        }
-    }
+    post(Routes.Totp.VERIFY) { with(handler) { verify() } }
+  }
 }

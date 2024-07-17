@@ -14,22 +14,22 @@ class GetTotpDevicesUseCase(
     private val client: HttpClient,
 ) {
 
-    suspend fun getTotpDevices(): List<TotpDevice> {
-        val response = client.get(Routes.Totp.GET_DEVICES)
+  suspend fun getTotpDevices(): List<TotpDevice> {
+    val response = client.get(Routes.Totp.GET_DEVICES)
 
-        val body = response.body<GetTotpDevicesResponseDTO>()
+    val body = response.body<GetTotpDevicesResponseDTO>()
 
-        return when (body.status) {
-            SuperTokensStatus.OK.value -> checkNotNull(body.devices).map {
-                TotpDevice(
-                    name = it.name,
-                    period = it.period,
-                    skew = it.skew,
-                    verified = it.verified,
-                )
-            }
-            else -> throw SuperTokensStatusException(body.status.toStatus())
-        }
+    return when (body.status) {
+      SuperTokensStatus.OK.value ->
+          checkNotNull(body.devices).map {
+            TotpDevice(
+                name = it.name,
+                period = it.period,
+                skew = it.skew,
+                verified = it.verified,
+            )
+          }
+      else -> throw SuperTokensStatusException(body.status.toStatus())
     }
-
+  }
 }

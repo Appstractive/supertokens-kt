@@ -10,23 +10,11 @@ fun Route.passwordlessRoutes(
     handler: PasswordlessHandler,
 ) {
 
-    post(Routes.Passwordless.SIGNUP_CODE) {
-        with(handler) {
-            startSignInUp()
-        }
-    }
+  post(Routes.Passwordless.SIGNUP_CODE) { with(handler) { startSignInUp() } }
 
-    post(Routes.Passwordless.SIGNUP_CODE_RESEND) {
-        with(handler) {
-            resendCode()
-        }
-    }
+  post(Routes.Passwordless.SIGNUP_CODE_RESEND) { with(handler) { resendCode() } }
 
-    authenticate(SuperTokensAuth, optional = true) {
-        post(Routes.Passwordless.SIGNUP_CODE_CONSUME) {
-            with(handler) {
-                consumeCode()
-            }
-        }
-    }
+  authenticate(SuperTokensAuth, optional = true) {
+    post(Routes.Passwordless.SIGNUP_CODE_CONSUME) { with(handler) { consumeCode() } }
+  }
 }

@@ -8,8 +8,8 @@ open class ResponseException(
     cause: Throwable? = null,
 ) : java.lang.RuntimeException(cause) {
 
-    override val message: String
-        get() = "Error ${status.value}: ${error ?: cause?.message ?: status.description}"
+  override val message: String
+    get() = "Error ${status.value}: ${error ?: cause?.message ?: status.description}"
 }
 
 class BadRequestException(

@@ -14,16 +14,18 @@ open class UserHandler(
     protected val scope: CoroutineScope,
 ) {
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.onUserSignedUp(user: User) {
-        setDefaultRoles(user)
-    }
+  open suspend fun PipelineContext<Unit, ApplicationCall>.onUserSignedUp(user: User) {
+    setDefaultRoles(user)
+  }
 
-    open suspend fun PipelineContext<Unit, ApplicationCall>.onUserSignedIn(user: User) = Unit
-
+  open suspend fun PipelineContext<Unit, ApplicationCall>.onUserSignedIn(user: User) = Unit
 }
 
 val UserHandlerAttributeKey = AttributeKey<UserHandler>("UserHandler")
 
-val ApplicationCall.userHandler: UserHandler get() = application.attributes[UserHandlerAttributeKey]
-val PipelineContext<Unit, ApplicationCall>.userHandler: UserHandler get() = application.attributes[UserHandlerAttributeKey]
-val Route.userHandler: UserHandler get() = application.attributes[UserHandlerAttributeKey]
+val ApplicationCall.userHandler: UserHandler
+  get() = application.attributes[UserHandlerAttributeKey]
+val PipelineContext<Unit, ApplicationCall>.userHandler: UserHandler
+  get() = application.attributes[UserHandlerAttributeKey]
+val Route.userHandler: UserHandler
+  get() = application.attributes[UserHandlerAttributeKey]

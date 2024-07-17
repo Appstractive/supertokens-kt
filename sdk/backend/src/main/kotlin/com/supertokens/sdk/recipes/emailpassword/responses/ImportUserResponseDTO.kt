@@ -9,4 +9,4 @@ data class ImportUserResponseDTO(
     override val status: String,
     val user: User? = null,
     val didUserAlreadyExist: Boolean? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

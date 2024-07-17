@@ -10,4 +10,4 @@ typealias ExistsResponse = ExistsResponseDTO
 data class ExistsResponseDTO(
     override val status: String = SuperTokensStatus.OK.value,
     val exists: Boolean,
-): BaseResponseDTO
+) : BaseResponseDTO

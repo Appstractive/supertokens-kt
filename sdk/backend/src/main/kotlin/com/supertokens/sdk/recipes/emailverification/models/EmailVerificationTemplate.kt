@@ -6,10 +6,11 @@ data class EmailVerificationTemplate(
     val appName: String,
     val email: String,
     val verificationLink: String,
-): TemplateProvider {
-    override val template: Map<String, String> = mapOf(
-        "appName" to appName,
-        "email" to email,
-        "verificationLink" to verificationLink,
-    )
+) : TemplateProvider {
+  override val template: Map<String, String> =
+      mapOf(
+          "appName" to appName,
+          "email" to email,
+          "verificationLink" to verificationLink,
+      )
 }

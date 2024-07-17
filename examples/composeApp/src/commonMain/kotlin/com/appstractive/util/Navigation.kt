@@ -7,15 +7,15 @@ import com.slack.circuit.runtime.screen.Screen
 import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.recipes.sessions.repositories.AuthState
 
-fun SuperTokensClient.getHomeScreen(): Screen = when(val authState = authRepository.authState.value) {
-    is AuthState.Authenticated -> {
-        if(authState.multiFactorVerified) {
-            HomeScreen
+fun SuperTokensClient.getHomeScreen(): Screen =
+    when (val authState = authRepository.authState.value) {
+      is AuthState.Authenticated -> {
+        if (authState.multiFactorVerified) {
+          HomeScreen
+        } else {
+          MfaScreen
         }
-        else {
-            MfaScreen
-        }
+      }
+      is AuthState.LoggedIn -> AuthScreen
+      AuthState.Unauthenticated -> AuthScreen
     }
-    is AuthState.LoggedIn -> AuthScreen
-    AuthState.Unauthenticated -> AuthScreen
-}

@@ -13,97 +13,111 @@ import com.supertokens.sdk.recipes.emailpassword.emailPasswordSignUp
 import com.supertokens.sdk.recipes.passwordless.Passwordless
 import com.supertokens.sdk.recipes.passwordless.consumePasswordlessLinkCode
 import com.supertokens.sdk.recipes.passwordless.createPasswordlessEmailCode
-import kotlinx.coroutines.runBlocking
-import org.junit.Test
 import java.time.Instant
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.runBlocking
+import org.junit.Test
 
-class AccountLinkingTests: BaseTest() {
-    override fun SuperTokensConfig.configure() {
-        recipe(EmailPassword)
-        recipe(Passwordless)
-        recipe(AccountLinking)
-    }
+class AccountLinkingTests : BaseTest() {
+  override fun SuperTokensConfig.configure() {
+    recipe(EmailPassword)
+    recipe(Passwordless)
+    recipe(AccountLinking)
+  }
 
-    @Test
-    fun testCanCreatePrimaryUser() = runBlocking {
-        val email = "${Instant.now().toEpochMilli()}@test.de"
-        val user = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
+  @Test
+  fun testCanCreatePrimaryUser() = runBlocking {
+    val email = "${Instant.now().toEpochMilli()}@test.de"
+    val user = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
 
-        val wasAlreadyPrimary = superTokens.checkCanCreatePrimaryUser(recipeUserId = user.recipeUserId ?: user.id)
-        assertFalse(wasAlreadyPrimary)
-    }
+    val wasAlreadyPrimary =
+        superTokens.checkCanCreatePrimaryUser(recipeUserId = user.recipeUserId ?: user.id)
+    assertFalse(wasAlreadyPrimary)
+  }
 
-    @Test
-    fun testCreatePrimaryUser() = runBlocking {
-        val email = "${Instant.now().toEpochMilli()}@test.de"
-        val user = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
+  @Test
+  fun testCreatePrimaryUser() = runBlocking {
+    val email = "${Instant.now().toEpochMilli()}@test.de"
+    val user = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
 
-        val createPrimaryUserResult = superTokens.createPrimaryUser(recipeUserId = user.recipeUserId ?: user.id)
-        assertFalse(createPrimaryUserResult.wasAlreadyAPrimaryUser)
-        assertTrue(createPrimaryUserResult.user.isPrimaryUser == true)
-    }
+    val createPrimaryUserResult =
+        superTokens.createPrimaryUser(recipeUserId = user.recipeUserId ?: user.id)
+    assertFalse(createPrimaryUserResult.wasAlreadyAPrimaryUser)
+    assertTrue(createPrimaryUserResult.user.isPrimaryUser == true)
+  }
 
-    @Test
-    fun testCanLinkAccounts() = runBlocking {
-        val email = "${Instant.now().toEpochMilli()}@test.de"
-        val emailPasswordUser = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
+  @Test
+  fun testCanLinkAccounts() = runBlocking {
+    val email = "${Instant.now().toEpochMilli()}@test.de"
+    val emailPasswordUser = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
 
-        val code = superTokens.createPasswordlessEmailCode(email)
-        val passwordlessUser = superTokens.consumePasswordlessLinkCode(code.preAuthSessionId, code.linkCode).user
+    val code = superTokens.createPasswordlessEmailCode(email)
+    val passwordlessUser =
+        superTokens.consumePasswordlessLinkCode(code.preAuthSessionId, code.linkCode).user
 
-        val createPrimaryUserResult = superTokens.createPrimaryUser(recipeUserId = passwordlessUser.recipeUserId ?: passwordlessUser.id)
+    val createPrimaryUserResult =
+        superTokens.createPrimaryUser(
+            recipeUserId = passwordlessUser.recipeUserId ?: passwordlessUser.id)
 
-        val canLinksAccountsResult = superTokens.checkCanLinkAccounts(
+    val canLinksAccountsResult =
+        superTokens.checkCanLinkAccounts(
             primaryUserId = createPrimaryUserResult.user.id,
             recipeUserId = emailPasswordUser.recipeUserId ?: emailPasswordUser.id,
         )
 
-        assertFalse(canLinksAccountsResult)
-    }
+    assertFalse(canLinksAccountsResult)
+  }
 
-    @Test
-    fun testLinkAccounts() = runBlocking {
-        val email = "${Instant.now().toEpochMilli()}@test.de"
-        val emailPasswordUser = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
+  @Test
+  fun testLinkAccounts() = runBlocking {
+    val email = "${Instant.now().toEpochMilli()}@test.de"
+    val emailPasswordUser = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
 
-        val code = superTokens.createPasswordlessEmailCode(email)
-        val passwordlessUser = superTokens.consumePasswordlessLinkCode(code.preAuthSessionId, code.linkCode).user
+    val code = superTokens.createPasswordlessEmailCode(email)
+    val passwordlessUser =
+        superTokens.consumePasswordlessLinkCode(code.preAuthSessionId, code.linkCode).user
 
-        val createPrimaryUserResult = superTokens.createPrimaryUser(recipeUserId = passwordlessUser.recipeUserId ?: passwordlessUser.id)
+    val createPrimaryUserResult =
+        superTokens.createPrimaryUser(
+            recipeUserId = passwordlessUser.recipeUserId ?: passwordlessUser.id)
 
-        val linksAccountsResult = superTokens.linkAccounts(
+    val linksAccountsResult =
+        superTokens.linkAccounts(
             primaryUserId = createPrimaryUserResult.user.id,
             recipeUserId = emailPasswordUser.recipeUserId ?: emailPasswordUser.id,
         )
 
-        assertFalse(linksAccountsResult.accountsAlreadyLinked)
-    }
+    assertFalse(linksAccountsResult.accountsAlreadyLinked)
+  }
 
-    @Test
-    fun testUnlinkAccounts() = runBlocking {
-        val email = "${Instant.now().toEpochMilli()}@test.de"
-        val emailPasswordUser = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
+  @Test
+  fun testUnlinkAccounts() = runBlocking {
+    val email = "${Instant.now().toEpochMilli()}@test.de"
+    val emailPasswordUser = superTokens.emailPasswordSignUp(email, TEST_PASSWORD)
 
-        val code = superTokens.createPasswordlessEmailCode(email)
-        val passwordlessUser = superTokens.consumePasswordlessLinkCode(code.preAuthSessionId, code.linkCode).user
+    val code = superTokens.createPasswordlessEmailCode(email)
+    val passwordlessUser =
+        superTokens.consumePasswordlessLinkCode(code.preAuthSessionId, code.linkCode).user
 
-        val createPrimaryUserResult = superTokens.createPrimaryUser(recipeUserId = passwordlessUser.recipeUserId ?: passwordlessUser.id)
+    val createPrimaryUserResult =
+        superTokens.createPrimaryUser(
+            recipeUserId = passwordlessUser.recipeUserId ?: passwordlessUser.id)
 
-        val linksAccountsResult = superTokens.linkAccounts(
+    val linksAccountsResult =
+        superTokens.linkAccounts(
             primaryUserId = createPrimaryUserResult.user.id,
             recipeUserId = emailPasswordUser.recipeUserId ?: emailPasswordUser.id,
         )
 
-        assertFalse(linksAccountsResult.accountsAlreadyLinked)
+    assertFalse(linksAccountsResult.accountsAlreadyLinked)
 
-        val unlinkResult = superTokens.unlinkAccounts(
+    val unlinkResult =
+        superTokens.unlinkAccounts(
             recipeUserId = emailPasswordUser.recipeUserId ?: emailPasswordUser.id,
         )
 
-        assertTrue(unlinkResult.wasLinked)
-        assertFalse(unlinkResult.wasRecipeUserDeleted)
-    }
-
+    assertTrue(unlinkResult.wasLinked)
+    assertFalse(unlinkResult.wasRecipeUserDeleted)
+  }
 }

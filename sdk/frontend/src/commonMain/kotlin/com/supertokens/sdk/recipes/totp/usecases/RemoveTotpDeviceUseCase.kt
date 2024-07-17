@@ -15,21 +15,20 @@ class RemoveTotpDeviceUseCase(
     private val client: HttpClient,
 ) {
 
-    suspend fun removeDevice(name: String): Boolean {
-        val response = client.post(Routes.Totp.REMOVE_DEVICE) {
-            setBody(
-                TotpDeviceRequestDTO(
-                    deviceName = name,
-                )
-            )
+  suspend fun removeDevice(name: String): Boolean {
+    val response =
+        client.post(Routes.Totp.REMOVE_DEVICE) {
+          setBody(
+              TotpDeviceRequestDTO(
+                  deviceName = name,
+              ))
         }
 
-        val body = response.body<RemoveTotpDeviceResponseDTO>()
+    val body = response.body<RemoveTotpDeviceResponseDTO>()
 
-        return when (body.status) {
-            SuperTokensStatus.OK.value -> checkNotNull(body.didDeviceExist)
-            else -> throw SuperTokensStatusException(body.status.toStatus())
-        }
+    return when (body.status) {
+      SuperTokensStatus.OK.value -> checkNotNull(body.didDeviceExist)
+      else -> throw SuperTokensStatusException(body.status.toStatus())
     }
-
+  }
 }

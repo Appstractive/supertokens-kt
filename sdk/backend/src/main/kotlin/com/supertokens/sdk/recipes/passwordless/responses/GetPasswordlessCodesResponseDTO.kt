@@ -23,4 +23,4 @@ data class PasswordlessDevices(
 data class GetPasswordlessCodesResponseDTO(
     override val status: String,
     val devices: List<PasswordlessDevices>,
-): BaseResponseDTO
+) : BaseResponseDTO

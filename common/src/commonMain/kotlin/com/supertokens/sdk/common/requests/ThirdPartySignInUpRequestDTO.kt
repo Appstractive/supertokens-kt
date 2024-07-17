@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Deprecated("Use ThirdPartySignInUpRequestDTO instead")
 typealias ThirdPartySignInUpRequest = ThirdPartySignInUpRequestDTO
+
 @Deprecated("Use RedirectUriInfoDTO instead")
 typealias RedirectUriInfo = RedirectUriInfoDTO
 

@@ -21,45 +21,56 @@ open class SessionHandler(
     protected val scope: CoroutineScope,
 ) {
 
-    /**
-     * A call to POST /signout
-     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Session%20Recipe/signout">Frontend Driver Interface</a>
-     */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.signOut() {
-        val user =  call.requirePrincipal<AuthenticatedUser>()
-        val session = sessions.getSession(user.sessionHandle)
-        sessions.removeSessions(
-            sessionHandles = listOf(session.sessionHandle),
-            tenantId = call.tenantId,
-        )
-        clearSessionInResponse()
-        call.respond(StatusResponseDTO())
-    }
+  /**
+   * A call to POST /signout
+   *
+   * @see <a
+   *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Session%20Recipe/signout">Frontend
+   *   Driver Interface</a>
+   */
+  open suspend fun PipelineContext<Unit, ApplicationCall>.signOut() {
+    val user = call.requirePrincipal<AuthenticatedUser>()
+    val session = sessions.getSession(user.sessionHandle)
+    sessions.removeSessions(
+        sessionHandles = listOf(session.sessionHandle),
+        tenantId = call.tenantId,
+    )
+    clearSessionInResponse()
+    call.respond(StatusResponseDTO())
+  }
 
-    /**
-     * A call to POST /session/refresh
-     * @see <a href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Session%20Recipe/refresh">Frontend Driver Interface</a>
-     */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.refresh() {
-        val refreshToken = call.request.headers[HEADER_REFRESH_TOKEN] ?: call.request.cookies[COOKIE_REFRESH_TOKEN] ?: throw UnauthorizedException()
-        val antiCsrfToken = call.request.headers[HEADER_ANTI_CSRF]
-        val session = kotlin.runCatching {
-            sessions.refreshSession(
-                refreshToken = refreshToken,
-                antiCsrfToken = antiCsrfToken,
-            )
-        }.getOrElse {
-            clearSessionInResponse()
-            return call.respond(HttpStatusCode.Unauthorized)
-        }
+  /**
+   * A call to POST /session/refresh
+   *
+   * @see <a
+   *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Session%20Recipe/refresh">Frontend
+   *   Driver Interface</a>
+   */
+  open suspend fun PipelineContext<Unit, ApplicationCall>.refresh() {
+    val refreshToken =
+        call.request.headers[HEADER_REFRESH_TOKEN]
+            ?: call.request.cookies[COOKIE_REFRESH_TOKEN]
+            ?: throw UnauthorizedException()
+    val antiCsrfToken = call.request.headers[HEADER_ANTI_CSRF]
+    val session =
+        kotlin
+            .runCatching {
+              sessions.refreshSession(
+                  refreshToken = refreshToken,
+                  antiCsrfToken = antiCsrfToken,
+              )
+            }
+            .getOrElse {
+              clearSessionInResponse()
+              return call.respond(HttpStatusCode.Unauthorized)
+            }
 
-        setSessionInResponse(
-            accessToken = session.accessToken,
-            refreshToken = session.refreshToken,
-            antiCsrfToken = session.antiCsrfToken,
-        )
+    setSessionInResponse(
+        accessToken = session.accessToken,
+        refreshToken = session.refreshToken,
+        antiCsrfToken = session.antiCsrfToken,
+    )
 
-        call.respond(StatusResponseDTO())
-    }
-
+    call.respond(StatusResponseDTO())
+  }
 }

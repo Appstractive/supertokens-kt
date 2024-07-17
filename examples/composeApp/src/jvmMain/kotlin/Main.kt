@@ -19,39 +19,34 @@ import com.appstractive.App
 import java.awt.event.WindowEvent
 import kotlin.system.exitProcess
 
-
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    var lastError: Throwable? by mutableStateOf(null)
+  var lastError: Throwable? by mutableStateOf(null)
 
-    application(exitProcessOnExit = false) {
-        System.setProperty("compose.interop.blending", "true")
+  application(exitProcessOnExit = false) {
+    System.setProperty("compose.interop.blending", "true")
 
-        CompositionLocalProvider(
-            LocalWindowExceptionHandlerFactory provides WindowExceptionHandlerFactory { window ->
-                WindowExceptionHandler {
-                    lastError = it
-                    window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
-                }
-            }
-        ) {
-            Window(onCloseRequest = ::exitApplication) {
-                App()
-            }
+    CompositionLocalProvider(
+        LocalWindowExceptionHandlerFactory provides
+            WindowExceptionHandlerFactory { window ->
+              WindowExceptionHandler {
+                lastError = it
+                window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
+              }
+            }) {
+          Window(onCloseRequest = ::exitApplication) { App() }
         }
-    }
+  }
 
-    if (lastError != null) {
-        lastError?.printStackTrace()
-        singleWindowApplication(
-            state = WindowState(width = 200.dp, height = Dp.Unspecified),
-            exitProcessOnExit = false
-        ) {
-            Text(lastError?.message ?: "Unknown error", Modifier.padding(8.dp))
+  if (lastError != null) {
+    lastError?.printStackTrace()
+    singleWindowApplication(
+        state = WindowState(width = 200.dp, height = Dp.Unspecified), exitProcessOnExit = false) {
+          Text(lastError?.message ?: "Unknown error", Modifier.padding(8.dp))
         }
 
-        exitProcess(1)
-    } else {
-        exitProcess(0)
-    }
+    exitProcess(1)
+  } else {
+    exitProcess(0)
+  }
 }

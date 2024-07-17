@@ -49,158 +49,154 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
+import java.net.URL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
-import java.net.URL
 
 typealias JwtVerification = Verification.() -> Unit
 
 @SuperTokensKtorDslMarker
 class SuperTokensConfig {
 
-    // The SuperTokens instance to use (required)
-    var superTokens: SuperTokens? = null
+  // The SuperTokens instance to use (required)
+  var superTokens: SuperTokens? = null
 
-    var scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+  var scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    // Handler for core APIs
-    var coreHandler: CoreHandler = CoreHandler(scope = scope)
+  // Handler for core APIs
+  var coreHandler: CoreHandler = CoreHandler(scope = scope)
 
-    var userHandler: UserHandler = UserHandler(scope = scope)
+  var userHandler: UserHandler = UserHandler(scope = scope)
 
-    // Handler for EmailPassword APIs
-    var emailPasswordHandler: EmailPasswordHandler = EmailPasswordHandler(scope = scope)
+  // Handler for EmailPassword APIs
+  var emailPasswordHandler: EmailPasswordHandler = EmailPasswordHandler(scope = scope)
 
-    // Handler for Session APIs
-    var sessionHandler: SessionHandler = SessionHandler(scope = scope)
+  // Handler for Session APIs
+  var sessionHandler: SessionHandler = SessionHandler(scope = scope)
 
-    // Handler for ThirdParty APIs
-    var thirdPartyHandler: ThirdPartyHandler = ThirdPartyHandler(scope = scope)
+  // Handler for ThirdParty APIs
+  var thirdPartyHandler: ThirdPartyHandler = ThirdPartyHandler(scope = scope)
 
-    // Handler for EmailVerification APIs
-    var emailVerificationHandler: EmailVerificationHandler = EmailVerificationHandler(scope = scope)
+  // Handler for EmailVerification APIs
+  var emailVerificationHandler: EmailVerificationHandler = EmailVerificationHandler(scope = scope)
 
-    // Handler for Passwordless APIs
-    var passwordlessHandler: PasswordlessHandler = PasswordlessHandler(scope = scope)
+  // Handler for Passwordless APIs
+  var passwordlessHandler: PasswordlessHandler = PasswordlessHandler(scope = scope)
 
-    // Handler for Totp APIs
-    var totpHandler: TotpHandler = TotpHandler(scope = scope)
+  // Handler for Totp APIs
+  var totpHandler: TotpHandler = TotpHandler(scope = scope)
 
-    var mfaHandler: MultiFactorHandler = MultiFactorHandler(scope = scope)
+  var mfaHandler: MultiFactorHandler = MultiFactorHandler(scope = scope)
 
-    // Allows you to perform additional validations on the JWT payload.
-    var jwtValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = TokenValidator
+  // Allows you to perform additional validations on the JWT payload.
+  var jwtValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = TokenValidator
 
+  internal var jwtVerification: JwtVerification? = null
 
-    internal var jwtVerification: JwtVerification? = null
-
-    // used to verify a token format and signature
-    fun jwtVerification(verify: JwtVerification) {
-        jwtVerification = verify
-    }
-
+  // used to verify a token format and signature
+  fun jwtVerification(verify: JwtVerification) {
+    jwtVerification = verify
+  }
 }
 
 val SuperTokens =
     createApplicationPlugin(name = "SuperTokens", createConfiguration = ::SuperTokensConfig) {
+      val config = pluginConfig
+      val superTokens =
+          config.superTokens ?: throw RuntimeException("SuperTokens SDK not configured")
 
-        val config = pluginConfig
-        val superTokens =
-            config.superTokens ?: throw RuntimeException("SuperTokens SDK not configured")
+      application.attributes.put(SuperTokensAttributeKey, superTokens)
+      application.attributes.put(UserHandlerAttributeKey, config.userHandler)
 
-        application.attributes.put(SuperTokensAttributeKey, superTokens)
-        application.attributes.put(UserHandlerAttributeKey, config.userHandler)
+      if (superTokens.hasRecipe<MultiFactorAuthRecipe>()) {
+        application.attributes.put(MfaHandlerAttributeKey, config.mfaHandler)
+      }
 
-        if (superTokens.hasRecipe<MultiFactorAuthRecipe>()) {
-            application.attributes.put(MfaHandlerAttributeKey, config.mfaHandler)
-        }
+      application.routing {
+        route(superTokens.appConfig.api.basePath) {
+          install(ContentNegotiation) {
+            json(
+                Json {
+                  prettyPrint = true
+                  isLenient = true
+                })
+          }
 
-        application.routing {
+          if (superTokens.hasRecipe<SessionRecipe>()) {
+            application.install(Authentication) {
+              jwt(name = SuperTokensAuth) {
+                validate(config.jwtValidator)
 
-            route(superTokens.appConfig.api.basePath) {
+                authHeader(authHeaderCookieWrapper)
 
-                install(ContentNegotiation) {
-                    json(Json {
-                        prettyPrint = true
-                        isLenient = true
-                    })
-                }
-
-                if (superTokens.hasRecipe<SessionRecipe>()) {
-                    application.install(Authentication) {
-                        jwt(name = SuperTokensAuth) {
-                            validate(config.jwtValidator)
-
-                            authHeader(authHeaderCookieWrapper)
-
-                            verifier(
-                                UrlJwkProvider(URL(superTokens.jwksUrl)),
-                                superTokens.getRecipe<SessionRecipe>().issuer
-                            ) {
-                                config.jwtVerification?.invoke(this)
-                            }
-                        }
-
-                        if (superTokens.hasRecipe<RolesRecipe>()) {
-                            roleBased {
-                                extractRoles { principal ->
-                                    (principal as? AuthenticatedUser)?.roles ?: emptySet()
-                                }
-                                extractPermissions { principal ->
-                                    (principal as? AuthenticatedUser)?.permissions ?: emptySet()
-                                }
-                            }
-                        }
+                verifier(
+                    UrlJwkProvider(URL(superTokens.jwksUrl)),
+                    superTokens.getRecipe<SessionRecipe>().issuer) {
+                      config.jwtVerification?.invoke(this)
                     }
-                }
+              }
 
-                recipeRoutes(superTokens, config)
-
-                // we need to install the routes for the optional tenantId again,
-                // because optional path parameters are only allowed at the end of a path
-                route("{tenantId?}/") {
-                    recipeRoutes(superTokens, config)
+              if (superTokens.hasRecipe<RolesRecipe>()) {
+                roleBased {
+                  extractRoles { principal ->
+                    (principal as? AuthenticatedUser)?.roles ?: emptySet()
+                  }
+                  extractPermissions { principal ->
+                    (principal as? AuthenticatedUser)?.permissions ?: emptySet()
+                  }
                 }
+              }
             }
+          }
+
+          recipeRoutes(superTokens, config)
+
+          // we need to install the routes for the optional tenantId again,
+          // because optional path parameters are only allowed at the end of a path
+          route("{tenantId?}/") { recipeRoutes(superTokens, config) }
         }
+      }
     }
 
 private fun Route.recipeRoutes(superTokens: SuperTokens, config: SuperTokensConfig) {
-    coreRoutes(config.coreHandler)
+  coreRoutes(config.coreHandler)
 
-    if (isSessionsEnabled) {
-        sessionRoutes(config.sessionHandler)
-    }
+  if (isSessionsEnabled) {
+    sessionRoutes(config.sessionHandler)
+  }
 
-    if (isEmailPasswordEnabled) {
-        emailPasswordRoutes(config.emailPasswordHandler)
-    }
+  if (isEmailPasswordEnabled) {
+    emailPasswordRoutes(config.emailPasswordHandler)
+  }
 
-    if (isThirdPartyEnabled) {
-        thirdPartyRoutes(config.thirdPartyHandler)
-    }
+  if (isThirdPartyEnabled) {
+    thirdPartyRoutes(config.thirdPartyHandler)
+  }
 
-    if (isEmailVerificationEnabled) {
-        emailVerificationRoutes(config.emailVerificationHandler)
-    }
+  if (isEmailVerificationEnabled) {
+    emailVerificationRoutes(config.emailVerificationHandler)
+  }
 
-    if (isPasswordlessEnabled) {
-        passwordlessRoutes(config.passwordlessHandler)
-    }
+  if (isPasswordlessEnabled) {
+    passwordlessRoutes(config.passwordlessHandler)
+  }
 
-    if (isTotpEnabled) {
-        totpRoutes(config.totpHandler)
-    }
+  if (isTotpEnabled) {
+    totpRoutes(config.totpHandler)
+  }
 
-    if (isMultiFactorAuthEnabled) {
-        multiFactorRoutes(config.mfaHandler)
-    }
+  if (isMultiFactorAuthEnabled) {
+    multiFactorRoutes(config.mfaHandler)
+  }
 }
 
 val SuperTokensAttributeKey = AttributeKey<SuperTokens>("SuperTokens")
 
-val ApplicationCall.superTokens: SuperTokens get() = application.attributes[SuperTokensAttributeKey]
-val PipelineContext<Unit, ApplicationCall>.superTokens: SuperTokens get() = application.attributes[SuperTokensAttributeKey]
-val Route.superTokens: SuperTokens get() = application.attributes[SuperTokensAttributeKey]
+val ApplicationCall.superTokens: SuperTokens
+  get() = application.attributes[SuperTokensAttributeKey]
+val PipelineContext<Unit, ApplicationCall>.superTokens: SuperTokens
+  get() = application.attributes[SuperTokensAttributeKey]
+val Route.superTokens: SuperTokens
+  get() = application.attributes[SuperTokensAttributeKey]

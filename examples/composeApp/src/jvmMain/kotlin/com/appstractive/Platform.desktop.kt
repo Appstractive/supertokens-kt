@@ -14,14 +14,14 @@ actual fun getPlatformDialogProperties(
     decorFitsSystemWindows: Boolean,
     usePlatformInsets: Boolean,
     scrimColor: Color
-): DialogProperties = DialogProperties(
-    dismissOnBackPress = dismissOnBackPress,
-    dismissOnClickOutside = dismissOnClickOutside,
-    usePlatformDefaultWidth = usePlatformDefaultWidth,
-)
+): DialogProperties =
+    DialogProperties(
+        dismissOnBackPress = dismissOnBackPress,
+        dismissOnClickOutside = dismissOnClickOutside,
+        usePlatformDefaultWidth = usePlatformDefaultWidth,
+    )
 
 @Composable
 internal actual fun getNavigator(backstack: BackStack<out BackStack.Record>): Navigator {
-    return rememberCircuitNavigator(backstack) {
-    }
+  return rememberCircuitNavigator(backstack) {}
 }

@@ -3,6 +3,7 @@
 ## Installation
 
 Gradle
+
 ```
 implementation("com.appstractive:supertokens-sdk-backend-ktor:1.4.1")
 ```

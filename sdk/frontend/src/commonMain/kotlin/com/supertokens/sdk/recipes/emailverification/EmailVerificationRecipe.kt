@@ -8,61 +8,59 @@ import com.supertokens.sdk.recipes.emailverification.usecases.CheckEmailVerified
 import com.supertokens.sdk.recipes.emailverification.usecases.SendEmailVerificationUseCase
 import com.supertokens.sdk.recipes.emailverification.usecases.VerifyEmailUseCase
 
-class EmailVerificationConfig: RecipeConfig
+class EmailVerificationConfig : RecipeConfig
 
 class EmailVerificationRecipe(
     private val superTokens: SuperTokensClient,
     private val config: EmailVerificationConfig,
 ) : Recipe<EmailVerificationConfig> {
 
-    private val sendEmailVerificationUseCase by lazy {
-        SendEmailVerificationUseCase(
-            client = superTokens.apiClient,
-            tenantId = superTokens.tenantId,
-        )
-    }
+  private val sendEmailVerificationUseCase by lazy {
+    SendEmailVerificationUseCase(
+        client = superTokens.apiClient,
+        tenantId = superTokens.tenantId,
+    )
+  }
 
-    private val verifyEmailUseCase by lazy {
-        VerifyEmailUseCase(
-            client = superTokens.apiClient,
-            tenantId = superTokens.tenantId,
-        )
-    }
+  private val verifyEmailUseCase by lazy {
+    VerifyEmailUseCase(
+        client = superTokens.apiClient,
+        tenantId = superTokens.tenantId,
+    )
+  }
 
-    private val checkEmailVerifiedUseCase by lazy {
-        CheckEmailVerifiedUseCase(
-            client = superTokens.apiClient,
-        )
-    }
+  private val checkEmailVerifiedUseCase by lazy {
+    CheckEmailVerifiedUseCase(
+        client = superTokens.apiClient,
+    )
+  }
 
-    suspend fun sendVerificationEmail() = sendEmailVerificationUseCase.sendVerificationEmail()
+  suspend fun sendVerificationEmail() = sendEmailVerificationUseCase.sendVerificationEmail()
 
-    suspend fun verifyEmail(token: String) = verifyEmailUseCase.verifyEmail(token)
+  suspend fun verifyEmail(token: String) = verifyEmailUseCase.verifyEmail(token)
 
-    suspend fun checkEmailVerified() = checkEmailVerifiedUseCase.checkEmailVerified()
-
+  suspend fun checkEmailVerified() = checkEmailVerifiedUseCase.checkEmailVerified()
 }
 
-object EmailVerification: RecipeBuilder<EmailVerificationConfig, EmailVerificationRecipe>() {
+object EmailVerification : RecipeBuilder<EmailVerificationConfig, EmailVerificationRecipe>() {
 
-    override fun install(configure: EmailVerificationConfig.() -> Unit): (SuperTokensClient) -> EmailVerificationRecipe {
-        val config = EmailVerificationConfig().apply(configure)
+  override fun install(
+      configure: EmailVerificationConfig.() -> Unit
+  ): (SuperTokensClient) -> EmailVerificationRecipe {
+    val config = EmailVerificationConfig().apply(configure)
 
-        return {
-            EmailVerificationRecipe(it, config)
-        }
-    }
-
+    return { EmailVerificationRecipe(it, config) }
+  }
 }
 
 suspend fun SuperTokensClient.sendVerificationEmail(): Boolean {
-    return getRecipe<EmailVerificationRecipe>().sendVerificationEmail()
+  return getRecipe<EmailVerificationRecipe>().sendVerificationEmail()
 }
 
 suspend fun SuperTokensClient.verifyEmail(token: String): Boolean {
-    return getRecipe<EmailVerificationRecipe>().verifyEmail(token)
+  return getRecipe<EmailVerificationRecipe>().verifyEmail(token)
 }
 
 suspend fun SuperTokensClient.checkEmailVerified(): Boolean {
-    return getRecipe<EmailVerificationRecipe>().checkEmailVerified()
+  return getRecipe<EmailVerificationRecipe>().checkEmailVerified()
 }

@@ -5,12 +5,8 @@ data class LoginOtpTemplate(
     val toEmail: String,
     val otp: String,
     val time: String,
-): TemplateProvider {
+) : TemplateProvider {
 
-    override val template = mapOf(
-        "appname" to appname,
-        "toEmail" to toEmail,
-        "otp" to otp,
-        "time" to time
-    )
+  override val template =
+      mapOf("appname" to appname, "toEmail" to toEmail, "otp" to otp, "time" to time)
 }

@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class CreateResetPasswordTokenResponseDTO(
     override val status: String,
     val token: String? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

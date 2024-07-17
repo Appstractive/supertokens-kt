@@ -34,14 +34,13 @@ import io.ktor.http.fullPath
 
 class SessionRecipeConfig : RecipeConfig {
 
-    var authRepository: AuthRepository? = null
-    var tokensRepository: TokensRepository? = null
-    var claimsRepository: ClaimsRepository? = null
+  var authRepository: AuthRepository? = null
+  var tokensRepository: TokensRepository? = null
+  var claimsRepository: ClaimsRepository? = null
 
-    var cookiesStorage: CookiesStorage? = null
+  var cookiesStorage: CookiesStorage? = null
 
-    var refreshTokensOnStart: Boolean = true
-
+  var refreshTokensOnStart: Boolean = true
 }
 
 class SessionRecipe(
@@ -49,118 +48,110 @@ class SessionRecipe(
     private val config: SessionRecipeConfig,
 ) : Recipe<SessionRecipeConfig> {
 
-    val authRepository: AuthRepository by lazy {
-        config.authRepository ?: AuthRepositoryImpl()
+  val authRepository: AuthRepository by lazy { config.authRepository ?: AuthRepositoryImpl() }
+  val tokensRepository: TokensRepository by lazy {
+    config.tokensRepository ?: TokensRepositorySettings(getDefaultSettings())
+  }
+  val claimsRepository: ClaimsRepository by lazy {
+    config.claimsRepository ?: ClaimsRepositorySettings(getDefaultSettings())
+  }
+
+  internal val refreshTokensUseCase by lazy {
+    RefreshTokensUseCase(
+        sessionRecipe = this,
+    )
+  }
+
+  internal val updateAccessTokenUseCase by lazy {
+    UpdateAccessTokenUseCase(
+        sessionRecipe = this,
+    )
+  }
+
+  internal val updateRefreshTokenUseCase by lazy {
+    UpdateRefreshTokenUseCase(
+        sessionRecipe = this,
+    )
+  }
+
+  internal val logoutUseCase by lazy {
+    LogoutUseCase(
+        sessionRecipe = this,
+    )
+  }
+
+  override suspend fun postInit() {
+    superTokens.apiClient.plugin(HttpSend).intercept(tokenHeaderInterceptor())
+
+    tokensRepository.getRefreshToken()?.let {
+      claimsRepository.getClaims()?.let { claims -> authRepository.setLoggedIn(claims.sub) }
+
+      if (config.refreshTokensOnStart) {
+        runCatching { refreshTokens() }
+      }
     }
-    val tokensRepository: TokensRepository by lazy {
-        config.tokensRepository ?: TokensRepositorySettings(getDefaultSettings())
-    }
-    val claimsRepository: ClaimsRepository by lazy {
-        config.claimsRepository ?: ClaimsRepositorySettings(getDefaultSettings())
-    }
+  }
 
-    internal val refreshTokensUseCase by lazy {
-        RefreshTokensUseCase(
-            sessionRecipe = this,
-        )
-    }
+  suspend fun refreshTokens(): BearerTokens? =
+      refreshTokensUseCase.refreshTokens(superTokens.apiClient)
 
-    internal val updateAccessTokenUseCase by lazy {
-        UpdateAccessTokenUseCase(
-            sessionRecipe = this,
-        )
-    }
-
-    internal val updateRefreshTokenUseCase by lazy {
-        UpdateRefreshTokenUseCase(
-            sessionRecipe = this,
-        )
-    }
-
-    internal val logoutUseCase by lazy {
-        LogoutUseCase(
-            sessionRecipe = this,
-        )
-    }
-
-    override suspend fun postInit() {
-        superTokens.apiClient.plugin(HttpSend).intercept(tokenHeaderInterceptor())
-
-        tokensRepository.getRefreshToken()?.let {
-            claimsRepository.getClaims()?.let { claims ->
-                authRepository.setLoggedIn(claims.sub)
-            }
-
-            if (config.refreshTokensOnStart) {
-                runCatching {
-                    refreshTokens()
-                }
-            }
-        }
-    }
-
-    suspend fun refreshTokens(): BearerTokens? =
-        refreshTokensUseCase.refreshTokens(superTokens.apiClient)
-
-    override fun HttpClientConfig<*>.configureClient() {
-        install(HttpCookies) {
-            storage = config.cookiesStorage ?: defaultCookieStorage(
-                sessionRecipe = this@SessionRecipe,
-            )
-        }
-
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    tokensRepository.getRefreshToken()?.let {
-                        BearerTokens(tokensRepository.getAccessToken() ?: "", it)
-                    }
-                }
-
-                refreshTokens {
-                    refreshTokensUseCase.refreshTokens(this)
-                }
-            }
-        }
+  override fun HttpClientConfig<*>.configureClient() {
+    install(HttpCookies) {
+      storage =
+          config.cookiesStorage
+              ?: defaultCookieStorage(
+                  sessionRecipe = this@SessionRecipe,
+              )
     }
 
-    private fun tokenHeaderInterceptor(): suspend Sender.(HttpRequestBuilder) -> HttpClientCall =
-        { request ->
-            execute(request).also {
-                if (it.response.status == HttpStatusCode.OK) {
-                    it.response.headers[HEADER_ACCESS_TOKEN]?.let { token ->
-                        if (token.isNotBlank()) {
-                            updateAccessTokenUseCase.updateAccessToken(token)
-                        } else if (!it.request.url.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
-                            signOut()
-                        }
-                    }
-
-                    it.response.headers[HEADER_REFRESH_TOKEN]?.let { token ->
-                        if (token.isNotBlank()) {
-                            updateRefreshTokenUseCase.updateRefreshToken(token)
-                        } else if (!it.request.url.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
-                            signOut()
-                        }
-                    }
-                }
-            }
+    install(Auth) {
+      bearer {
+        loadTokens {
+          tokensRepository.getRefreshToken()?.let {
+            BearerTokens(tokensRepository.getAccessToken() ?: "", it)
+          }
         }
 
-    suspend fun signOut() = logoutUseCase.signOut()
+        refreshTokens { refreshTokensUseCase.refreshTokens(this) }
+      }
+    }
+  }
 
+  private fun tokenHeaderInterceptor(): suspend Sender.(HttpRequestBuilder) -> HttpClientCall =
+      { request ->
+        execute(request).also {
+          if (it.response.status == HttpStatusCode.OK) {
+            it.response.headers[HEADER_ACCESS_TOKEN]?.let { token ->
+              if (token.isNotBlank()) {
+                updateAccessTokenUseCase.updateAccessToken(token)
+              } else if (!it.request.url.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
+                signOut()
+              }
+            }
+
+            it.response.headers[HEADER_REFRESH_TOKEN]?.let { token ->
+              if (token.isNotBlank()) {
+                updateRefreshTokenUseCase.updateRefreshToken(token)
+              } else if (!it.request.url.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
+                signOut()
+              }
+            }
+          }
+        }
+      }
+
+  suspend fun signOut() = logoutUseCase.signOut()
 }
 
 object Session : RecipeBuilder<SessionRecipeConfig, SessionRecipe>() {
 
-    override fun install(configure: SessionRecipeConfig.() -> Unit): (SuperTokensClient) -> SessionRecipe {
-        val config = SessionRecipeConfig().apply(configure)
+  override fun install(
+      configure: SessionRecipeConfig.() -> Unit
+  ): (SuperTokensClient) -> SessionRecipe {
+    val config = SessionRecipeConfig().apply(configure)
 
-        return {
-            SessionRecipe(it, config)
-        }
-    }
-
+    return { SessionRecipe(it, config) }
+  }
 }
 
 suspend fun SuperTokensClient.signOut() = getRecipe<SessionRecipe>().signOut()

@@ -12,4 +12,4 @@ data class SignInUpResponseDTO(
     override val status: String = SuperTokensStatus.OK.value,
     val createdNewUser: Boolean?,
     val user: User?,
-): BaseResponseDTO
+) : BaseResponseDTO

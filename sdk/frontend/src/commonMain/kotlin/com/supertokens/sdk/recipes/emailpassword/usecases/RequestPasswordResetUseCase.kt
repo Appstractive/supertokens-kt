@@ -15,37 +15,38 @@ import io.ktor.client.request.setBody
 import io.ktor.http.appendEncodedPathSegments
 
 class RequestPasswordResetUseCase(
-  private val client: HttpClient,
-  private val tenantId: String?,
+    private val client: HttpClient,
+    private val tenantId: String?,
 ) {
 
   suspend fun requestReset(email: String) {
-    val response = client.post {
-      url {
-        appendEncodedPathSegments(
-            listOfNotNull(
-                tenantId,
-                Routes.EmailPassword.PASSWORD_RESET_TOKEN,
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.EmailPassword.PASSWORD_RESET_TOKEN,
+                ),
             )
-        )
-      }
-      setBody(
-          FormFieldRequestDTO(
-              formFields = listOf(
-                  FormFieldDTO(
-                      id = FORM_FIELD_EMAIL_ID,
-                      value = email,
-                  ),
+          }
+          setBody(
+              FormFieldRequestDTO(
+                  formFields =
+                      listOf(
+                          FormFieldDTO(
+                              id = FORM_FIELD_EMAIL_ID,
+                              value = email,
+                          ),
+                      ),
               ),
           )
-      )
-    }
+        }
 
     val body = response.body<StatusResponseDTO>()
 
-    if(body.status != SuperTokensStatus.OK.value) {
+    if (body.status != SuperTokensStatus.OK.value) {
       throw SuperTokensStatusException(body.status.toStatus())
     }
   }
-
 }

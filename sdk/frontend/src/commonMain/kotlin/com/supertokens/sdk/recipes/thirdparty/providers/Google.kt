@@ -12,26 +12,30 @@ import com.supertokens.sdk.recipes.thirdparty.ThirdPartySignInTokens
 class ProviderGoogle(
     superTokens: SuperTokensClient,
     config: ProviderConfig,
-): Provider<ProviderConfig>(
-    id = ThirdPartyProvider.GOOGLE,
-    config = config,
-)
+) :
+    Provider<ProviderConfig>(
+        id = ThirdPartyProvider.GOOGLE,
+        config = config,
+    )
 
-object Google: ProviderBuilder<ProviderConfig, ProviderGoogle>() {
+object Google : ProviderBuilder<ProviderConfig, ProviderGoogle>() {
 
-    const val id = ThirdPartyProvider.GOOGLE
+  const val id = ThirdPartyProvider.GOOGLE
 
-    object AuthCode: ThirdPartySignInAuthCode(id)
-    object Tokens: ThirdPartySignInTokens(id)
+  object AuthCode : ThirdPartySignInAuthCode(id)
 
-    override fun install(configure: ProviderConfig.() -> Unit): (SuperTokensClient, ThirdPartyRecipe) -> ProviderGoogle {
-        val config = ProviderConfig().apply(configure)
+  object Tokens : ThirdPartySignInTokens(id)
 
-        return { superTokens, _ ->
-            ProviderGoogle(
-                superTokens, config,
-            )
-        }
+  override fun install(
+      configure: ProviderConfig.() -> Unit
+  ): (SuperTokensClient, ThirdPartyRecipe) -> ProviderGoogle {
+    val config = ProviderConfig().apply(configure)
+
+    return { superTokens, _ ->
+      ProviderGoogle(
+          superTokens,
+          config,
+      )
     }
-
+  }
 }

@@ -10,12 +10,11 @@ class CheckEmailVerifiedUseCase(
     private val client: HttpClient,
 ) {
 
-    suspend fun checkEmailVerified(): Boolean {
-        val response = client.get(Routes.EmailVerification.CHECK_VERIFIED)
+  suspend fun checkEmailVerified(): Boolean {
+    val response = client.get(Routes.EmailVerification.CHECK_VERIFIED)
 
-        val body = response.body<VerifyEmailResponseDTO>()
+    val body = response.body<VerifyEmailResponseDTO>()
 
-        return body.isVerified == true
-    }
-
+    return body.isVerified == true
+  }
 }

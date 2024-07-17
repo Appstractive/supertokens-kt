@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 data class CreateJwtResponseDTO(
     override val status: String = SuperTokensStatus.OK.value,
     val jwt: String? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

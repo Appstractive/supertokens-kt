@@ -3,6 +3,7 @@
 ## Installation
 
 Gradle:
+
 ```
 implementation("com.appstractive:supertokens-sdk-backend:1.4.1")
 ```

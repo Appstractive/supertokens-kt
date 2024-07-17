@@ -26,33 +26,32 @@ abstract class EmailService(
     val emailVerificationTemplateName: String = "email-verification.html",
 ) {
 
-    private val cfg = Configuration(VERSION_2_3_32).apply {
-        this.localizedLookup = localizedLookup
-    }
+  private val cfg = Configuration(VERSION_2_3_32).apply { this.localizedLookup = localizedLookup }
 
-    init {
-        cfg.templateLoader = templateLoader
-    }
+  init {
+    cfg.templateLoader = templateLoader
+  }
 
-    abstract suspend fun sendEmail(content: EmailContent)
+  abstract suspend fun sendEmail(content: EmailContent)
 
-    open fun getTemplate(template: String): Template = cfg.getTemplate(template)
+  open fun getTemplate(template: String): Template = cfg.getTemplate(template)
 
-    fun processTemplate(name: String, provider: TemplateProvider): String {
-        val template = getTemplate(name)
-        val out = StringWriter()
-        template.process(
-            provider.template,
-            out,
-        )
-        return out.toString()
-    }
-
+  fun processTemplate(name: String, provider: TemplateProvider): String {
+    val template = getTemplate(name)
+    val out = StringWriter()
+    template.process(
+        provider.template,
+        out,
+    )
+    return out.toString()
+  }
 }
 
-val DEFAULT_EMAIL_TEMPLATE_LOADER = object : URLTemplateLoader() {
+val DEFAULT_EMAIL_TEMPLATE_LOADER =
+    object : URLTemplateLoader() {
 
-    override fun getURL(name: String): URL {
-        return URL("https://raw.githubusercontent.com/supertokens/email-sms-templates/master/email-html/$name")
+      override fun getURL(name: String): URL {
+        return URL(
+            "https://raw.githubusercontent.com/supertokens/email-sms-templates/master/email-html/$name")
+      }
     }
-}

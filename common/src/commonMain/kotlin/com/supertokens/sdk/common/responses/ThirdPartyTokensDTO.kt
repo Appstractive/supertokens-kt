@@ -8,8 +8,6 @@ typealias ThirdPartyTokens = ThirdPartyTokensDTO
 
 @Serializable
 data class ThirdPartyTokensDTO(
-    @SerialName("access_token")
-    val accessToken: String,
-    @SerialName("id_token")
-    val idToken: String? = null,
+    @SerialName("access_token") val accessToken: String,
+    @SerialName("id_token") val idToken: String? = null,
 )

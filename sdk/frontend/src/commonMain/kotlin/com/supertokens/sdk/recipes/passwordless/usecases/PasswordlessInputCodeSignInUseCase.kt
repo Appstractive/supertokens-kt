@@ -18,36 +18,38 @@ class PasswordlessInputCodeSignInUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun signIn(preAuthSessionId: String, deviceId: String, userInputCode: String): SignInData {
-        val response = client.post {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.Passwordless.SIGNUP_CODE_CONSUME,
-                    )
-                )
-            }
-            setBody(
-                ConsumePasswordlessCodeRequestDTO(
-                    preAuthSessionId = preAuthSessionId,
-                    deviceId = deviceId,
-                    userInputCode = userInputCode,
-                )
-            )
+  suspend fun signIn(
+      preAuthSessionId: String,
+      deviceId: String,
+      userInputCode: String
+  ): SignInData {
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.Passwordless.SIGNUP_CODE_CONSUME,
+                ))
+          }
+          setBody(
+              ConsumePasswordlessCodeRequestDTO(
+                  preAuthSessionId = preAuthSessionId,
+                  deviceId = deviceId,
+                  userInputCode = userInputCode,
+              ))
         }
 
-        val body = response.body<SignInUpResponseDTO>()
+    val body = response.body<SignInUpResponseDTO>()
 
-        return when(val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> {
-                SignInData(
-                    user = checkNotNull(body.user),
-                    createdNewUser = checkNotNull(body.createdNewUser),
-                )
-            }
-            else -> throw SuperTokensStatusException(status)
-        }
+    return when (val status = body.status.toStatus()) {
+      SuperTokensStatus.OK -> {
+        SignInData(
+            user = checkNotNull(body.user),
+            createdNewUser = checkNotNull(body.createdNewUser),
+        )
+      }
+      else -> throw SuperTokensStatusException(status)
     }
-
+  }
 }

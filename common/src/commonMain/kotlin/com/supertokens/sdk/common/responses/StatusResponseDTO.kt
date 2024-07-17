@@ -10,4 +10,4 @@ typealias StatusResponse = StatusResponseDTO
 data class StatusResponseDTO(
     override val status: String = SuperTokensStatus.OK.value,
     val message: String? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

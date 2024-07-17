@@ -19,47 +19,46 @@ class ThirdPartyAuthCodeSignInUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun signIn(
-        providerId: String,
-        pkceCodeVerifier: String,
-        redirectURI: String,
-        redirectURIQueryParams: Map<String, String>,
-        clientType: String? = null,
-    ): SignInData {
-        val response = client.post {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.ThirdParty.SIGN_IN_UP,
-                    )
-                )
-            }
-            setBody(
-                ThirdPartySignInUpRequestDTO(
-                    thirdPartyId = providerId,
-                    redirectURIInfo = RedirectUriInfoDTO(
-                        redirectURIOnProviderDashboard = redirectURI,
-                        redirectURIQueryParams = redirectURIQueryParams ?: emptyMap(),
-                        pkceCodeVerifier = pkceCodeVerifier,
-                    ),
-                    clientType = clientType,
-                )
-            )
+  suspend fun signIn(
+      providerId: String,
+      pkceCodeVerifier: String,
+      redirectURI: String,
+      redirectURIQueryParams: Map<String, String>,
+      clientType: String? = null,
+  ): SignInData {
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.ThirdParty.SIGN_IN_UP,
+                ))
+          }
+          setBody(
+              ThirdPartySignInUpRequestDTO(
+                  thirdPartyId = providerId,
+                  redirectURIInfo =
+                      RedirectUriInfoDTO(
+                          redirectURIOnProviderDashboard = redirectURI,
+                          redirectURIQueryParams = redirectURIQueryParams ?: emptyMap(),
+                          pkceCodeVerifier = pkceCodeVerifier,
+                      ),
+                  clientType = clientType,
+              ))
         }
 
-        val body = response.body<SignInUpResponseDTO>()
+    val body = response.body<SignInUpResponseDTO>()
 
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> {
-                SignInData(
-                    user = checkNotNull(body.user),
-                    createdNewUser = checkNotNull(body.createdNewUser),
-                )
-            }
+    return when (val status = body.status.toStatus()) {
+      SuperTokensStatus.OK -> {
+        SignInData(
+            user = checkNotNull(body.user),
+            createdNewUser = checkNotNull(body.createdNewUser),
+        )
+      }
 
-            else -> throw SuperTokensStatusException(status)
-        }
+      else -> throw SuperTokensStatusException(status)
     }
-
+  }
 }

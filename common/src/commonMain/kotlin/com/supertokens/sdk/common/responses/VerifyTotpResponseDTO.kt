@@ -9,4 +9,4 @@ data class VerifyTotpResponseDTO(
     val currentNumberOfFailedAttempts: Long? = null,
     val maxNumberOfFailedAttempts: Long? = null,
     val retryAfterMs: Long? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

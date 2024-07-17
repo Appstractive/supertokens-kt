@@ -8,4 +8,4 @@ data class ConsumePasswordTokenResponseDTO(
     override val status: String,
     val userId: String? = null,
     val email: String? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

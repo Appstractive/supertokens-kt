@@ -18,26 +18,25 @@ class CheckEmailExistsUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun checkEmailExists(email: String): Boolean {
-        val response = client.get {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.EMAIL_EXISTS,
-                    )
-                )
-                parameters.append("email", email)
-            }
-            header(HEADER_RECIPE_ID, recipeId)
+  suspend fun checkEmailExists(email: String): Boolean {
+    val response =
+        client.get {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.EMAIL_EXISTS,
+                ))
+            parameters.append("email", email)
+          }
+          header(HEADER_RECIPE_ID, recipeId)
         }
 
-        val body = response.body<ExistsResponseDTO>()
+    val body = response.body<ExistsResponseDTO>()
 
-        return when(body.status) {
-            SuperTokensStatus.OK.value -> body.exists
-            else -> throw SuperTokensStatusException(body.status.toStatus())
-        }
+    return when (body.status) {
+      SuperTokensStatus.OK.value -> body.exists
+      else -> throw SuperTokensStatusException(body.status.toStatus())
     }
-
+  }
 }

@@ -8,168 +8,142 @@ import kotlin.test.assertTrue
 
 class MultiFactorTests {
 
-    @Test
-    fun testSingleAuthFactor() {
-        val factors = listOf(AuthFactor.TOTP)
+  @Test
+  fun testSingleAuthFactor() {
+    val factors = listOf(AuthFactor.TOTP)
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+            )))
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
+            )))
 
-        assertFalse(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                )
-            )
-        )
-    }
+    assertFalse(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+            )))
+  }
 
-    @Test
-    fun testMultipleAuthFactor() {
-        val factors = listOf(
+  @Test
+  fun testMultipleAuthFactor() {
+    val factors =
+        listOf(
             AuthFactor.TOTP,
             AuthFactor.OTP_PHONE,
         )
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+            )))
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+            )))
 
-        assertFalse(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertFalse(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+            )))
 
-        assertFalse(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                )
-            )
-        )
-    }
+    assertFalse(
+        factors.isValid(
+            mapOf(
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+            )))
+  }
 
-    @Test
-    fun testAnyAuthFactor() {
-        val factors = listOf(
+  @Test
+  fun testAnyAuthFactor() {
+    val factors =
+        listOf(
             AuthFactor.AnyOf(AuthFactor.TOTP, AuthFactor.OTP_PHONE),
         )
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+            )))
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+            )))
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+            )))
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+            )))
 
-        assertFalse(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
-                )
-            )
-        )
-    }
+    assertFalse(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
+            )))
+  }
 
-    @Test
-    fun testAllAuthFactor() {
-        val factors = listOf(
+  @Test
+  fun testAllAuthFactor() {
+    val factors =
+        listOf(
             AuthFactor.AllOf(AuthFactor.TOTP, AuthFactor.OTP_PHONE),
         )
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+            )))
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+            )))
 
-        assertFalse(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                )
-            )
-        )
-    }
+    assertFalse(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+            )))
+  }
 
-    @Test
-    fun testAllInOrderAuthFactor() {
-        val factors = listOf(
+  @Test
+  fun testAllInOrderAuthFactor() {
+    val factors =
+        listOf(
             AuthFactor.AllOf(
                 AuthFactor.TOTP,
                 AuthFactor.OTP_PHONE,
@@ -177,45 +151,36 @@ class MultiFactorTests {
             ),
         )
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.TOTP.key to System.currentTimeMillis(),
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis() + 100000,
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis() - 100000,
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.TOTP.key to System.currentTimeMillis(),
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis() + 100000,
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis() - 100000,
+            )))
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis() + 100000,
-                    AuthFactor.TOTP.key to System.currentTimeMillis() - 100000,
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis() + 100000,
+                AuthFactor.TOTP.key to System.currentTimeMillis() - 100000,
+            )))
 
-        assertTrue(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis() + 100000,
-                    AuthFactor.TOTP.key to System.currentTimeMillis() - 100000,
-                )
-            )
-        )
+    assertTrue(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis(),
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis() + 100000,
+                AuthFactor.TOTP.key to System.currentTimeMillis() - 100000,
+            )))
 
-        assertFalse(
-            factors.isValid(
-                mapOf(
-                    AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
-                    AuthFactor.TOTP.key to System.currentTimeMillis() + 100000,
-                    AuthFactor.OTP_PHONE.key to System.currentTimeMillis() - 100000,
-                )
-            )
-        )
-    }
-
+    assertFalse(
+        factors.isValid(
+            mapOf(
+                AuthFactor.OTP_EMAIL.key to System.currentTimeMillis(),
+                AuthFactor.TOTP.key to System.currentTimeMillis() + 100000,
+                AuthFactor.OTP_PHONE.key to System.currentTimeMillis() - 100000,
+            )))
+  }
 }

@@ -15,4 +15,4 @@ data class TotpDeviceDTO(
 data class GetTotpDevicesResponseDTO(
     override val status: String = SuperTokensStatus.OK.value,
     val devices: List<TotpDeviceDTO>? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

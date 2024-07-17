@@ -13,4 +13,4 @@ data class GetSessionResponseDTO(
     val expiry: Long? = null,
     val timeCreated: Long? = null,
     val sessionHandle: String? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

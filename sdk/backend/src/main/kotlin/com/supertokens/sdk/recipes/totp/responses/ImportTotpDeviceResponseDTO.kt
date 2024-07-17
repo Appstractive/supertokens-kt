@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class ImportTotpDeviceResponseDTO(
     override val status: String,
     val deviceName: String,
-): BaseResponseDTO
+) : BaseResponseDTO

@@ -18,7 +18,6 @@ import io.ktor.server.auth.parseAuthorizationHeader
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
 
-
 data class AuthenticatedUser(
     val id: String,
     val accessToken: String,
@@ -31,62 +30,60 @@ data class AuthenticatedUser(
 const val SuperTokensAuth = "SuperTokens"
 
 val TokenValidator: suspend ApplicationCall.(JWTCredential) -> Principal? = {
-    accessToken?.let { token ->
-        if (sessions.verifySessionInCore) {
-            sessions.verifySession(
-                accessToken = token,
-                antiCsrfToken = request.headers[HEADER_ANTI_CSRF],
-            )
-        }
-
-        val sub = it.subject ?: return@let null
-        val sessionHandle = it["sessionHandle"] ?: return@let null
-
-        if (isMultiFactorAuthEnabled) {
-            if (!with(mfaHandler) { checkMfaAuth(credential = it) }) {
-                return@let null
-            }
-        }
-
-        AuthenticatedUser(
-            id = sub,
-            accessToken = token,
-            sessionHandle = sessionHandle,
-            jwtPayload = it.payload,
-            roles = it.payload.claims[Claims.ROLES]?.asList(String::class.java)?.toSet(),
-            permissions = (it.payload.claims[Claims.PERMISSIONS]?.asList(String::class.java)
-                ?.toSet()),
-        )
+  accessToken?.let { token ->
+    if (sessions.verifySessionInCore) {
+      sessions.verifySession(
+          accessToken = token,
+          antiCsrfToken = request.headers[HEADER_ANTI_CSRF],
+      )
     }
+
+    val sub = it.subject ?: return@let null
+    val sessionHandle = it["sessionHandle"] ?: return@let null
+
+    if (isMultiFactorAuthEnabled) {
+      if (!with(mfaHandler) { checkMfaAuth(credential = it) }) {
+        return@let null
+      }
+    }
+
+    AuthenticatedUser(
+        id = sub,
+        accessToken = token,
+        sessionHandle = sessionHandle,
+        jwtPayload = it.payload,
+        roles = it.payload.claims[Claims.ROLES]?.asList(String::class.java)?.toSet(),
+        permissions = (it.payload.claims[Claims.PERMISSIONS]?.asList(String::class.java)?.toSet()),
+    )
+  }
 }
 
-
 val authHeaderCookieWrapper: (ApplicationCall) -> HttpAuthHeader? = { call ->
-    val authHeader = try {
+  val authHeader =
+      try {
         call.request.parseAuthorizationHeader()
-    } catch (cause: IllegalArgumentException) {
+      } catch (cause: IllegalArgumentException) {
         null
-    }
+      }
 
-    authHeader?.also {
-        if(it is HttpAuthHeader.Single) {
-            call.attributes.put(AccessTokenAttributeKey, it.blob)
-        }
-    } ?: call.request.cookies[COOKIE_ACCESS_TOKEN]?.let {
-        HttpAuthHeader.Single(
-            "Bearer",
-            it
-        )
-    }?.also {
-        call.attributes.put(AccessTokenAttributeKey, it.blob)
+  authHeader?.also {
+    if (it is HttpAuthHeader.Single) {
+      call.attributes.put(AccessTokenAttributeKey, it.blob)
     }
+  }
+      ?: call.request.cookies[COOKIE_ACCESS_TOKEN]
+          ?.let { HttpAuthHeader.Single("Bearer", it) }
+          ?.also { call.attributes.put(AccessTokenAttributeKey, it.blob) }
 }
 
 inline fun <reified P : Principal> ApplicationCall.requirePrincipal(): P = requirePrincipal(null)
+
 inline fun <reified P : Principal> ApplicationCall.requirePrincipal(provider: String?): P =
     authentication.principal(provider) ?: throw UnauthorizedException()
 
 val AccessTokenAttributeKey = AttributeKey<String>("AccessToken")
 
-val ApplicationCall.accessToken: String? get() = attributes.getOrNull(AccessTokenAttributeKey)
-val PipelineContext<Unit, ApplicationCall>.accessToken: String? get() = call.accessToken
+val ApplicationCall.accessToken: String?
+  get() = attributes.getOrNull(AccessTokenAttributeKey)
+val PipelineContext<Unit, ApplicationCall>.accessToken: String?
+  get() = call.accessToken

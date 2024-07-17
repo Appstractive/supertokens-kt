@@ -1,6 +1,5 @@
 package com.supertokens.sdk.models
 
-
 data class SessionData(
     val handle: String,
     val userId: String,

@@ -10,89 +10,88 @@ import com.supertokens.sdk.recipes.sessions.signOut
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.Serializable
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
 
 @Ignore
 class SessionTests {
 
-    private val client = superTokensClient("https://auth.appstractive.cloud") {
+  private val client =
+      superTokensClient("https://auth.appstractive.cloud") {
         recipe(EmailPassword)
-        recipe(Session) {
-            tokensRepository = TokensRepositoryMemory()
-        }
-    }
+        recipe(Session) { tokensRepository = TokensRepositoryMemory() }
+      }
 
-    @Serializable
-    private data class PrivateResponse(
-        val id: String,
-    )
+  @Serializable
+  private data class PrivateResponse(
+      val id: String,
+  )
 
-    @Test
-    fun testPrivateApi() = runBlocking {
-        val user = client.signInWith(EmailPassword) {
-            email = "test@test.de"
-            password = "a1234567"
-        }
-
-        assertEquals("test@test.de", user.email)
-
-        val response = client.apiClient.get("/private") {
-
+  @Test
+  fun testPrivateApi() = runBlocking {
+    val user =
+        client.signInWith(EmailPassword) {
+          email = "test@test.de"
+          password = "a1234567"
         }
 
-        assertEquals(HttpStatusCode.OK, response.status)
+    assertEquals("test@test.de", user.email)
 
-        val body = response.body<PrivateResponse>()
-        assertEquals(user.id, body.id)
-    }
+    val response = client.apiClient.get("/private") {}
 
-    @Test
-    fun testSignOutPrivateApi() = runBlocking {
-        val user = client.signInWith(EmailPassword) {
-            email = "test@test.de"
-            password = "a1234567"
+    assertEquals(HttpStatusCode.OK, response.status)
+
+    val body = response.body<PrivateResponse>()
+    assertEquals(user.id, body.id)
+  }
+
+  @Test
+  fun testSignOutPrivateApi() = runBlocking {
+    val user =
+        client.signInWith(EmailPassword) {
+          email = "test@test.de"
+          password = "a1234567"
         }
 
-        assertEquals("test@test.de", user.email)
+    assertEquals("test@test.de", user.email)
 
-        var response = client.apiClient.get("/private")
+    var response = client.apiClient.get("/private")
 
-        assertEquals(HttpStatusCode.OK, response.status)
+    assertEquals(HttpStatusCode.OK, response.status)
 
-        client.signOut()
+    client.signOut()
 
-        response = client.apiClient.get("/private")
+    response = client.apiClient.get("/private")
 
-        assertEquals(HttpStatusCode.Unauthorized, response.status)
-    }
+    assertEquals(HttpStatusCode.Unauthorized, response.status)
+  }
 
-    @Test
-    fun testTokenRefresh() = runBlocking {
-        val user = client.signInWith(EmailPassword) {
-            email = "test@test.de"
-            password = "a1234567"
+  @Test
+  fun testTokenRefresh() = runBlocking {
+    val user =
+        client.signInWith(EmailPassword) {
+          email = "test@test.de"
+          password = "a1234567"
         }
 
-        var response = client.apiClient.get("/private")
+    var response = client.apiClient.get("/private")
 
-        assertEquals(HttpStatusCode.OK, response.status)
+    assertEquals(HttpStatusCode.OK, response.status)
 
-        val firstToken = client.getAccessToken()
+    val firstToken = client.getAccessToken()
 
-        client.getRecipe<SessionRecipe>().refreshTokens()
+    client.getRecipe<SessionRecipe>().refreshTokens()
 
-        val secondToken = client.getAccessToken()
+    val secondToken = client.getAccessToken()
 
-        assertNotEquals(firstToken, secondToken)
+    assertNotEquals(firstToken, secondToken)
 
-        response = client.apiClient.get("/private")
+    response = client.apiClient.get("/private")
 
-        assertEquals(HttpStatusCode.OK, response.status)
-    }
-
+    assertEquals(HttpStatusCode.OK, response.status)
+  }
 }

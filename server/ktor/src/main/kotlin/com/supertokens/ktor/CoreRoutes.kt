@@ -10,20 +10,11 @@ fun Route.coreRoutes(
     handler: CoreHandler,
 ) {
 
-    if(isPasswordlessEnabled) {
-        get(Routes.PHONE_NUMBER_EXISTS) {
-            with(handler) {
-                phoneNumberExists()
-            }
-        }
-    }
+  if (isPasswordlessEnabled) {
+    get(Routes.PHONE_NUMBER_EXISTS) { with(handler) { phoneNumberExists() } }
+  }
 
-    if(isPasswordlessEnabled || isEmailPasswordEnabled) {
-        get(Routes.EMAIL_EXISTS) {
-            with(handler) {
-                emailExists()
-            }
-        }
-    }
-
+  if (isPasswordlessEnabled || isEmailPasswordEnabled) {
+    get(Routes.EMAIL_EXISTS) { with(handler) { emailExists() } }
+  }
 }

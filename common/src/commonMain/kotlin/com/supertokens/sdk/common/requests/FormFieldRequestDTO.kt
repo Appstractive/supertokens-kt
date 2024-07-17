@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Deprecated("Use FormFieldDTO instead")
 typealias FormField = FormFieldDTO
+
 @Deprecated("Use FormFieldRequestDTO instead")
 typealias FormFieldRequest = FormFieldRequestDTO
 

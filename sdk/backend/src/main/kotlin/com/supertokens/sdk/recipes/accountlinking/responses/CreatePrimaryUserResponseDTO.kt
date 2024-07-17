@@ -9,4 +9,4 @@ data class CreatePrimaryUserResponseDTO(
     override val status: String,
     val wasAlreadyAPrimaryUser: Boolean,
     val user: User,
-): BaseResponseDTO
+) : BaseResponseDTO

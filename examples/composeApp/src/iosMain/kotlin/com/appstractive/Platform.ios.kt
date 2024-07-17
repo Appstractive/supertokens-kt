@@ -16,7 +16,7 @@ actual fun getPlatformDialogProperties(
     decorFitsSystemWindows: Boolean,
     usePlatformInsets: Boolean,
     scrimColor: Color
-): DialogProperties  =
+): DialogProperties =
     DialogProperties(
         dismissOnBackPress = dismissOnBackPress,
         dismissOnClickOutside = dismissOnClickOutside,
@@ -27,6 +27,5 @@ actual fun getPlatformDialogProperties(
 
 @Composable
 internal actual fun getNavigator(backstack: BackStack<out BackStack.Record>): Navigator {
-    return rememberCircuitNavigator(backstack) {
-    }
+  return rememberCircuitNavigator(backstack) {}
 }

@@ -1,6 +1,5 @@
 package com.supertokens.sdk.recipes.session.responses
 
-import com.supertokens.sdk.common.extractedContent
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 

@@ -9,4 +9,4 @@ data class CreateTotpDeviceResponseDTO(
     val deviceName: String? = null,
     val qrCodeString: String? = null,
     val secret: String? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

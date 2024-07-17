@@ -1,4 +1,3 @@
 package com.supertokens.ktor
 
-@DslMarker
-annotation class SuperTokensKtorDslMarker
+@DslMarker annotation class SuperTokensKtorDslMarker

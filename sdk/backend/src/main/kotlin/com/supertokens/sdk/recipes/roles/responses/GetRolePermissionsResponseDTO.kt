@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class GetRolePermissionsResponseDTO(
     override val status: String,
     val permissions: List<String> = emptyList(),
-): BaseResponseDTO
+) : BaseResponseDTO

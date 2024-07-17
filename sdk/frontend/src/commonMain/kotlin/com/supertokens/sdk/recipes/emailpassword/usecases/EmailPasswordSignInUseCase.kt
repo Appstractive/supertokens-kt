@@ -23,38 +23,37 @@ class EmailPasswordSignInUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun signIn(email: String, password: String): User {
-        val response = client.post {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.EmailPassword.SIGN_IN,
-                    )
-                )
-            }
-            setBody(
-                FormFieldRequestDTO(
-                    formFields = listOf(
-                        FormFieldDTO(
-                            id = FORM_FIELD_EMAIL_ID,
-                            value = email,
-                        ),
-                        FormFieldDTO(
-                            id = FORM_FIELD_PASSWORD_ID,
-                            value = password,
-                        ),
-                    ),
-                )
-            )
+  suspend fun signIn(email: String, password: String): User {
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.EmailPassword.SIGN_IN,
+                ))
+          }
+          setBody(
+              FormFieldRequestDTO(
+                  formFields =
+                      listOf(
+                          FormFieldDTO(
+                              id = FORM_FIELD_EMAIL_ID,
+                              value = email,
+                          ),
+                          FormFieldDTO(
+                              id = FORM_FIELD_PASSWORD_ID,
+                              value = password,
+                          ),
+                      ),
+              ))
         }
 
-        val body = response.body<SignInResponseDTO>()
+    val body = response.body<SignInResponseDTO>()
 
-        return when (body.status) {
-            SuperTokensStatus.OK.value -> checkNotNull(body.user)
-            else -> throw SuperTokensStatusException(body.status.toStatus())
-        }
+    return when (body.status) {
+      SuperTokensStatus.OK.value -> checkNotNull(body.user)
+      else -> throw SuperTokensStatusException(body.status.toStatus())
     }
-
+  }
 }

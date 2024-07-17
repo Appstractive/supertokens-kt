@@ -8,4 +8,4 @@ import kotlinx.serialization.json.JsonObject
 data class UserMetaDataResponseDTO(
     override val status: String,
     val metadata: JsonObject? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

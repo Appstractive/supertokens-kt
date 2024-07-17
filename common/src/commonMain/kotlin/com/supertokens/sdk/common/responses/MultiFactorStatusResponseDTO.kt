@@ -13,20 +13,15 @@ data class FactorsStatusDTO(
 
 @Serializable
 data class EmailsStatusDTO(
-    @SerialName("emailpassword")
-    val emailPassword: List<String> = emptyList(),
-    @SerialName("otp-email")
-    val otp: List<String> = emptyList(),
-    @SerialName("link-email")
-    val link: List<String> = emptyList(),
+    @SerialName("emailpassword") val emailPassword: List<String> = emptyList(),
+    @SerialName("otp-email") val otp: List<String> = emptyList(),
+    @SerialName("link-email") val link: List<String> = emptyList(),
 )
 
 @Serializable
 data class PhoneStatusDTO(
-    @SerialName("otp-phone")
-    val otp: List<String> = emptyList(),
-    @SerialName("link-phone")
-    val link: List<String> = emptyList(),
+    @SerialName("otp-phone") val otp: List<String> = emptyList(),
+    @SerialName("link-phone") val link: List<String> = emptyList(),
 )
 
 @Serializable
@@ -35,4 +30,4 @@ data class MultiFactorStatusResponseDTO(
     val factors: FactorsStatusDTO? = null,
     val emails: EmailsStatusDTO? = null,
     val phoneNumbers: PhoneStatusDTO? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

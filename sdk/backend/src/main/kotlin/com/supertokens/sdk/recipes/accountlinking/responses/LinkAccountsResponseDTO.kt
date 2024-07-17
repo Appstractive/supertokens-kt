@@ -9,4 +9,4 @@ data class LinkAccountsResponseDTO(
     override val status: String,
     val accountsAlreadyLinked: Boolean,
     val user: User,
-): BaseResponseDTO
+) : BaseResponseDTO

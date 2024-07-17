@@ -31,17 +31,17 @@ data class EndpointConfig(
     val path: String = "/",
 ) {
 
-    val fullUrl = "$scheme://$host$path"
-    val basePath: String
-        get() = if (path.endsWith("/")) path else "${path}/"
-
+  val fullUrl = "$scheme://$host$path"
+  val basePath: String
+    get() = if (path.endsWith("/")) path else "${path}/"
 }
 
 data class AppConfig(
     val name: String,
-    val frontends: List<EndpointConfig> = listOf(
-        EndpointConfig(),
-    ),
+    val frontends: List<EndpointConfig> =
+        listOf(
+            EndpointConfig(),
+        ),
     val api: EndpointConfig = EndpointConfig(),
 )
 
@@ -49,7 +49,7 @@ fun <C : RecipeConfig, R : Recipe<C>> SuperTokensConfig.recipe(
     builder: RecipeBuilder<C, R>,
     configure: C.() -> Unit = {}
 ) {
-    +builder.install(configure)
+  +builder.install(configure)
 }
 
 @SuperTokensDslMarker
@@ -58,92 +58,93 @@ class SuperTokensConfig(
     val appConfig: AppConfig,
 ) {
 
-    var client: HttpClient? = null
+  var client: HttpClient? = null
 
-    var enableRequestLogging: Boolean = false
+  var enableRequestLogging: Boolean = false
 
-    var apiKey: String? = null
+  var apiKey: String? = null
 
-    var appId: String? = null
+  var appId: String? = null
 
-    var recipes: List<BuildRecipe> = emptyList()
-        private set
+  var recipes: List<BuildRecipe> = emptyList()
+    private set
 
-    var audience: (user: User, tenantId: String?) -> List<String> = { _, _ ->
-        listOf(appConfig.api.host)
-    }
+  var audience: (user: User, tenantId: String?) -> List<String> = { _, _ ->
+    listOf(appConfig.api.host)
+  }
 
-    operator fun BuildRecipe.unaryPlus() {
-        recipes = recipes + this
-    }
-
+  operator fun BuildRecipe.unaryPlus() {
+    recipes = recipes + this
+  }
 }
 
 class SuperTokens(
     private val config: SuperTokensConfig,
 ) {
 
-    val recipes: List<Recipe<*>> = config.recipes.map { it.invoke(this) }
+  val recipes: List<Recipe<*>> = config.recipes.map { it.invoke(this) }
 
-    val appConfig: AppConfig = config.appConfig
+  val appConfig: AppConfig = config.appConfig
 
-    val jwksUrl: String = "${config.connectionUrl}/.well-known/jwks.json"
+  val jwksUrl: String = "${config.connectionUrl}/.well-known/jwks.json"
 
-    val appId by lazy { config.appId }
+  val appId by lazy { config.appId }
 
-    val audience by lazy { config.audience }
+  val audience by lazy { config.audience }
 
-    internal val core: CoreHandler = CoreHandler()
+  internal val core: CoreHandler = CoreHandler()
 
-    internal val _events = MutableSharedFlow<SuperTokensEvent>(
-        extraBufferCapacity = 50,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
+  internal val _events =
+      MutableSharedFlow<SuperTokensEvent>(
+          extraBufferCapacity = 50,
+          onBufferOverflow = BufferOverflow.DROP_OLDEST,
+      )
 
-    val events = _events.asSharedFlow()
+  val events = _events.asSharedFlow()
 
-    @OptIn(ExperimentalSerializationApi::class)
-    val client = config.client ?: HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(Json {
-                isLenient = true
-                explicitNulls = false
-                encodeDefaults = true
-                ignoreUnknownKeys = true
-            })
-        }
-
-        if (config.enableRequestLogging) {
-            install(Logging)
-        }
-
-        defaultRequest {
-            url(config.connectionUrl)
-
-            config.apiKey?.let {
-                header(Constants.HEADER_API_KEY, it)
+  @OptIn(ExperimentalSerializationApi::class)
+  val client =
+      config.client
+          ?: HttpClient(CIO) {
+            install(ContentNegotiation) {
+              json(
+                  Json {
+                    isLenient = true
+                    explicitNulls = false
+                    encodeDefaults = true
+                    ignoreUnknownKeys = true
+                  })
             }
 
-            header(Constants.HEADER_CDI_VERSION, Constants.CDI_VERSION)
-            contentType(ContentType.Application.Json)
-        }
-    }
-
-    inline fun <reified T : Recipe<*>> getRecipe(): T = recipes.filterIsInstance<T>().firstOrNull()
-        ?: throw RuntimeException("Recipe ${T::class.java.simpleName} not configured")
-
-    inline fun <reified T : Recipe<*>> hasRecipe(): Boolean =
-        recipes.filterIsInstance<T>().isNotEmpty()
-
-    fun getFrontEnd(origin: String?): EndpointConfig {
-        val frontends = appConfig.frontends
-        return origin.takeIf { !it.equals("null", ignoreCase = true) }?.let {
-            frontends.firstOrNull {
-                origin.equals("${it.scheme}://${it.host}", ignoreCase = true)
+            if (config.enableRequestLogging) {
+              install(Logging)
             }
+
+            defaultRequest {
+              url(config.connectionUrl)
+
+              config.apiKey?.let { header(Constants.HEADER_API_KEY, it) }
+
+              header(Constants.HEADER_CDI_VERSION, Constants.CDI_VERSION)
+              contentType(ContentType.Application.Json)
+            }
+          }
+
+  inline fun <reified T : Recipe<*>> getRecipe(): T =
+      recipes.filterIsInstance<T>().firstOrNull()
+          ?: throw RuntimeException("Recipe ${T::class.java.simpleName} not configured")
+
+  inline fun <reified T : Recipe<*>> hasRecipe(): Boolean =
+      recipes.filterIsInstance<T>().isNotEmpty()
+
+  fun getFrontEnd(origin: String?): EndpointConfig {
+    val frontends = appConfig.frontends
+    return origin
+        .takeIf { !it.equals("null", ignoreCase = true) }
+        ?.let {
+          frontends.firstOrNull { origin.equals("${it.scheme}://${it.host}", ignoreCase = true) }
         } ?: frontends.first()
-    }
-
+  }
 }
 
 fun superTokens(
@@ -151,9 +152,11 @@ fun superTokens(
     appConfig: AppConfig,
     init: SuperTokensConfig.() -> Unit
 ): SuperTokens {
-    val config = SuperTokensConfig(
-        connectionUrl = connectionURI,
-        appConfig = appConfig,
-    ).apply(init)
-    return SuperTokens(config)
+  val config =
+      SuperTokensConfig(
+              connectionUrl = connectionURI,
+              appConfig = appConfig,
+          )
+          .apply(init)
+  return SuperTokens(config)
 }

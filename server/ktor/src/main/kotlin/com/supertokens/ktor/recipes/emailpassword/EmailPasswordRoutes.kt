@@ -10,38 +10,17 @@ import io.ktor.server.routing.post
 
 fun Route.emailPasswordRoutes(handler: EmailPasswordHandler) {
 
-    post(Routes.EmailPassword.SIGN_IN) {
-        with(handler) {
-            signIn()
-        }
-    }
+  post(Routes.EmailPassword.SIGN_IN) { with(handler) { signIn() } }
 
-    post(Routes.EmailPassword.SIGN_UP) {
-        with(handler) {
-            signUp()
-        }
-    }
+  post(Routes.EmailPassword.SIGN_UP) { with(handler) { signUp() } }
 
-    post(Routes.EmailPassword.PASSWORD_RESET_TOKEN) {
-        with(handler) {
-            passwordResetWithToken()
-        }
-    }
+  post(Routes.EmailPassword.PASSWORD_RESET_TOKEN) { with(handler) { passwordResetWithToken() } }
 
-    post(Routes.EmailPassword.PASSWORD_RESET) {
-        with(handler) {
-            resetPassword()
-        }
-    }
+  post(Routes.EmailPassword.PASSWORD_RESET) { with(handler) { resetPassword() } }
 
-    if(superTokens.hasRecipe<SessionRecipe>()) {
-        authenticate(SuperTokensAuth) {
-            post(Routes.EmailPassword.PASSWORD_CHANGE) {
-                with(handler) {
-                    changePassword()
-                }
-            }
-        }
+  if (superTokens.hasRecipe<SessionRecipe>()) {
+    authenticate(SuperTokensAuth) {
+      post(Routes.EmailPassword.PASSWORD_CHANGE) { with(handler) { changePassword() } }
     }
-
+  }
 }

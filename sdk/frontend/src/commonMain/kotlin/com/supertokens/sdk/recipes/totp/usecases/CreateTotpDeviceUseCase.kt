@@ -21,25 +21,25 @@ class CreateTotpDeviceUseCase(
     private val client: HttpClient,
 ) {
 
-    suspend fun createDevice(name: String): CreateTotpDeviceResult {
-        val response = client.post(Routes.Totp.CREATE_DEVICE) {
-            setBody(
-                TotpDeviceRequestDTO(
-                    deviceName = name,
-                )
-            )
+  suspend fun createDevice(name: String): CreateTotpDeviceResult {
+    val response =
+        client.post(Routes.Totp.CREATE_DEVICE) {
+          setBody(
+              TotpDeviceRequestDTO(
+                  deviceName = name,
+              ))
         }
 
-        val body = response.body<CreateTotpDeviceResponseDTO>()
+    val body = response.body<CreateTotpDeviceResponseDTO>()
 
-        return when (body.status) {
-            SuperTokensStatus.OK.value -> CreateTotpDeviceResult(
-                deviceName = checkNotNull(body.deviceName),
-                qrCodeString = checkNotNull(body.qrCodeString),
-                secret = checkNotNull(body.secret),
-            )
-            else -> throw SuperTokensStatusException(body.status.toStatus())
-        }
+    return when (body.status) {
+      SuperTokensStatus.OK.value ->
+          CreateTotpDeviceResult(
+              deviceName = checkNotNull(body.deviceName),
+              qrCodeString = checkNotNull(body.qrCodeString),
+              secret = checkNotNull(body.secret),
+          )
+      else -> throw SuperTokensStatusException(body.status.toStatus())
     }
-
+  }
 }

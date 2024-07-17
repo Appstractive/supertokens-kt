@@ -14,41 +14,28 @@ import io.ktor.utils.io.errors.IOException
 class ApiErrorDialog(
     private val exception: Exception,
 ) : Overlay<Unit> {
-    @Composable
-    override fun Content(navigator: OverlayNavigator<Unit>) {
-        AlertDialog(
-            confirmButton = {
-                TextButton(onClick = {
-                    navigator.finish(Unit)
-                }) {
-                    Text("OK")
-                }
-            },
-            onDismissRequest = {
-                navigator.finish(Unit)
-            },
-            text = {
-                Text(getErrorMessage(exception))
-            },
-            title = {
-                Text("Error")
-            },
-        )
-    }
+  @Composable
+  override fun Content(navigator: OverlayNavigator<Unit>) {
+    AlertDialog(
+        confirmButton = { TextButton(onClick = { navigator.finish(Unit) }) { Text("OK") } },
+        onDismissRequest = { navigator.finish(Unit) },
+        text = { Text(getErrorMessage(exception)) },
+        title = { Text("Error") },
+    )
+  }
 
-    @Composable
-    private fun getErrorMessage(exception: Exception): String =
-        when (exception) {
-            is SuperTokensStatusException ->
-                when (exception.status) {
-                    else -> exception.status.value
-                }
+  @Composable
+  private fun getErrorMessage(exception: Exception): String =
+      when (exception) {
+        is SuperTokensStatusException ->
+            when (exception.status) {
+              else -> exception.status.value
+            }
 
-            is IOException,
-            is ConnectTimeoutException,
-            is SocketTimeoutException,
-            -> "Connection Error"
+        is IOException,
+        is ConnectTimeoutException,
+        is SocketTimeoutException, -> "Connection Error"
 
-            else -> "Unknown Error"
-        }
+        else -> "Unknown Error"
+      }
 }

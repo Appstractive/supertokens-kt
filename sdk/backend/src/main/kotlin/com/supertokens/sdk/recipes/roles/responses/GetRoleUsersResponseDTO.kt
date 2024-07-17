@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class GetRoleUsersResponseDTO(
     override val status: String,
     val users: List<String> = emptyList(),
-): BaseResponseDTO
+) : BaseResponseDTO

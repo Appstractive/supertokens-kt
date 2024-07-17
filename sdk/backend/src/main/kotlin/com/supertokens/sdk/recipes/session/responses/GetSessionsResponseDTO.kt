@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class GetSessionsResponseDTO(
     override val status: String,
     val sessionHandles: List<String>,
-): BaseResponseDTO
+) : BaseResponseDTO

@@ -12,26 +12,30 @@ import com.supertokens.sdk.recipes.thirdparty.ThirdPartySignInTokens
 class ProviderBitbucket(
     superTokens: SuperTokensClient,
     config: ProviderConfig,
-): Provider<ProviderConfig>(
-    id = ThirdPartyProvider.BITBUCKET,
-    config = config,
-)
+) :
+    Provider<ProviderConfig>(
+        id = ThirdPartyProvider.BITBUCKET,
+        config = config,
+    )
 
-object Bitbucket: ProviderBuilder<ProviderConfig, ProviderBitbucket>() {
+object Bitbucket : ProviderBuilder<ProviderConfig, ProviderBitbucket>() {
 
-    const val id = ThirdPartyProvider.BITBUCKET
+  const val id = ThirdPartyProvider.BITBUCKET
 
-    object AuthCode: ThirdPartySignInAuthCode(id)
-    object Tokens: ThirdPartySignInTokens(id)
+  object AuthCode : ThirdPartySignInAuthCode(id)
 
-    override fun install(configure: ProviderConfig.() -> Unit): (SuperTokensClient, ThirdPartyRecipe) -> ProviderBitbucket {
-        val config = ProviderConfig().apply(configure)
+  object Tokens : ThirdPartySignInTokens(id)
 
-        return { superTokens, _ ->
-            ProviderBitbucket(
-                superTokens, config,
-            )
-        }
+  override fun install(
+      configure: ProviderConfig.() -> Unit
+  ): (SuperTokensClient, ThirdPartyRecipe) -> ProviderBitbucket {
+    val config = ProviderConfig().apply(configure)
+
+    return { superTokens, _ ->
+      ProviderBitbucket(
+          superTokens,
+          config,
+      )
     }
-
+  }
 }

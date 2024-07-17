@@ -33,12 +33,11 @@ data class User(
     val recipeUserId: String? = null,
 ) {
 
-    @Deprecated("Use emails list instead", ReplaceWith("emails?.firstOrNull()"))
-    val email: String?
-        get() = emails?.firstOrNull()
+  @Deprecated("Use emails list instead", ReplaceWith("emails?.firstOrNull()"))
+  val email: String?
+    get() = emails?.firstOrNull()
 
-    @Deprecated("Use phoneNumbers list instead", ReplaceWith("phoneNumbers?.firstOrNull()"))
-    val phoneNumber: String?
-        get() = phoneNumbers?.firstOrNull()
-
+  @Deprecated("Use phoneNumbers list instead", ReplaceWith("phoneNumbers?.firstOrNull()"))
+  val phoneNumber: String?
+    get() = phoneNumbers?.firstOrNull()
 }

@@ -18,35 +18,33 @@ class PasswordlessPhoneNumberSignUpUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun signUp(phoneNumber: String): PasswordlessSignUpData {
-        val response = client.post {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.Passwordless.SIGNUP_CODE,
-                    )
-                )
-            }
-            setBody(
-                StartPasswordlessSignInUpRequestDTO(
-                    phoneNumber = phoneNumber,
-                )
-            )
+  suspend fun signUp(phoneNumber: String): PasswordlessSignUpData {
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.Passwordless.SIGNUP_CODE,
+                ))
+          }
+          setBody(
+              StartPasswordlessSignInUpRequestDTO(
+                  phoneNumber = phoneNumber,
+              ))
         }
 
-        val body = response.body<StartPasswordlessSignInUpResponseDTO>()
+    val body = response.body<StartPasswordlessSignInUpResponseDTO>()
 
-        return when(val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> {
-                PasswordlessSignUpData(
-                    deviceId = checkNotNull(body.deviceId),
-                    preAuthSessionId = checkNotNull(body.preAuthSessionId),
-                    flowType = checkNotNull(body.flowType),
-                )
-            }
-            else -> throw SuperTokensStatusException(status)
-        }
+    return when (val status = body.status.toStatus()) {
+      SuperTokensStatus.OK -> {
+        PasswordlessSignUpData(
+            deviceId = checkNotNull(body.deviceId),
+            preAuthSessionId = checkNotNull(body.preAuthSessionId),
+            flowType = checkNotNull(body.flowType),
+        )
+      }
+      else -> throw SuperTokensStatusException(status)
     }
-
+  }
 }

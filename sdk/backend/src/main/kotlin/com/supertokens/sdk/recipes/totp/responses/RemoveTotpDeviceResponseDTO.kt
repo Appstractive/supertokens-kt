@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class RemoveTotpDeviceResponseDTO(
     override val status: String,
     val didDeviceExist: Boolean? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

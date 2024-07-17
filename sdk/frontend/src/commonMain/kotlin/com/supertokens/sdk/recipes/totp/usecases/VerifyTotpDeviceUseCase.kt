@@ -14,19 +14,18 @@ class VerifyTotpDeviceUseCase(
     private val client: HttpClient,
 ) {
 
-    suspend fun verifyDevice(deviceName: String, totp: String): SuperTokensStatus {
-        val response = client.post(Routes.Totp.VERIFY_DEVICE) {
-            setBody(
-                VerifyTotpDeviceRequestDTO(
-                    deviceName = deviceName,
-                    totp = totp,
-                )
-            )
+  suspend fun verifyDevice(deviceName: String, totp: String): SuperTokensStatus {
+    val response =
+        client.post(Routes.Totp.VERIFY_DEVICE) {
+          setBody(
+              VerifyTotpDeviceRequestDTO(
+                  deviceName = deviceName,
+                  totp = totp,
+              ))
         }
 
-        val body = response.body<StatusResponseDTO>()
+    val body = response.body<StatusResponseDTO>()
 
-        return body.status.toStatus()
-    }
-
+    return body.status.toStatus()
+  }
 }

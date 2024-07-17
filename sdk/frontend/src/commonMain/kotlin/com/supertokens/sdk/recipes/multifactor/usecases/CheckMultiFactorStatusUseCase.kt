@@ -13,27 +13,27 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 
-
 class CheckMultiFactorStatusUseCase(
     private val client: HttpClient,
 ) {
 
-    suspend fun checkStatus(): MultiFactorAuthStatus {
-        val response = client.post(Routes.Mfa.CHECK)
-        val body = response.body<MultiFactorStatusResponseDTO>()
+  suspend fun checkStatus(): MultiFactorAuthStatus {
+    val response = client.post(Routes.Mfa.CHECK)
+    val body = response.body<MultiFactorStatusResponseDTO>()
 
-        return when (body.status) {
-            SuperTokensStatus.OK.value -> MultiFactorAuthStatus(
-                factors = FactorsStatus(
-                    alreadySetup = checkNotNull(body.factors).alreadySetup,
-                    allowedToSetup = checkNotNull(body.factors).allowedToSetup,
-                    next = checkNotNull(body.factors).next,
-                ),
-                emails = EmailsStatus(),
-                phoneNumbers = PhoneStatus(),
-            )
-            else -> throw SuperTokensStatusException(body.status.toStatus())
-        }
+    return when (body.status) {
+      SuperTokensStatus.OK.value ->
+          MultiFactorAuthStatus(
+              factors =
+                  FactorsStatus(
+                      alreadySetup = checkNotNull(body.factors).alreadySetup,
+                      allowedToSetup = checkNotNull(body.factors).allowedToSetup,
+                      next = checkNotNull(body.factors).next,
+                  ),
+              emails = EmailsStatus(),
+              phoneNumbers = PhoneStatus(),
+          )
+      else -> throw SuperTokensStatusException(body.status.toStatus())
     }
-
+  }
 }

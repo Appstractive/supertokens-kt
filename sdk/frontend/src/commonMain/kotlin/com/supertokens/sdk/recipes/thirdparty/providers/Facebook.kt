@@ -12,26 +12,30 @@ import com.supertokens.sdk.recipes.thirdparty.ThirdPartySignInTokens
 class ProviderFacebook(
     superTokens: SuperTokensClient,
     config: ProviderConfig,
-): Provider<ProviderConfig>(
-    id = ThirdPartyProvider.FACEBOOK,
-    config = config,
-)
+) :
+    Provider<ProviderConfig>(
+        id = ThirdPartyProvider.FACEBOOK,
+        config = config,
+    )
 
-object Facebook: ProviderBuilder<ProviderConfig, ProviderFacebook>() {
+object Facebook : ProviderBuilder<ProviderConfig, ProviderFacebook>() {
 
-    const val id = ThirdPartyProvider.FACEBOOK
+  const val id = ThirdPartyProvider.FACEBOOK
 
-    object AuthCode: ThirdPartySignInAuthCode(id)
-    object Tokens: ThirdPartySignInTokens(id)
+  object AuthCode : ThirdPartySignInAuthCode(id)
 
-    override fun install(configure: ProviderConfig.() -> Unit): (SuperTokensClient, ThirdPartyRecipe) -> ProviderFacebook {
-        val config = ProviderConfig().apply(configure)
+  object Tokens : ThirdPartySignInTokens(id)
 
-        return { superTokens, _ ->
-            ProviderFacebook(
-                superTokens, config,
-            )
-        }
+  override fun install(
+      configure: ProviderConfig.() -> Unit
+  ): (SuperTokensClient, ThirdPartyRecipe) -> ProviderFacebook {
+    val config = ProviderConfig().apply(configure)
+
+    return { superTokens, _ ->
+      ProviderFacebook(
+          superTokens,
+          config,
+      )
     }
-
+  }
 }

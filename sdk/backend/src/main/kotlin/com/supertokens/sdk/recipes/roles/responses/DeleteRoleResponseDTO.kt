@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class DeleteRoleResponseDTO(
     override val status: String,
     val didRoleExist: Boolean,
-): BaseResponseDTO
+) : BaseResponseDTO

@@ -6,8 +6,7 @@ class UpdateRefreshTokenUseCase(
     private val sessionRecipe: SessionRecipe,
 ) {
 
-    suspend fun updateRefreshToken(token: String) {
-        sessionRecipe.tokensRepository.setRefreshToken(token)
-    }
-
+  suspend fun updateRefreshToken(token: String) {
+    sessionRecipe.tokensRepository.setRefreshToken(token)
+  }
 }

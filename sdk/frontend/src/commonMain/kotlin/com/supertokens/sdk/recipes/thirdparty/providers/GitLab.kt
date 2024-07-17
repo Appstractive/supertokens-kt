@@ -12,26 +12,30 @@ import com.supertokens.sdk.recipes.thirdparty.ThirdPartySignInTokens
 class ProviderGitLab(
     superTokens: SuperTokensClient,
     config: ProviderConfig,
-): Provider<ProviderConfig>(
-    id = ThirdPartyProvider.GITLAB,
-    config = config,
-)
+) :
+    Provider<ProviderConfig>(
+        id = ThirdPartyProvider.GITLAB,
+        config = config,
+    )
 
-object GitLab: ProviderBuilder<ProviderConfig, ProviderGitLab>() {
+object GitLab : ProviderBuilder<ProviderConfig, ProviderGitLab>() {
 
-    const val id = ThirdPartyProvider.GITLAB
+  const val id = ThirdPartyProvider.GITLAB
 
-    object AuthCode: ThirdPartySignInAuthCode(id)
-    object Tokens: ThirdPartySignInTokens(id)
+  object AuthCode : ThirdPartySignInAuthCode(id)
 
-    override fun install(configure: ProviderConfig.() -> Unit): (SuperTokensClient, ThirdPartyRecipe) -> ProviderGitLab {
-        val config = ProviderConfig().apply(configure)
+  object Tokens : ThirdPartySignInTokens(id)
 
-        return { superTokens, _ ->
-            ProviderGitLab(
-                superTokens, config,
-            )
-        }
+  override fun install(
+      configure: ProviderConfig.() -> Unit
+  ): (SuperTokensClient, ThirdPartyRecipe) -> ProviderGitLab {
+    val config = ProviderConfig().apply(configure)
+
+    return { superTokens, _ ->
+      ProviderGitLab(
+          superTokens,
+          config,
+      )
     }
-
+  }
 }

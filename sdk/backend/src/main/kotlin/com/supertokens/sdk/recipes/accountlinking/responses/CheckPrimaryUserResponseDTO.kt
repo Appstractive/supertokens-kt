@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class CheckPrimaryUserResponseDTO(
     override val status: String,
     val wasAlreadyAPrimaryUser: Boolean,
-): BaseResponseDTO
+) : BaseResponseDTO

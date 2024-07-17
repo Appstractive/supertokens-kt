@@ -6,5 +6,5 @@ import com.russhwolf.settings.Settings
 
 @OptIn(ExperimentalSettingsImplementation::class)
 internal actual fun getDefaultSettings(): Settings {
-    return KeychainSettings("SuperTokens")
+  return KeychainSettings("SuperTokens")
 }

@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class CreateOrUpdateRoleResponseDTO(
     override val status: String,
     val createdNewRole: Boolean,
-): BaseResponseDTO
+) : BaseResponseDTO

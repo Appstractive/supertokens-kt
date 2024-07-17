@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class VerifyTotpDeviceResponseDTO(
     override val status: String,
     val wasAlreadyVerified: Boolean? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

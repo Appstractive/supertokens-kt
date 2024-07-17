@@ -9,21 +9,15 @@ import io.ktor.server.routing.application
 import io.ktor.util.pipeline.PipelineContext
 
 val ApplicationCall.multiFactorAuth: MultiFactorAuthRecipe
-    get() =
-        application.attributes[SuperTokensAttributeKey].getRecipe()
+  get() = application.attributes[SuperTokensAttributeKey].getRecipe()
 val PipelineContext<Unit, ApplicationCall>.multiFactorAuth: MultiFactorAuthRecipe
-    get() =
-        application.attributes[SuperTokensAttributeKey].getRecipe()
+  get() = application.attributes[SuperTokensAttributeKey].getRecipe()
 val Route.multiFactorAuth: MultiFactorAuthRecipe
-    get() =
-        application.attributes[SuperTokensAttributeKey].getRecipe()
+  get() = application.attributes[SuperTokensAttributeKey].getRecipe()
 
 val ApplicationCall.isMultiFactorAuthEnabled: Boolean
-    get() =
-        application.attributes[SuperTokensAttributeKey].hasRecipe<MultiFactorAuthRecipe>()
+  get() = application.attributes[SuperTokensAttributeKey].hasRecipe<MultiFactorAuthRecipe>()
 val PipelineContext<Unit, ApplicationCall>.isMultiFactorAuthEnabled: Boolean
-    get() =
-        application.attributes[SuperTokensAttributeKey].hasRecipe<MultiFactorAuthRecipe>()
+  get() = application.attributes[SuperTokensAttributeKey].hasRecipe<MultiFactorAuthRecipe>()
 val Route.isMultiFactorAuthEnabled: Boolean
-    get() =
-        application.attributes[SuperTokensAttributeKey].hasRecipe<MultiFactorAuthRecipe>()
+  get() = application.attributes[SuperTokensAttributeKey].hasRecipe<MultiFactorAuthRecipe>()

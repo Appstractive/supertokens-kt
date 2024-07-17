@@ -10,4 +10,4 @@ typealias VerifyEmailResponse = VerifyEmailResponseDTO
 data class VerifyEmailResponseDTO(
     override val status: String = SuperTokensStatus.OK.value,
     val isVerified: Boolean?,
-): BaseResponseDTO
+) : BaseResponseDTO

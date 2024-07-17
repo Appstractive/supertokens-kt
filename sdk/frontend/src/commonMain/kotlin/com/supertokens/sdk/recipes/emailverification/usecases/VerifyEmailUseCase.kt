@@ -16,26 +16,24 @@ class VerifyEmailUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun verifyEmail(token: String): Boolean {
-        val response = client.post {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.EmailVerification.VERIFY,
-                    )
-                )
-            }
-            setBody(
-                VerifyEmailTokenRequestDTO(
-                    token = token,
-                )
-            )
+  suspend fun verifyEmail(token: String): Boolean {
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.EmailVerification.VERIFY,
+                ))
+          }
+          setBody(
+              VerifyEmailTokenRequestDTO(
+                  token = token,
+              ))
         }
 
-        val body = response.body<StatusResponseDTO>()
+    val body = response.body<StatusResponseDTO>()
 
-        return body.status.toStatus() == SuperTokensStatus.OK
-    }
-
+    return body.status.toStatus() == SuperTokensStatus.OK
+  }
 }

@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.session.responses
 
-import com.supertokens.sdk.models.Token
 import com.supertokens.sdk.common.responses.BaseResponseDTO
+import com.supertokens.sdk.models.Token
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,4 +11,4 @@ data class CreateSessionResponseDTO(
     val accessToken: Token? = null,
     val refreshToken: Token? = null,
     val antiCsrfToken: String? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

@@ -8,56 +8,58 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 typealias Role = String
+
 typealias Permission = String
+
 typealias AuthExtractor = suspend (Principal) -> Set<Role>
 
 class RoleBasedAuthConfiguration {
-    var required: Set<String> = emptySet()
-    var authCheckType: AuthCheckType = AuthCheckType.ALL
-    var failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden
-    lateinit var authType: AuthType
+  var required: Set<String> = emptySet()
+  var authCheckType: AuthCheckType = AuthCheckType.ALL
+  var failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden
+  lateinit var authType: AuthType
 }
 
 enum class AuthCheckType {
-    ALL,
-    ANY,
-    NONE,
+  ALL,
+  ANY,
+  NONE,
 }
 
 enum class AuthType {
-    ROLE,
-    PERMISSION,
+  ROLE,
+  PERMISSION,
 }
 
 class AuthorizedRouteSelector(private val description: String) : RouteSelector() {
-    override fun evaluate(context: RoutingResolveContext, segmentIndex: Int) = RouteSelectorEvaluation.Constant
+  override fun evaluate(context: RoutingResolveContext, segmentIndex: Int) =
+      RouteSelectorEvaluation.Constant
 
-    override fun toString(): String = "(authorize ${description})"
+  override fun toString(): String = "(authorize ${description})"
 }
 
-
-
 class RoleBasedAuthPluginConfiguration {
-    var roleExtractor: AuthExtractor = { emptySet() }
-        private set
+  var roleExtractor: AuthExtractor = { emptySet() }
+    private set
 
-    fun extractRoles(extractor: AuthExtractor) {
-        roleExtractor = extractor
-    }
+  fun extractRoles(extractor: AuthExtractor) {
+    roleExtractor = extractor
+  }
 
-    var permissionExtractor: AuthExtractor = { emptySet() }
-        private set
+  var permissionExtractor: AuthExtractor = { emptySet() }
+    private set
 
-    fun extractPermissions(extractor: AuthExtractor) {
-        permissionExtractor = extractor
-    }
+  fun extractPermissions(extractor: AuthExtractor) {
+    permissionExtractor = extractor
+  }
 
-    var throwOnUnauthorizedResponse = false
+  var throwOnUnauthorizedResponse = false
 }
 
 private lateinit var pluginGlobalConfig: RoleBasedAuthPluginConfiguration
+
 fun AuthenticationConfig.roleBased(config: RoleBasedAuthPluginConfiguration.() -> Unit) {
-    pluginGlobalConfig = RoleBasedAuthPluginConfiguration().apply(config)
+  pluginGlobalConfig = RoleBasedAuthPluginConfiguration().apply(config)
 }
 
 private fun Route.buildAuthorizedRoute(
@@ -67,98 +69,174 @@ private fun Route.buildAuthorizedRoute(
     failStatusCode: HttpStatusCode,
     build: Route.() -> Unit
 ): Route {
-    val authorizedRoute = createChild(AuthorizedRouteSelector(required.joinToString(",")))
-    authorizedRoute.install(RoleBasedAuth) {
-        this.authType = type
-        this.required = required
-        this.authCheckType = authCheckType
-        this.failStatusCode = failStatusCode
-    }
-    authorizedRoute.build()
-    return authorizedRoute
+  val authorizedRoute = createChild(AuthorizedRouteSelector(required.joinToString(",")))
+  authorizedRoute.install(RoleBasedAuth) {
+    this.authType = type
+    this.required = required
+    this.authCheckType = authCheckType
+    this.failStatusCode = failStatusCode
+  }
+  authorizedRoute.build()
+  return authorizedRoute
 }
 
-fun Route.withRole(role: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.ROLE, required = setOf(role), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
+fun Route.withRole(
+    role: Role,
+    failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden,
+    build: Route.() -> Unit
+) =
+    buildAuthorizedRoute(
+        type = AuthType.ROLE,
+        required = setOf(role),
+        authCheckType = AuthCheckType.ALL,
+        failStatusCode = failStatusCode,
+        build = build)
 
-fun Route.withRoles(vararg roles: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.ROLE, required = roles.toSet(), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
+fun Route.withRoles(
+    vararg roles: Role,
+    failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden,
+    build: Route.() -> Unit
+) =
+    buildAuthorizedRoute(
+        type = AuthType.ROLE,
+        required = roles.toSet(),
+        authCheckType = AuthCheckType.ALL,
+        failStatusCode = failStatusCode,
+        build = build)
 
-fun Route.withAnyRole(vararg roles: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.ROLE, required = roles.toSet(), authCheckType = AuthCheckType.ANY, failStatusCode = failStatusCode, build = build)
+fun Route.withAnyRole(
+    vararg roles: Role,
+    failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden,
+    build: Route.() -> Unit
+) =
+    buildAuthorizedRoute(
+        type = AuthType.ROLE,
+        required = roles.toSet(),
+        authCheckType = AuthCheckType.ANY,
+        failStatusCode = failStatusCode,
+        build = build)
 
-fun Route.withoutRoles(vararg roles: Role, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.ROLE, required = roles.toSet(), authCheckType = AuthCheckType.NONE, failStatusCode = failStatusCode, build = build)
+fun Route.withoutRoles(
+    vararg roles: Role,
+    failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden,
+    build: Route.() -> Unit
+) =
+    buildAuthorizedRoute(
+        type = AuthType.ROLE,
+        required = roles.toSet(),
+        authCheckType = AuthCheckType.NONE,
+        failStatusCode = failStatusCode,
+        build = build)
 
-fun Route.withPermission(permission: Permission, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = setOf(permission), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
+fun Route.withPermission(
+    permission: Permission,
+    failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden,
+    build: Route.() -> Unit
+) =
+    buildAuthorizedRoute(
+        type = AuthType.PERMISSION,
+        required = setOf(permission),
+        authCheckType = AuthCheckType.ALL,
+        failStatusCode = failStatusCode,
+        build = build)
 
-fun Route.withPermissions(vararg permissions: Permission, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = permissions.toSet(), authCheckType = AuthCheckType.ALL, failStatusCode = failStatusCode, build = build)
+fun Route.withPermissions(
+    vararg permissions: Permission,
+    failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden,
+    build: Route.() -> Unit
+) =
+    buildAuthorizedRoute(
+        type = AuthType.PERMISSION,
+        required = permissions.toSet(),
+        authCheckType = AuthCheckType.ALL,
+        failStatusCode = failStatusCode,
+        build = build)
 
-fun Route.withAnyPermission(vararg permissions: Permission, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = permissions.toSet(), authCheckType = AuthCheckType.ANY, failStatusCode = failStatusCode, build = build)
+fun Route.withAnyPermission(
+    vararg permissions: Permission,
+    failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden,
+    build: Route.() -> Unit
+) =
+    buildAuthorizedRoute(
+        type = AuthType.PERMISSION,
+        required = permissions.toSet(),
+        authCheckType = AuthCheckType.ANY,
+        failStatusCode = failStatusCode,
+        build = build)
 
-fun Route.withoutPermission(vararg permissions: Permission, failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden, build: Route.() -> Unit) =
-    buildAuthorizedRoute(type = AuthType.PERMISSION, required = permissions.toSet(), authCheckType = AuthCheckType.NONE, failStatusCode = failStatusCode, build = build)
-
+fun Route.withoutPermission(
+    vararg permissions: Permission,
+    failStatusCode: HttpStatusCode = HttpStatusCode.Forbidden,
+    build: Route.() -> Unit
+) =
+    buildAuthorizedRoute(
+        type = AuthType.PERMISSION,
+        required = permissions.toSet(),
+        authCheckType = AuthCheckType.NONE,
+        failStatusCode = failStatusCode,
+        build = build)
 
 val RoleBasedAuth =
-    createRouteScopedPlugin(name = "RoleBasedAuthorization", createConfiguration = ::RoleBasedAuthConfiguration) {
-        if (::pluginGlobalConfig.isInitialized.not()) {
-            error("RoleBasedAuthPlugin not initialized. Setup plugin by calling AuthenticationConfig#roleBased in authenticate block")
-        }
-        with(pluginConfig) {
+    createRouteScopedPlugin(
+        name = "RoleBasedAuthorization", createConfiguration = ::RoleBasedAuthConfiguration) {
+          if (::pluginGlobalConfig.isInitialized.not()) {
+            error(
+                "RoleBasedAuthPlugin not initialized. Setup plugin by calling AuthenticationConfig#roleBased in authenticate block")
+          }
+          with(pluginConfig) {
             on(AuthenticationChecked) { call ->
-                val principal = call.principal<Principal>() ?: return@on
-                val userAuth = when(authType) {
+              val principal = call.principal<Principal>() ?: return@on
+              val userAuth =
+                  when (authType) {
                     AuthType.ROLE -> pluginGlobalConfig.roleExtractor.invoke(principal)
                     AuthType.PERMISSION -> pluginGlobalConfig.permissionExtractor.invoke(principal)
+                  }
+              val denyReasons = mutableListOf<String>()
+
+              when (authCheckType) {
+                AuthCheckType.ALL -> {
+                  val missing = required - userAuth
+                  if (missing.isNotEmpty()) {
+                    denyReasons +=
+                        "Principal lacks required authorization(s) ${missing.joinToString(" and ")}"
+                  }
                 }
-                val denyReasons = mutableListOf<String>()
 
-                when (authCheckType) {
-                    AuthCheckType.ALL -> {
-                        val missing = required - userAuth
-                        if (missing.isNotEmpty()) {
-                            denyReasons += "Principal lacks required authorization(s) ${missing.joinToString(" and ")}"
-                        }
-                    }
-
-                    AuthCheckType.ANY -> {
-                        if (userAuth.none { it in required }) {
-                            denyReasons += "Principal has none of the sufficient authorization(s) ${
+                AuthCheckType.ANY -> {
+                  if (userAuth.none { it in required }) {
+                    denyReasons +=
+                        "Principal has none of the sufficient authorization(s) ${
                                 required.joinToString(
                                     " or "
                                 )
                             }"
-                        }
-                    }
+                  }
+                }
 
-                    AuthCheckType.NONE -> {
-                        if (userAuth.any { it in required }) {
-                            denyReasons += "Principal has forbidden authorization(s) ${
+                AuthCheckType.NONE -> {
+                  if (userAuth.any { it in required }) {
+                    denyReasons +=
+                        "Principal has forbidden authorization(s) ${
                                 (required.intersect(userAuth)).joinToString(
                                     " and "
                                 )
                             }"
-
-                        }
-                    }
+                  }
                 }
-                if (denyReasons.isNotEmpty()) {
-                    if (pluginGlobalConfig.throwOnUnauthorizedResponse) {
-                        throw UnauthorizedAccessException(denyReasons)
-                    } else {
-                        val message = denyReasons.joinToString(". ")
-                        if (application.developmentMode) {
-                            application.log.warn("Authorization failed for ${call.request.path()} $message")
-                        }
-                        call.respond(failStatusCode)
-                    }
+              }
+              if (denyReasons.isNotEmpty()) {
+                if (pluginGlobalConfig.throwOnUnauthorizedResponse) {
+                  throw UnauthorizedAccessException(denyReasons)
+                } else {
+                  val message = denyReasons.joinToString(". ")
+                  if (application.developmentMode) {
+                    application.log.warn("Authorization failed for ${call.request.path()} $message")
+                  }
+                  call.respond(failStatusCode)
                 }
+              }
             }
+          }
         }
-    }
 
 class UnauthorizedAccessException(val denyReasons: MutableList<String>) : Exception()

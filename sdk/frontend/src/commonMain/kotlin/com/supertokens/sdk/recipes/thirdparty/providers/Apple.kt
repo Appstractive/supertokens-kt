@@ -12,26 +12,30 @@ import com.supertokens.sdk.recipes.thirdparty.ThirdPartySignInTokens
 class ProviderApple(
     superTokens: SuperTokensClient,
     config: ProviderConfig,
-): Provider<ProviderConfig>(
-    id = ThirdPartyProvider.APPLE,
-    config = config,
-)
+) :
+    Provider<ProviderConfig>(
+        id = ThirdPartyProvider.APPLE,
+        config = config,
+    )
 
-object Apple: ProviderBuilder<ProviderConfig, ProviderApple>() {
+object Apple : ProviderBuilder<ProviderConfig, ProviderApple>() {
 
-    const val id = ThirdPartyProvider.APPLE
+  const val id = ThirdPartyProvider.APPLE
 
-    object AuthCode: ThirdPartySignInAuthCode(id)
-    object Tokens: ThirdPartySignInTokens(id)
+  object AuthCode : ThirdPartySignInAuthCode(id)
 
-    override fun install(configure: ProviderConfig.() -> Unit): (SuperTokensClient, ThirdPartyRecipe) -> ProviderApple {
-        val config = ProviderConfig().apply(configure)
+  object Tokens : ThirdPartySignInTokens(id)
 
-        return { superTokens, _ ->
-            ProviderApple(
-                superTokens, config,
-            )
-        }
+  override fun install(
+      configure: ProviderConfig.() -> Unit
+  ): (SuperTokensClient, ThirdPartyRecipe) -> ProviderApple {
+    val config = ProviderConfig().apply(configure)
+
+    return { superTokens, _ ->
+      ProviderApple(
+          superTokens,
+          config,
+      )
     }
-
+  }
 }

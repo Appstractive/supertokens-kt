@@ -21,33 +21,40 @@ data class ProviderEndpoint(
     val params: Map<String, String>,
 ) {
 
-    val fullUrl: String
-        get() = if(params.isEmpty()) url else "$url?${params.map { "${it.key}=${URLEncoder.encode(it.value, "UTF-8")}" }.joinToString("&")}"
-
+  val fullUrl: String
+    get() =
+        if (params.isEmpty()) url
+        else
+            "$url?${params.map { "${it.key}=${URLEncoder.encode(it.value, "UTF-8")}" }.joinToString("&")}"
 }
 
 @SuperTokensProviderDslMarker
 interface ProviderConfig {
-    val isDefault: Boolean
+  val isDefault: Boolean
 }
 
-abstract class Provider<out C: ProviderConfig> {
+abstract class Provider<out C : ProviderConfig> {
 
-    abstract val id: String
-    abstract val clientId: String
-    abstract val isDefault: Boolean
+  abstract val id: String
+  abstract val clientId: String
+  abstract val isDefault: Boolean
 
-    abstract fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?): ProviderEndpoint
-    abstract fun getAuthorizationEndpoint(redirectUrl: String): ProviderEndpoint
-    abstract suspend fun getTokens(parameters: Map<String, String>, pkceCodeVerifier: String?, redirectUrl: String?): ThirdPartyTokensDTO
-    abstract suspend fun getUserInfo(tokenResponse: ThirdPartyTokensDTO): ThirdPartyUserInfo
+  abstract fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?): ProviderEndpoint
 
+  abstract fun getAuthorizationEndpoint(redirectUrl: String): ProviderEndpoint
+
+  abstract suspend fun getTokens(
+      parameters: Map<String, String>,
+      pkceCodeVerifier: String?,
+      redirectUrl: String?
+  ): ThirdPartyTokensDTO
+
+  abstract suspend fun getUserInfo(tokenResponse: ThirdPartyTokensDTO): ThirdPartyUserInfo
 }
 
 typealias BuildProvider = (SuperTokens, ThirdPartyRecipe) -> Provider<*>
 
-abstract class ProviderBuilder<out C: ProviderConfig, out R: Provider<C>> {
+abstract class ProviderBuilder<out C : ProviderConfig, out R : Provider<C>> {
 
-    abstract fun install(configure: C.() -> Unit): (SuperTokens, ThirdPartyRecipe) -> R
-
+  abstract fun install(configure: C.() -> Unit): (SuperTokens, ThirdPartyRecipe) -> R
 }

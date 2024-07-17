@@ -11,25 +11,11 @@ fun Route.emailVerificationRoutes(
     handler: EmailVerificationHandler,
 ) {
 
-    authenticate(SuperTokensAuth) {
-        post(Routes.EmailVerification.VERIFY_TOKEN) {
-            with(handler) {
-                sendEmailVerification()
-            }
-        }
+  authenticate(SuperTokensAuth) {
+    post(Routes.EmailVerification.VERIFY_TOKEN) { with(handler) { sendEmailVerification() } }
 
-        get(Routes.EmailVerification.CHECK_VERIFIED) {
-            with(handler) {
-                checkEmailVerified()
-            }
-        }
+    get(Routes.EmailVerification.CHECK_VERIFIED) { with(handler) { checkEmailVerified() } }
+  }
 
-    }
-
-    post(Routes.EmailVerification.VERIFY) {
-        with(handler) {
-            verifyEmail()
-        }
-    }
-
+  post(Routes.EmailVerification.VERIFY) { with(handler) { verifyEmail() } }
 }

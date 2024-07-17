@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Deprecated("Use SignInResponseDTO instead")
 typealias SignInResponse = SignInResponseDTO
+
 @Deprecated("Use FormFieldErrorDTO instead")
 typealias FormFieldError = FormFieldErrorDTO
 
@@ -21,4 +22,4 @@ data class SignInResponseDTO(
     val user: User? = null,
     val formFields: List<FormFieldErrorDTO>? = null,
     val message: String? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

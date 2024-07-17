@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 data class CreateEmailVerificationTokenResponseDTO(
     override val status: String = SuperTokensStatus.OK.value,
     val token: String? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

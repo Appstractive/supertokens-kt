@@ -37,57 +37,57 @@ hash = "0.4.0"
 
 [libraries]
 
-android-startup = {module = "androidx.startup:startup-runtime", version.ref = "android-startup"}
-android-crypto = {module = "androidx.security:security-crypto-ktx", version.ref = "android-crypto"}
+android-startup = { module = "androidx.startup:startup-runtime", version.ref = "android-startup" }
+android-crypto = { module = "androidx.security:security-crypto-ktx", version.ref = "android-crypto" }
 androidx-coreKtx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 
-kotlin-serialization = {module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization"}
-kotlin-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization"}
-kotlin-coroutines = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines"}
+kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization" }
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
-kotlin-coroutines-swing = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlin-coroutines"}
-kotlin-random = {module = "org.kotlincrypto:secure-random", version.ref = "random"}
-kotlin-hash-sha = {module = "org.kotlincrypto.hash:sha2", version.ref = "hash"}
+kotlin-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlin-coroutines" }
+kotlin-random = { module = "org.kotlincrypto:secure-random", version.ref = "random" }
+kotlin-hash-sha = { module = "org.kotlincrypto.hash:sha2", version.ref = "hash" }
 
-ktor-serialization = {module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor_version"}
+ktor-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor_version" }
 
-ktor-client-core = {module = "io.ktor:ktor-client-core", version.ref = "ktor_version"}
-ktor-client-cio = {module = "io.ktor:ktor-client-cio", version.ref = "ktor_version"}
-ktor-client-logging = {module = "io.ktor:ktor-client-logging", version.ref = "ktor_version"}
-ktor-client-serialization = {module = "io.ktor:ktor-client-serialization", version.ref = "ktor_version"}
-ktor-client-json = {module = "io.ktor:ktor-client-json", version.ref = "ktor_version"}
-ktor-client-contentnegotiation = {module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor_version"}
-ktor-client-auth = {module = "io.ktor:ktor-client-auth", version.ref = "ktor_version"}
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor_version" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor_version" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor_version" }
+ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor_version" }
+ktor-client-json = { module = "io.ktor:ktor-client-json", version.ref = "ktor_version" }
+ktor-client-contentnegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor_version" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor_version" }
 
-ktor-server-core = {module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor_version"}
-ktor-server-cio = {module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor_version"}
-ktor-server-contentnegotiation = {module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor_version"}
-ktor-server-statuspages = {module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor_version"}
-ktor-server-auth = {module = "io.ktor:ktor-server-auth", version.ref = "ktor_version"}
-ktor-server-auth-jwt = {module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor_version"}
-ktor-server-logging = {module = "io.ktor:ktor-server-call-logging", version.ref = "ktor_version"}
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor_version" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor_version" }
+ktor-server-contentnegotiation = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor_version" }
+ktor-server-statuspages = { module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor_version" }
+ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor_version" }
+ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor_version" }
+ktor-server-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor_version" }
 
-settings = {module = "com.russhwolf:multiplatform-settings", version.ref = "settings"}
+settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
 
-javax-mail = {module = "org.apache.commons:commons-email", version.ref = "mail"}
-freemarker = {module = "org.freemarker:freemarker", version.ref = "freemarker"}
+javax-mail = { module = "org.apache.commons:commons-email", version.ref = "mail" }
+freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
 
-jwt = {module = "com.auth0:java-jwt", version.ref = "jwt"}
-jwt-rsa = {module = "com.auth0:jwks-rsa", version.ref = "jwt-rsa"}
+jwt = { module = "com.auth0:java-jwt", version.ref = "jwt" }
+jwt-rsa = { module = "com.auth0:jwks-rsa", version.ref = "jwt-rsa" }
 
-circuit-core = {module = "com.slack.circuit:circuit-foundation", version.ref = "circuit"}
-circuit-overlays = {module = "com.slack.circuit:circuit-overlay", version.ref = "circuit"}
-circuitx-android = {module = "com.slack.circuit:circuitx-android", version.ref = "circuit"}
-circuitx-overlays = {module = "com.slack.circuit:circuitx-overlays", version.ref = "circuit"}
+circuit-core = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit" }
+circuit-overlays = { module = "com.slack.circuit:circuit-overlay", version.ref = "circuit" }
+circuitx-android = { module = "com.slack.circuit:circuitx-android", version.ref = "circuit" }
+circuitx-overlays = { module = "com.slack.circuit:circuitx-overlays", version.ref = "circuit" }
 
-compose-qr = {module = "io.github.alexzhirkevich:qrose", version = "1.0.1"}
+compose-qr = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 
-slf4j = {module = "org.slf4j:slf4j-simple", version.ref = "slf4j"}
+slf4j = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 
-test-kotlin = {module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin"}
-test-totp = {module = "dev.turingcomplete:kotlin-onetimepassword", version.ref = "totp"}
+test-kotlin = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+test-totp = { module = "dev.turingcomplete:kotlin-onetimepassword", version.ref = "totp" }
 
 junit = "junit:junit:4.13.2"
 

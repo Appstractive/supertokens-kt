@@ -25,29 +25,27 @@ const val RECIPE_MULTI_FACTOR_AUTH = "multifactorauth"
 
 object Claims {
 
-    const val ISSUED_AT = "iat"
-    const val EXPIRES_AT = "exp"
-    const val ISSUER = "iss"
-    const val AUDIENCE = "aud"
-    const val USER_ID = "sub"
-    const val EMAIL = "email"
-    const val EMAIL_VERIFIED = "st-ev"
-    const val PHONE_NUMBER = "phoneNumber"
-    const val ROLES = "st-role"
-    const val PERMISSIONS = "st-perm"
-    const val MFA = "st-mfa"
-    const val MFA_FACTORS = "c"
-    const val MFA_VERIFIED = "v"
-
+  const val ISSUED_AT = "iat"
+  const val EXPIRES_AT = "exp"
+  const val ISSUER = "iss"
+  const val AUDIENCE = "aud"
+  const val USER_ID = "sub"
+  const val EMAIL = "email"
+  const val EMAIL_VERIFIED = "st-ev"
+  const val PHONE_NUMBER = "phoneNumber"
+  const val ROLES = "st-role"
+  const val PERMISSIONS = "st-perm"
+  const val MFA = "st-mfa"
+  const val MFA_FACTORS = "c"
+  const val MFA_VERIFIED = "v"
 }
 
 object ThirdPartyProvider {
 
-    const val APPLE = "apple"
-    const val BITBUCKET = "bitbucket"
-    const val FACEBOOK = "facebook"
-    const val GITHUB = "github"
-    const val GITLAB = "gitlab"
-    const val GOOGLE = "google"
-
+  const val APPLE = "apple"
+  const val BITBUCKET = "bitbucket"
+  const val FACEBOOK = "facebook"
+  const val GITHUB = "github"
+  const val GITLAB = "gitlab"
+  const val GOOGLE = "google"
 }

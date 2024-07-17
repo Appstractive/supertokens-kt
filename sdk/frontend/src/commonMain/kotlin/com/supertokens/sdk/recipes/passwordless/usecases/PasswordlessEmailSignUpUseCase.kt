@@ -18,35 +18,33 @@ class PasswordlessEmailSignUpUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun signUp(email: String): PasswordlessSignUpData {
-        val response = client.post {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.Passwordless.SIGNUP_CODE,
-                    )
-                )
-            }
-            setBody(
-                StartPasswordlessSignInUpRequestDTO(
-                    email = email,
-                )
-            )
+  suspend fun signUp(email: String): PasswordlessSignUpData {
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.Passwordless.SIGNUP_CODE,
+                ))
+          }
+          setBody(
+              StartPasswordlessSignInUpRequestDTO(
+                  email = email,
+              ))
         }
 
-        val body = response.body<StartPasswordlessSignInUpResponseDTO>()
+    val body = response.body<StartPasswordlessSignInUpResponseDTO>()
 
-        return when(val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> {
-                PasswordlessSignUpData(
-                    deviceId = checkNotNull(body.deviceId),
-                    preAuthSessionId = checkNotNull(body.preAuthSessionId),
-                    flowType = checkNotNull(body.flowType),
-                )
-            }
-            else -> throw SuperTokensStatusException(status)
-        }
+    return when (val status = body.status.toStatus()) {
+      SuperTokensStatus.OK -> {
+        PasswordlessSignUpData(
+            deviceId = checkNotNull(body.deviceId),
+            preAuthSessionId = checkNotNull(body.preAuthSessionId),
+            flowType = checkNotNull(body.flowType),
+        )
+      }
+      else -> throw SuperTokensStatusException(status)
     }
-
+  }
 }

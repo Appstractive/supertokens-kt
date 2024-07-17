@@ -10,6 +10,7 @@ import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.common.RECIPE_TOTP
 import com.supertokens.sdk.common.SuperTokensStatus
+import com.supertokens.sdk.common.models.AuthFactor
 import com.supertokens.sdk.common.requests.TotpDeviceRequestDTO
 import com.supertokens.sdk.common.requests.VerifyTotpDeviceRequestDTO
 import com.supertokens.sdk.common.requests.VerifyTotpRequestDTO
@@ -19,7 +20,6 @@ import com.supertokens.sdk.common.responses.RemoveTotpDeviceResponseDTO
 import com.supertokens.sdk.common.responses.StatusResponseDTO
 import com.supertokens.sdk.common.responses.TotpDeviceDTO
 import com.supertokens.sdk.core.getUserById
-import com.supertokens.sdk.common.models.AuthFactor
 import io.ktor.http.URLProtocol
 import io.ktor.http.parameters
 import io.ktor.http.path
@@ -35,156 +35,149 @@ open class TotpHandler(
     protected val scope: CoroutineScope,
 ) {
 
-    /**
-     * A call to GET /totp/device/list
-     */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.getDevices() {
-        val user = call.requirePrincipal<AuthenticatedUser>()
+  /** A call to GET /totp/device/list */
+  open suspend fun PipelineContext<Unit, ApplicationCall>.getDevices() {
+    val user = call.requirePrincipal<AuthenticatedUser>()
 
-        val devices = totp.getDevices(userId = user.id)
+    val devices = totp.getDevices(userId = user.id)
 
-        call.respond(
-            GetTotpDevicesResponseDTO(
-                devices = devices.map {
-                    TotpDeviceDTO(
-                        name = it.name,
-                        period = it.period,
-                        skew = it.skew,
-                        verified = it.verified,
-                    )
+    call.respond(
+        GetTotpDevicesResponseDTO(
+            devices =
+                devices.map {
+                  TotpDeviceDTO(
+                      name = it.name,
+                      period = it.period,
+                      skew = it.skew,
+                      verified = it.verified,
+                  )
                 },
-            )
-        )
-    }
+        ))
+  }
 
-    /**
-     * A call to POST /totp/device
-     */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.createDevice() {
-        val user = call.requirePrincipal<AuthenticatedUser>()
-        val body = call.receive<TotpDeviceRequestDTO>()
+  /** A call to POST /totp/device */
+  open suspend fun PipelineContext<Unit, ApplicationCall>.createDevice() {
+    val user = call.requirePrincipal<AuthenticatedUser>()
+    val body = call.receive<TotpDeviceRequestDTO>()
 
-        val secret = totp.addDevice(
+    val secret =
+        totp.addDevice(
             userId = user.id,
             deviceName = body.deviceName,
         )
-        val issuer = totp.issuer
+    val issuer = totp.issuer
 
-        call.respond(
-            CreateTotpDeviceResponseDTO(
-                deviceName = body.deviceName,
-                secret = secret,
-                qrCodeString = url {
-                    protocol = URLProtocol.createOrDefault("otpauth")
-                    host = "totp"
-                    path("/")
-                    parameters {
-                        append("secret", secret)
-                        append("issuer", issuer)
-                    }
+    call.respond(
+        CreateTotpDeviceResponseDTO(
+            deviceName = body.deviceName,
+            secret = secret,
+            qrCodeString =
+                url {
+                  protocol = URLProtocol.createOrDefault("otpauth")
+                  host = "totp"
+                  path("/")
+                  parameters {
+                    append("secret", secret)
+                    append("issuer", issuer)
+                  }
                 },
-            )
-        )
-    }
+        ))
+  }
 
-    /**
-     * A call to POST /totp/device/remove
-     */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.removeDevice() {
-        val user = call.requirePrincipal<AuthenticatedUser>()
-        val body = call.receive<TotpDeviceRequestDTO>()
+  /** A call to POST /totp/device/remove */
+  open suspend fun PipelineContext<Unit, ApplicationCall>.removeDevice() {
+    val user = call.requirePrincipal<AuthenticatedUser>()
+    val body = call.receive<TotpDeviceRequestDTO>()
 
-        val didExist = totp.removeDevice(
+    val didExist =
+        totp.removeDevice(
             userId = user.id,
             deviceName = body.deviceName,
         )
 
-        call.respond(
-            RemoveTotpDeviceResponseDTO(
-                didDeviceExist = didExist,
-            )
-        )
-    }
+    call.respond(
+        RemoveTotpDeviceResponseDTO(
+            didDeviceExist = didExist,
+        ))
+  }
 
-    /**
-     * A call to POST /totp/device/verify
-     */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.verifyDevice() {
-        val user = call.requirePrincipal<AuthenticatedUser>()
-        val body = call.receive<VerifyTotpDeviceRequestDTO>()
+  /** A call to POST /totp/device/verify */
+  open suspend fun PipelineContext<Unit, ApplicationCall>.verifyDevice() {
+    val user = call.requirePrincipal<AuthenticatedUser>()
+    val body = call.receive<VerifyTotpDeviceRequestDTO>()
 
-        totp.verifyDevice(
-            userId = user.id,
-            deviceName = body.deviceName,
-            totp = body.totp,
-            tenantId = call.tenantId,
-        )
+    totp.verifyDevice(
+        userId = user.id,
+        deviceName = body.deviceName,
+        totp = body.totp,
+        tenantId = call.tenantId,
+    )
 
-        if (isSessionsEnabled) {
-            accessToken?.let { token ->
-                val session = sessions.verifySession(token, checkDatabase = true)
+    if (isSessionsEnabled) {
+      accessToken?.let { token ->
+        val session = sessions.verifySession(token, checkDatabase = true)
 
-                if(session.session.userId == user.id) {
+        if (session.session.userId == user.id) {
 
-                    val newSession = sessions.regenerateSession(
-                        accessToken = token,
-                        userDataInJWT = sessions.getJwtData(
-                            user = superTokens.getUserById(user.id),
-                            tenantId = call.tenantId,
-                            recipeId = RECIPE_TOTP,
-                            multiAuthFactor = AuthFactor.TOTP,
-                            accessToken = token,
-                        )
-                    )
+          val newSession =
+              sessions.regenerateSession(
+                  accessToken = token,
+                  userDataInJWT =
+                      sessions.getJwtData(
+                          user = superTokens.getUserById(user.id),
+                          tenantId = call.tenantId,
+                          recipeId = RECIPE_TOTP,
+                          multiAuthFactor = AuthFactor.TOTP,
+                          accessToken = token,
+                      ))
 
-                    setSessionInResponse(
-                        accessToken = newSession.accessToken,
-                    )
-                }
-            }
+          setSessionInResponse(
+              accessToken = newSession.accessToken,
+          )
         }
-
-        call.respond(StatusResponseDTO())
+      }
     }
 
-    /**
-     * A call to POST /totp/verify
-     */
-    open suspend fun PipelineContext<Unit, ApplicationCall>.verify() {
-        val user = call.requirePrincipal<AuthenticatedUser>()
-        val body = call.receive<VerifyTotpRequestDTO>()
+    call.respond(StatusResponseDTO())
+  }
 
-        val result = totp.verifyCode(
+  /** A call to POST /totp/verify */
+  open suspend fun PipelineContext<Unit, ApplicationCall>.verify() {
+    val user = call.requirePrincipal<AuthenticatedUser>()
+    val body = call.receive<VerifyTotpRequestDTO>()
+
+    val result =
+        totp.verifyCode(
             userId = user.id,
             totp = body.totp,
             tenantId = call.tenantId,
         )
 
-        if (result == SuperTokensStatus.OK && isSessionsEnabled) {
-            accessToken?.let { token ->
-                val session = sessions.verifySession(token, checkDatabase = true)
+    if (result == SuperTokensStatus.OK && isSessionsEnabled) {
+      accessToken?.let { token ->
+        val session = sessions.verifySession(token, checkDatabase = true)
 
-                if(session.session.userId == user.id) {
+        if (session.session.userId == user.id) {
 
-                    val newSession = sessions.regenerateSession(
-                        accessToken = token,
-                        userDataInJWT = sessions.getJwtData(
-                            user = superTokens.getUserById(user.id),
-                            tenantId = call.tenantId,
-                            recipeId = RECIPE_TOTP,
-                            multiAuthFactor = AuthFactor.TOTP,
-                            accessToken = token,
-                        )
-                    )
+          val newSession =
+              sessions.regenerateSession(
+                  accessToken = token,
+                  userDataInJWT =
+                      sessions.getJwtData(
+                          user = superTokens.getUserById(user.id),
+                          tenantId = call.tenantId,
+                          recipeId = RECIPE_TOTP,
+                          multiAuthFactor = AuthFactor.TOTP,
+                          accessToken = token,
+                      ))
 
-                    setSessionInResponse(
-                        accessToken = newSession.accessToken,
-                    )
-                }
-            }
+          setSessionInResponse(
+              accessToken = newSession.accessToken,
+          )
         }
-
-        call.respond(StatusResponseDTO(status = result.value))
+      }
     }
 
+    call.respond(StatusResponseDTO(status = result.value))
+  }
 }

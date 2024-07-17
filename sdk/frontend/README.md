@@ -3,6 +3,7 @@
 ## Installation
 
 Gradle:
+
 ```
 implementation("com.appstractive:supertokens-sdk-frontend:1.4.1")
 ```
@@ -10,6 +11,7 @@ implementation("com.appstractive:supertokens-sdk-frontend:1.4.1")
 ## Usage
 
 ### Client creation
+
 ``` kotlin
 val client = superTokensClient("https://auth.appstractive.cloud") {
     recipe(EmailPassword)

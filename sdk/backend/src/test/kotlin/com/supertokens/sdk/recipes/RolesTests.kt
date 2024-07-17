@@ -14,89 +14,88 @@ import com.supertokens.sdk.recipes.roles.getUserRoles
 import com.supertokens.sdk.recipes.roles.removeRolePermissions
 import com.supertokens.sdk.recipes.roles.removeUserRole
 import com.supertokens.sdk.recipes.roles.setUserRole
-import kotlinx.coroutines.runBlocking
-import org.junit.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.runBlocking
+import org.junit.Test
 
 class RolesTests : BaseTest() {
 
-    override fun SuperTokensConfig.configure() {
-        recipe(Roles)
-    }
+  override fun SuperTokensConfig.configure() {
+    recipe(Roles)
+  }
 
-    @Test
-    fun testConfig() {
-        val recipe = superTokens.getRecipe<RolesRecipe>()
-    }
+  @Test
+  fun testConfig() {
+    val recipe = superTokens.getRecipe<RolesRecipe>()
+  }
 
-    @Test
-    fun testCreateOrUpdateRole() = runBlocking {
-        superTokens.createOrUpdateRole("Everyone", listOf("do:whatever"))
+  @Test
+  fun testCreateOrUpdateRole() = runBlocking {
+    superTokens.createOrUpdateRole("Everyone", listOf("do:whatever"))
 
-        val roles = superTokens.getRoles()
-        assertTrue(roles.contains("Everyone"))
+    val roles = superTokens.getRoles()
+    assertTrue(roles.contains("Everyone"))
 
-        val permissions = superTokens.getRolePermissions("Everyone")
-        assertTrue(permissions.contains("do:whatever"))
+    val permissions = superTokens.getRolePermissions("Everyone")
+    assertTrue(permissions.contains("do:whatever"))
 
-        val permissionRoles = superTokens.getPermissionRoles("do:whatever")
-        assertTrue(permissionRoles.contains("Everyone"))
-    }
+    val permissionRoles = superTokens.getPermissionRoles("do:whatever")
+    assertTrue(permissionRoles.contains("Everyone"))
+  }
 
-    @Test
-    fun testDeleteRole() = runBlocking {
-        superTokens.deleteRole("Everyone")
+  @Test
+  fun testDeleteRole() = runBlocking {
+    superTokens.deleteRole("Everyone")
 
-        val roles = superTokens.getRoles()
-        assertFalse(roles.contains("Everyone"))
+    val roles = superTokens.getRoles()
+    assertFalse(roles.contains("Everyone"))
 
-        val permissionRoles = superTokens.getPermissionRoles("do:whatever")
-        assertFalse(permissionRoles.contains("Everyone"))
-    }
+    val permissionRoles = superTokens.getPermissionRoles("do:whatever")
+    assertFalse(permissionRoles.contains("Everyone"))
+  }
 
-    @Test
-    fun testRemoveRolePermissions() = runBlocking {
-        superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
+  @Test
+  fun testRemoveRolePermissions() = runBlocking {
+    superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
 
-        var permissions = superTokens.getRolePermissions("Everyone")
-        assertTrue(permissions.contains("do:whatever"))
-        assertTrue(permissions.contains("do:nothing"))
+    var permissions = superTokens.getRolePermissions("Everyone")
+    assertTrue(permissions.contains("do:whatever"))
+    assertTrue(permissions.contains("do:nothing"))
 
-        superTokens.removeRolePermissions("Everyone", listOf("do:nothing"))
+    superTokens.removeRolePermissions("Everyone", listOf("do:nothing"))
 
-        permissions = superTokens.getRolePermissions("Everyone")
-        assertTrue(permissions.contains("do:whatever"))
-        assertFalse(permissions.contains("do:nothing"))
-    }
+    permissions = superTokens.getRolePermissions("Everyone")
+    assertTrue(permissions.contains("do:whatever"))
+    assertFalse(permissions.contains("do:nothing"))
+  }
 
-    @Test
-    fun testSetUserRole() = runBlocking {
-        val user = superTokens.getUsersByEMail(TEST_USER).first()
+  @Test
+  fun testSetUserRole() = runBlocking {
+    val user = superTokens.getUsersByEMail(TEST_USER).first()
 
-        superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
+    superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
 
-        superTokens.setUserRole(user.id, "Everyone")
+    superTokens.setUserRole(user.id, "Everyone")
 
-        val roles = superTokens.getUserRoles(user.id)
-        assertTrue(roles.contains("Everyone"))
-    }
+    val roles = superTokens.getUserRoles(user.id)
+    assertTrue(roles.contains("Everyone"))
+  }
 
-    @Test
-    fun testRemoveUserRole() = runBlocking {
-        val user = superTokens.getUsersByEMail(TEST_USER).first()
+  @Test
+  fun testRemoveUserRole() = runBlocking {
+    val user = superTokens.getUsersByEMail(TEST_USER).first()
 
-        superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
+    superTokens.createOrUpdateRole("Everyone", listOf("do:whatever", "do:nothing"))
 
-        superTokens.setUserRole(user.id, "Everyone")
+    superTokens.setUserRole(user.id, "Everyone")
 
-        var roles = superTokens.getUserRoles(user.id)
-        assertTrue(roles.contains("Everyone"))
+    var roles = superTokens.getUserRoles(user.id)
+    assertTrue(roles.contains("Everyone"))
 
-        superTokens.removeUserRole(user.id, "Everyone")
+    superTokens.removeUserRole(user.id, "Everyone")
 
-        roles = superTokens.getUserRoles(user.id)
-        assertFalse(roles.contains("Everyone"))
-    }
-
+    roles = superTokens.getUserRoles(user.id)
+    assertFalse(roles.contains("Everyone"))
+  }
 }

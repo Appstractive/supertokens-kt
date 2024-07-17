@@ -9,21 +9,15 @@ import io.ktor.server.routing.application
 import io.ktor.util.pipeline.PipelineContext
 
 val ApplicationCall.emailVerification: EmailVerificationRecipe
-    get() =
-        application.attributes[SuperTokensAttributeKey].getRecipe()
+  get() = application.attributes[SuperTokensAttributeKey].getRecipe()
 val PipelineContext<Unit, ApplicationCall>.emailVerification: EmailVerificationRecipe
-    get() =
-        application.attributes[SuperTokensAttributeKey].getRecipe()
+  get() = application.attributes[SuperTokensAttributeKey].getRecipe()
 val Route.emailVerification: EmailVerificationRecipe
-    get() =
-        application.attributes[SuperTokensAttributeKey].getRecipe()
+  get() = application.attributes[SuperTokensAttributeKey].getRecipe()
 
 val ApplicationCall.isEmailVerificationEnabled: Boolean
-    get() =
-        application.attributes[SuperTokensAttributeKey].hasRecipe<EmailVerificationRecipe>()
+  get() = application.attributes[SuperTokensAttributeKey].hasRecipe<EmailVerificationRecipe>()
 val PipelineContext<Unit, ApplicationCall>.isEmailVerificationEnabled: Boolean
-    get() =
-        application.attributes[SuperTokensAttributeKey].hasRecipe<EmailVerificationRecipe>()
+  get() = application.attributes[SuperTokensAttributeKey].hasRecipe<EmailVerificationRecipe>()
 val Route.isEmailVerificationEnabled: Boolean
-    get() =
-        application.attributes[SuperTokensAttributeKey].hasRecipe<EmailVerificationRecipe>()
+  get() = application.attributes[SuperTokensAttributeKey].hasRecipe<EmailVerificationRecipe>()

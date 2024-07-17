@@ -6,13 +6,13 @@ data class LoginMagicLinkOtpTemplate(
     val urlWithLinkCode: String,
     val otp: String,
     val time: String,
-): TemplateProvider {
+) : TemplateProvider {
 
-    override val template = mapOf(
-        "appname" to appname,
-        "toEmail" to toEmail,
-        "urlWithLinkCode" to urlWithLinkCode,
-        "otp" to otp,
-        "time" to time
-    )
+  override val template =
+      mapOf(
+          "appname" to appname,
+          "toEmail" to toEmail,
+          "urlWithLinkCode" to urlWithLinkCode,
+          "otp" to otp,
+          "time" to time)
 }

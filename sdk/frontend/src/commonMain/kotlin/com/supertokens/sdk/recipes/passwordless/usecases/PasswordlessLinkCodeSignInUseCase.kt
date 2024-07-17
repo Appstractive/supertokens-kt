@@ -18,35 +18,33 @@ class PasswordlessLinkCodeSignInUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun signIn(preAuthSessionId: String, linkCode: String): SignInData {
-        val response = client.post {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.Passwordless.SIGNUP_CODE_CONSUME,
-                    )
-                )
-            }
-            setBody(
-                ConsumePasswordlessCodeRequestDTO(
-                    preAuthSessionId = preAuthSessionId,
-                    linkCode = linkCode,
-                )
-            )
+  suspend fun signIn(preAuthSessionId: String, linkCode: String): SignInData {
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.Passwordless.SIGNUP_CODE_CONSUME,
+                ))
+          }
+          setBody(
+              ConsumePasswordlessCodeRequestDTO(
+                  preAuthSessionId = preAuthSessionId,
+                  linkCode = linkCode,
+              ))
         }
 
-        val body = response.body<SignInUpResponseDTO>()
+    val body = response.body<SignInUpResponseDTO>()
 
-        return when(val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> {
-                SignInData(
-                    user = checkNotNull(body.user),
-                    createdNewUser = checkNotNull(body.createdNewUser),
-                )
-            }
-            else -> throw SuperTokensStatusException(status)
-        }
+    return when (val status = body.status.toStatus()) {
+      SuperTokensStatus.OK -> {
+        SignInData(
+            user = checkNotNull(body.user),
+            createdNewUser = checkNotNull(body.createdNewUser),
+        )
+      }
+      else -> throw SuperTokensStatusException(status)
     }
-
+  }
 }

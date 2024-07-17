@@ -19,44 +19,44 @@ class ThirdPartyTokenSignInUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun signIn(
-        providerId: String,
-        accessToken: String,
-        idToken: String?,
-        clientType: String? = null,
-    ): SignInData {
-        val response = client.post {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.ThirdParty.SIGN_IN_UP,
-                    )
-                )
-            }
-            setBody(
-                ThirdPartySignInUpRequestDTO(
-                    oAuthTokens = ThirdPartyTokensDTO(
-                        accessToken = accessToken,
-                        idToken = idToken,
-                    ),
-                    thirdPartyId = providerId,
-                    clientType = clientType,
-                )
-            )
+  suspend fun signIn(
+      providerId: String,
+      accessToken: String,
+      idToken: String?,
+      clientType: String? = null,
+  ): SignInData {
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.ThirdParty.SIGN_IN_UP,
+                ))
+          }
+          setBody(
+              ThirdPartySignInUpRequestDTO(
+                  oAuthTokens =
+                      ThirdPartyTokensDTO(
+                          accessToken = accessToken,
+                          idToken = idToken,
+                      ),
+                  thirdPartyId = providerId,
+                  clientType = clientType,
+              ))
         }
 
-        val body = response.body<SignInUpResponseDTO>()
+    val body = response.body<SignInUpResponseDTO>()
 
-        return when (val status = body.status.toStatus()) {
-            SuperTokensStatus.OK -> {
-                SignInData(
-                    user = checkNotNull(body.user),
-                    createdNewUser = checkNotNull(body.createdNewUser),
-                )
-            }
+    return when (val status = body.status.toStatus()) {
+      SuperTokensStatus.OK -> {
+        SignInData(
+            user = checkNotNull(body.user),
+            createdNewUser = checkNotNull(body.createdNewUser),
+        )
+      }
 
-            else -> throw SuperTokensStatusException(status)
-        }
+      else -> throw SuperTokensStatusException(status)
     }
+  }
 }

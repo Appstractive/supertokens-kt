@@ -5,7 +5,5 @@ import com.russhwolf.settings.Settings
 import java.util.prefs.Preferences
 
 internal actual fun getDefaultSettings(): Settings {
-    return PreferencesSettings(
-        Preferences.userRoot()
-    )
+  return PreferencesSettings(Preferences.userRoot())
 }

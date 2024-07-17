@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
 data class CheckCanLinkAccountsResponseDTO(
     override val status: String,
     val accountsAlreadyLinked: Boolean,
-): BaseResponseDTO
+) : BaseResponseDTO

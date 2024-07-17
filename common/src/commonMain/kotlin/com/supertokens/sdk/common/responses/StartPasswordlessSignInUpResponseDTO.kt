@@ -13,4 +13,4 @@ data class StartPasswordlessSignInUpResponseDTO(
     val deviceId: String? = null,
     val preAuthSessionId: String? = null,
     val flowType: PasswordlessMode? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

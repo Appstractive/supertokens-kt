@@ -9,11 +9,5 @@ import io.ktor.server.routing.post
 fun Route.multiFactorRoutes(
     handler: MultiFactorHandler,
 ) {
-    authenticate(SuperTokensAuth) {
-        post(Routes.Mfa.CHECK) {
-            with(handler) {
-                checkMfaStatus()
-            }
-        }
-    }
+  authenticate(SuperTokensAuth) { post(Routes.Mfa.CHECK) { with(handler) { checkMfaStatus() } } }
 }

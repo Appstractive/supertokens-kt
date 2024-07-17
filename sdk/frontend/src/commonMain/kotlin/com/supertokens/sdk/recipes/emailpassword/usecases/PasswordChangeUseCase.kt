@@ -16,41 +16,42 @@ import io.ktor.client.request.setBody
 import io.ktor.http.appendEncodedPathSegments
 
 class PasswordChangeUseCase(
-  private val client: HttpClient,
-  private val tenantId: String?,
+    private val client: HttpClient,
+    private val tenantId: String?,
 ) {
 
   suspend fun changePassword(currentPassword: String, newPassword: String) {
-    val response = client.post {
-      url {
-        appendEncodedPathSegments(
-            listOfNotNull(
-                tenantId,
-                Routes.EmailPassword.PASSWORD_CHANGE,
+    val response =
+        client.post {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.EmailPassword.PASSWORD_CHANGE,
+                ),
             )
-        )
-      }
-      setBody(
-          PasswordChangeRequestDTO(
-              formFields = listOf(
-                  FormFieldDTO(
-                      id = FORM_FIELD_PASSWORD_ID,
-                      value = currentPassword,
-                  ),
-                  FormFieldDTO(
-                      id = FORM_FIELD_NEW_PASSWORD_ID,
-                      value = newPassword,
-                  ),
+          }
+          setBody(
+              PasswordChangeRequestDTO(
+                  formFields =
+                      listOf(
+                          FormFieldDTO(
+                              id = FORM_FIELD_PASSWORD_ID,
+                              value = currentPassword,
+                          ),
+                          FormFieldDTO(
+                              id = FORM_FIELD_NEW_PASSWORD_ID,
+                              value = newPassword,
+                          ),
+                      ),
               ),
           )
-      )
-    }
+        }
 
     val body = response.body<StatusResponseDTO>()
 
-    if(body.status != SuperTokensStatus.OK.value) {
+    if (body.status != SuperTokensStatus.OK.value) {
       throw SuperTokensStatusException(body.status.toStatus())
     }
   }
-
 }

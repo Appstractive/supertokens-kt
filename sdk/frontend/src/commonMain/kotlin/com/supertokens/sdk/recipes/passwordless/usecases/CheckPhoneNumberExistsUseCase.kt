@@ -18,26 +18,25 @@ class CheckPhoneNumberExistsUseCase(
     private val tenantId: String?,
 ) {
 
-    suspend fun checkPhoneNumberExists(phoneNumber: String): Boolean {
-        val response = client.get {
-            url {
-                appendEncodedPathSegments(
-                    listOfNotNull(
-                        tenantId,
-                        Routes.PHONE_NUMBER_EXISTS,
-                    )
-                )
-                parameters.append("phoneNumber", phoneNumber)
-            }
-            header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
+  suspend fun checkPhoneNumberExists(phoneNumber: String): Boolean {
+    val response =
+        client.get {
+          url {
+            appendEncodedPathSegments(
+                listOfNotNull(
+                    tenantId,
+                    Routes.PHONE_NUMBER_EXISTS,
+                ))
+            parameters.append("phoneNumber", phoneNumber)
+          }
+          header(HEADER_RECIPE_ID, RECIPE_PASSWORDLESS)
         }
 
-        val body = response.body<ExistsResponseDTO>()
+    val body = response.body<ExistsResponseDTO>()
 
-        return when(body.status) {
-            SuperTokensStatus.OK.value -> body.exists
-            else -> throw SuperTokensStatusException(body.status.toStatus())
-        }
+    return when (body.status) {
+      SuperTokensStatus.OK.value -> body.exists
+      else -> throw SuperTokensStatusException(body.status.toStatus())
     }
-
+  }
 }

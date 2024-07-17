@@ -14,38 +14,39 @@ import io.ktor.client.request.setBody
 data class InvalidTotpException(
     val currentNumberOfFailedAttempts: Long,
     val maxNumberOfFailedAttempts: Long,
-): SuperTokensStatusException(SuperTokensStatus.InvalidTotpCodeError)
+) : SuperTokensStatusException(SuperTokensStatus.InvalidTotpCodeError)
 
 data class InvalidTotpLimitException(
     val retryAfterMs: Long,
-): SuperTokensStatusException(SuperTokensStatus.InvalidTotpCodeError)
+) : SuperTokensStatusException(SuperTokensStatus.InvalidTotpCodeError)
 
 class VerifyTotpUseCase(
     private val client: HttpClient,
 ) {
 
-    suspend fun verifyCode(totp: String): Boolean {
-        val response = client.post(Routes.Totp.VERIFY) {
-            setBody(
-                VerifyTotpRequestDTO(
-                    totp = totp,
-                )
-            )
+  suspend fun verifyCode(totp: String): Boolean {
+    val response =
+        client.post(Routes.Totp.VERIFY) {
+          setBody(
+              VerifyTotpRequestDTO(
+                  totp = totp,
+              ))
         }
 
-        val body = response.body<VerifyTotpResponseDTO>()
+    val body = response.body<VerifyTotpResponseDTO>()
 
-        return when(body.status.toStatus()) {
-            SuperTokensStatus.OK -> true
-            SuperTokensStatus.InvalidTotpCodeError -> throw InvalidTotpException(
-                currentNumberOfFailedAttempts = checkNotNull(body.currentNumberOfFailedAttempts),
-                maxNumberOfFailedAttempts = checkNotNull(body.maxNumberOfFailedAttempts),
-            )
-            SuperTokensStatus.TotpLimitReachedError -> throw InvalidTotpLimitException(
-                retryAfterMs = checkNotNull(body.retryAfterMs),
-            )
-            else -> false
-        }
+    return when (body.status.toStatus()) {
+      SuperTokensStatus.OK -> true
+      SuperTokensStatus.InvalidTotpCodeError ->
+          throw InvalidTotpException(
+              currentNumberOfFailedAttempts = checkNotNull(body.currentNumberOfFailedAttempts),
+              maxNumberOfFailedAttempts = checkNotNull(body.maxNumberOfFailedAttempts),
+          )
+      SuperTokensStatus.TotpLimitReachedError ->
+          throw InvalidTotpLimitException(
+              retryAfterMs = checkNotNull(body.retryAfterMs),
+          )
+      else -> false
     }
-
+  }
 }

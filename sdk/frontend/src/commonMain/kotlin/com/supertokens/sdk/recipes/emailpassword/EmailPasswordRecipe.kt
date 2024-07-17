@@ -24,80 +24,80 @@ class EmailPasswordRecipe(
     private val config: EmailPasswordConfig,
 ) : Recipe<EmailPasswordConfig> {
 
-    private val emailPasswordSignInUseCase by lazy {
-        EmailPasswordSignInUseCase(
-            client = superTokens.apiClient,
-            authRepository = superTokens.authRepository,
-            tenantId = superTokens.tenantId,
-        )
-    }
+  private val emailPasswordSignInUseCase by lazy {
+    EmailPasswordSignInUseCase(
+        client = superTokens.apiClient,
+        authRepository = superTokens.authRepository,
+        tenantId = superTokens.tenantId,
+    )
+  }
 
-    private val emailPasswordSignUpUseCase by lazy {
-        EmailPasswordSignUpUseCase(
-            client = superTokens.apiClient,
-            authRepository = superTokens.authRepository,
-            tenantId = superTokens.tenantId,
-        )
-    }
+  private val emailPasswordSignUpUseCase by lazy {
+    EmailPasswordSignUpUseCase(
+        client = superTokens.apiClient,
+        authRepository = superTokens.authRepository,
+        tenantId = superTokens.tenantId,
+    )
+  }
 
-    private val checkEmailExistsUseCase by lazy {
-        CheckEmailExistsUseCase(
-            client = superTokens.apiClient,
-            tenantId = superTokens.tenantId,
-            recipeId = RECIPE_EMAIL_PASSWORD,
-        )
-    }
+  private val checkEmailExistsUseCase by lazy {
+    CheckEmailExistsUseCase(
+        client = superTokens.apiClient,
+        tenantId = superTokens.tenantId,
+        recipeId = RECIPE_EMAIL_PASSWORD,
+    )
+  }
 
-    private val requestPasswordResetUseCase by lazy {
-        RequestPasswordResetUseCase(
-            client = superTokens.apiClient,
-            tenantId = superTokens.tenantId,
-        )
-    }
+  private val requestPasswordResetUseCase by lazy {
+    RequestPasswordResetUseCase(
+        client = superTokens.apiClient,
+        tenantId = superTokens.tenantId,
+    )
+  }
 
-    private val passwordResetUseCase by lazy {
-        PasswordResetUseCase(
-            client = superTokens.apiClient,
-            tenantId = superTokens.tenantId,
-        )
-    }
+  private val passwordResetUseCase by lazy {
+    PasswordResetUseCase(
+        client = superTokens.apiClient,
+        tenantId = superTokens.tenantId,
+    )
+  }
 
-    private val passwordChangeUseCase by lazy {
-        PasswordChangeUseCase(
-            client = superTokens.apiClient,
-            tenantId = superTokens.tenantId,
-        )
-    }
+  private val passwordChangeUseCase by lazy {
+    PasswordChangeUseCase(
+        client = superTokens.apiClient,
+        tenantId = superTokens.tenantId,
+    )
+  }
 
-    suspend fun signUp(email: String, password: String) =
-        emailPasswordSignUpUseCase.signUp(
-            email = email,
-            password = password,
-        )
+  suspend fun signUp(email: String, password: String) =
+      emailPasswordSignUpUseCase.signUp(
+          email = email,
+          password = password,
+      )
 
-    suspend fun signIn(email: String, password: String) =
-        emailPasswordSignInUseCase.signIn(
-            email = email,
-            password = password,
-        )
+  suspend fun signIn(email: String, password: String) =
+      emailPasswordSignInUseCase.signIn(
+          email = email,
+          password = password,
+      )
 
-    suspend fun checkEmailExists(email: String) =
-        checkEmailExistsUseCase.checkEmailExists(email = email)
+  suspend fun checkEmailExists(email: String) =
+      checkEmailExistsUseCase.checkEmailExists(email = email)
 
-    suspend fun requestPasswordReset(email: String) =
-        requestPasswordResetUseCase.requestReset(email = email)
+  suspend fun requestPasswordReset(email: String) =
+      requestPasswordResetUseCase.requestReset(email = email)
 
-    suspend fun resetPassword(token: String, newPassword: String) =
-        passwordResetUseCase.resetPassword(
-            token = token,
-            newPassword = newPassword,
-        )
+  suspend fun resetPassword(token: String, newPassword: String) =
+      passwordResetUseCase.resetPassword(
+          token = token,
+          newPassword = newPassword,
+      )
 
-    suspend fun changePassword(currentPassword: String, newPassword: String) =
-        passwordChangeUseCase.changePassword(
-            currentPassword = currentPassword,
-            newPassword = newPassword,
-        )
+  suspend fun changePassword(currentPassword: String, newPassword: String) =
+      passwordChangeUseCase.changePassword(
+          currentPassword = currentPassword,
+          newPassword = newPassword,
+      )
 }
 
 object EmailPassword :
@@ -105,42 +105,42 @@ object EmailPassword :
     SignInProvider<EmailPassword.Config, User>,
     SignUpProvider<EmailPassword.Config, User> {
 
-    override fun install(
-        configure: EmailPasswordConfig.() -> Unit
-    ): (SuperTokensClient) -> EmailPasswordRecipe {
-        val config = EmailPasswordConfig().apply(configure)
+  override fun install(
+      configure: EmailPasswordConfig.() -> Unit
+  ): (SuperTokensClient) -> EmailPasswordRecipe {
+    val config = EmailPasswordConfig().apply(configure)
 
-        return { EmailPasswordRecipe(it, config) }
-    }
+    return { EmailPasswordRecipe(it, config) }
+  }
 
-    data class Config(var email: String? = null, var password: String? = null) :
-        SignInProviderConfig, SignUpProviderConfig
+  data class Config(var email: String? = null, var password: String? = null) :
+      SignInProviderConfig, SignUpProviderConfig
 
-    override suspend fun signIn(
-        superTokensClient: SuperTokensClient,
-        configure: Config.() -> Unit
-    ): User {
-        val config = Config().apply(configure)
+  override suspend fun signIn(
+      superTokensClient: SuperTokensClient,
+      configure: Config.() -> Unit
+  ): User {
+    val config = Config().apply(configure)
 
-        return superTokensClient
-            .getRecipe<EmailPasswordRecipe>()
-            .signIn(
-                email = checkNotNull(config.email) { "email is required" },
-                password = checkNotNull(config.password) { "password is required" },
-            )
-    }
+    return superTokensClient
+        .getRecipe<EmailPasswordRecipe>()
+        .signIn(
+            email = checkNotNull(config.email) { "email is required" },
+            password = checkNotNull(config.password) { "password is required" },
+        )
+  }
 
-    override suspend fun signUp(
-        superTokensClient: SuperTokensClient,
-        configure: Config.() -> Unit
-    ): User {
-        val config = Config().apply(configure)
+  override suspend fun signUp(
+      superTokensClient: SuperTokensClient,
+      configure: Config.() -> Unit
+  ): User {
+    val config = Config().apply(configure)
 
-        return superTokensClient
-            .getRecipe<EmailPasswordRecipe>()
-            .signUp(
-                email = checkNotNull(config.email) { "email is required" },
-                password = checkNotNull(config.password) { "password is required" },
-            )
-    }
+    return superTokensClient
+        .getRecipe<EmailPasswordRecipe>()
+        .signUp(
+            email = checkNotNull(config.email) { "email is required" },
+            password = checkNotNull(config.password) { "password is required" },
+        )
+  }
 }

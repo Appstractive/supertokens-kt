@@ -13,4 +13,4 @@ data class PasswordlessCodeResponseDTO(
     val linkCode: String? = null,
     val timeCreated: Long? = null,
     val codeLifetime: Long? = null,
-): BaseResponseDTO
+) : BaseResponseDTO

@@ -9,21 +9,15 @@ import io.ktor.server.routing.application
 import io.ktor.util.pipeline.PipelineContext
 
 val ApplicationCall.sessions: SessionRecipe
-    get() =
-        application.attributes[SuperTokensAttributeKey].getRecipe()
+  get() = application.attributes[SuperTokensAttributeKey].getRecipe()
 val PipelineContext<Unit, ApplicationCall>.sessions: SessionRecipe
-    get() =
-        application.attributes[SuperTokensAttributeKey].getRecipe()
+  get() = application.attributes[SuperTokensAttributeKey].getRecipe()
 val Route.sessions: SessionRecipe
-    get() =
-        application.attributes[SuperTokensAttributeKey].getRecipe()
+  get() = application.attributes[SuperTokensAttributeKey].getRecipe()
 
 val ApplicationCall.isSessionsEnabled: Boolean
-    get() =
-        application.attributes[SuperTokensAttributeKey].hasRecipe<SessionRecipe>()
+  get() = application.attributes[SuperTokensAttributeKey].hasRecipe<SessionRecipe>()
 val PipelineContext<Unit, ApplicationCall>.isSessionsEnabled: Boolean
-    get() =
-        application.attributes[SuperTokensAttributeKey].hasRecipe<SessionRecipe>()
+  get() = application.attributes[SuperTokensAttributeKey].hasRecipe<SessionRecipe>()
 val Route.isSessionsEnabled: Boolean
-    get() =
-        application.attributes[SuperTokensAttributeKey].hasRecipe<SessionRecipe>()
+  get() = application.attributes[SuperTokensAttributeKey].hasRecipe<SessionRecipe>()

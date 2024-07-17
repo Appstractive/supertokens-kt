@@ -6,10 +6,9 @@ import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
 import com.supertokens.sdk.recipes.sessions.SessionRecipe
-import com.supertokens.sdk.recipes.sessions.repositories.ClaimsRepository
 import com.supertokens.sdk.recipes.sessions.repositories.AuthRepository
 import com.supertokens.sdk.recipes.sessions.repositories.AuthState
-import com.supertokens.sdk.recipes.sessions.repositories.AuthRepositoryImpl
+import com.supertokens.sdk.recipes.sessions.repositories.ClaimsRepository
 import com.supertokens.sdk.recipes.sessions.repositories.TokensRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -37,108 +36,113 @@ class SuperTokensClientConfig(
     val apiBaseUrl: String,
 ) {
 
-    var tenantId: String? = null
+  var tenantId: String? = null
 
-    // Modify the http client config used by the SDK
-    var clientConfig: HttpClientConfig<*>.() -> Unit = {}
+  // Modify the http client config used by the SDK
+  var clientConfig: HttpClientConfig<*>.() -> Unit = {}
 
-    var clientName: String = "MyMobileApp"
+  var clientName: String = "MyMobileApp"
 
-    val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+  val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    var recipes: List<BuildRecipe> = emptyList()
-        private set
+  var recipes: List<BuildRecipe> = emptyList()
+    private set
 
-    operator fun BuildRecipe.unaryPlus() {
-        recipes = recipes + this
-    }
+  operator fun BuildRecipe.unaryPlus() {
+    recipes = recipes + this
+  }
 
-    fun <C: RecipeConfig, R: Recipe<C>> recipe(builder: RecipeBuilder<C, R>, configure: C.() -> Unit = {}) {
-        +builder.install(configure)
-    }
-
+  fun <C : RecipeConfig, R : Recipe<C>> recipe(
+      builder: RecipeBuilder<C, R>,
+      configure: C.() -> Unit = {}
+  ) {
+    +builder.install(configure)
+  }
 }
 
 class SuperTokensClient(
     private val config: SuperTokensClientConfig,
 ) {
 
-    internal val scope: CoroutineScope
-        get() = config.scope
+  internal val scope: CoroutineScope
+    get() = config.scope
 
-    val tenantId: String?
-        get() = config.tenantId
+  val tenantId: String?
+    get() = config.tenantId
 
-    val recipes: List<Recipe<*>> = config.recipes.map { it.invoke(this) }
+  val recipes: List<Recipe<*>> = config.recipes.map { it.invoke(this) }
 
-    @OptIn(ExperimentalSerializationApi::class)
-    val apiClient by lazy {
-        HttpClient {
+  @OptIn(ExperimentalSerializationApi::class)
+  val apiClient by lazy {
+    HttpClient {
+      install(ContentNegotiation) {
+        json(
+            Json {
+              isLenient = true
+              explicitNulls = false
+              encodeDefaults = true
+              ignoreUnknownKeys = true
+            })
+      }
 
-            install(ContentNegotiation) {
-                json(Json {
-                    isLenient = true
-                    explicitNulls = false
-                    encodeDefaults = true
-                    ignoreUnknownKeys = true
-                })
-            }
+      recipes.forEach { with(it) { configureClient() } }
 
-            recipes.forEach {
-                with(it) {
-                    configureClient()
-                }
-            }
+      config.clientConfig(this)
 
-            config.clientConfig(this)
-
-            defaultRequest {
-                url(config.apiBaseUrl)
-                contentType(ContentType.Application.Json)
-                header(HttpHeaders.Origin, config.clientName)
-            }
-        }
+      defaultRequest {
+        url(config.apiBaseUrl)
+        contentType(ContentType.Application.Json)
+        header(HttpHeaders.Origin, config.clientName)
+      }
     }
+  }
 
+  val authRepository: AuthRepository
+    get() = getRecipe<SessionRecipe>().authRepository
 
-    val authRepository: AuthRepository
-        get() = getRecipe<SessionRecipe>().authRepository
-    val tokenRepository: TokensRepository
-        get() = getRecipe<SessionRecipe>().tokensRepository
-    val claimsRepository: ClaimsRepository
-        get() = getRecipe<SessionRecipe>().claimsRepository
+  val tokenRepository: TokensRepository
+    get() = getRecipe<SessionRecipe>().tokensRepository
 
-    private val _isInitialized = MutableStateFlow(false)
-    val isInitialized = _isInitialized.asStateFlow()
+  val claimsRepository: ClaimsRepository
+    get() = getRecipe<SessionRecipe>().claimsRepository
 
-    inline fun <reified T : Recipe<*>> getRecipe(): T = recipes.filterIsInstance<T>().firstOrNull()
-        ?: throw RuntimeException("Recipe ${T::class.simpleName} not configured")
+  private val _isInitialized = MutableStateFlow(false)
+  val isInitialized = _isInitialized.asStateFlow()
 
-    inline fun <reified T : Recipe<*>> hasRecipe(): Boolean = recipes.filterIsInstance<T>().isNotEmpty()
+  inline fun <reified T : Recipe<*>> getRecipe(): T =
+      recipes.filterIsInstance<T>().firstOrNull()
+          ?: throw RuntimeException("Recipe ${T::class.simpleName} not configured")
 
-    /** true, if the the user is at least logged in (but may not be authenticated from the backend yet)
-     *  It essentially means, there is a refresh token present, but no access token yet, e.g. during startup
-     *  when a new access token hasn't been fetched yet.
-     */
-    fun isLoggedIn(): Boolean = authRepository.authState.value !is AuthState.Unauthenticated
-    // true, if the user was authenticated from the backend (an access token is present)
-    fun isAuthenticated():Boolean = authRepository.authState.value is AuthState.Authenticated
+  inline fun <reified T : Recipe<*>> hasRecipe(): Boolean =
+      recipes.filterIsInstance<T>().isNotEmpty()
 
-    init {
-        scope.launch {
-            recipes.forEach {  recipe ->
-                recipe.postInit()
-            }
+  /**
+   * true, if the the user is at least logged in (but may not be authenticated from the backend yet)
+   * It essentially means, there is a refresh token present, but no access token yet, e.g. during
+   * startup when a new access token hasn't been fetched yet.
+   */
+  fun isLoggedIn(): Boolean = authRepository.authState.value !is AuthState.Unauthenticated
 
-            _isInitialized.value = true
-        }
+  // true, if the user was authenticated from the backend (an access token is present)
+  fun isAuthenticated(): Boolean = authRepository.authState.value is AuthState.Authenticated
+
+  init {
+    scope.launch {
+      recipes.forEach { recipe -> recipe.postInit() }
+
+      _isInitialized.value = true
     }
-
+  }
 }
 
-fun superTokensClient(apiBaseUrl: String, init: SuperTokensClientConfig.() -> Unit = {}): SuperTokensClient {
-    val config = SuperTokensClientConfig(
-        apiBaseUrl = apiBaseUrl,
-    ).apply(init)
-    return SuperTokensClient(config)
+fun superTokensClient(
+    apiBaseUrl: String,
+    init: SuperTokensClientConfig.() -> Unit = {}
+): SuperTokensClient {
+  val config =
+      SuperTokensClientConfig(
+              apiBaseUrl = apiBaseUrl,
+          )
+          .apply(init)
+  return SuperTokensClient(config)
 }

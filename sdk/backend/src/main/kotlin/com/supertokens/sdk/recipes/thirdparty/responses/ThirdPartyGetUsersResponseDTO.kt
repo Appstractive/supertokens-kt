@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 data class ThirdPartyGetUsersResponseDTO(
     override val status: String,
     val users: List<User>,
-): BaseResponseDTO
+) : BaseResponseDTO

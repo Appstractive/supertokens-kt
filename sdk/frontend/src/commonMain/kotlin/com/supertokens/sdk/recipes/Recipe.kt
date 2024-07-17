@@ -4,18 +4,17 @@ import com.supertokens.sdk.SuperTokensClient
 import io.ktor.client.HttpClientConfig
 
 interface RecipeConfig
-interface Recipe<C: RecipeConfig> {
 
-    suspend fun postInit() {}
+interface Recipe<C : RecipeConfig> {
 
-    fun HttpClientConfig<*>.configureClient() {}
+  suspend fun postInit() {}
 
+  fun HttpClientConfig<*>.configureClient() {}
 }
 
 typealias BuildRecipe = (SuperTokensClient) -> Recipe<*>
 
-abstract class RecipeBuilder<C: RecipeConfig, R: Recipe<C>> {
+abstract class RecipeBuilder<C : RecipeConfig, R : Recipe<C>> {
 
-    abstract fun install(configure: C.() -> Unit): BuildRecipe
-
+  abstract fun install(configure: C.() -> Unit): BuildRecipe
 }
