@@ -75,10 +75,10 @@ open class ThirdPartyHandler(
         if (isSessionsEnabled) {
             val session = sessions.createSession(
                 userId = response.user.id,
-                tenantId = null,
+                tenantId = call.tenantId,
                 userDataInJWT = sessions.getJwtData(
                     user = response.user,
-                    tenantId = null,
+                    tenantId = call.tenantId,
                     recipeId = RECIPE_THIRD_PARTY,
                     multiAuthFactor = null,
                     accessToken = null,
@@ -144,17 +144,17 @@ open class ThirdPartyHandler(
             thirdPartyId = provider.id,
             thirdPartyUserId = userInfo.id,
             email = userInfo.email?.id ?: handleMissingEmail(provider, userInfo),
-            tenantId = null,
+            tenantId = call.tenantId,
             isVerified = userInfo.email?.isVerified == true,
         )
 
         if (isSessionsEnabled) {
             val session = sessions.createSession(
                 userId = response.user.id,
-                tenantId = null,
+                tenantId = call.tenantId,
                 userDataInJWT = sessions.getJwtData(
                     user = response.user,
-                    tenantId = null,
+                    tenantId = call.tenantId,
                     recipeId = RECIPE_THIRD_PARTY,
                     multiAuthFactor = null,
                     accessToken = null,

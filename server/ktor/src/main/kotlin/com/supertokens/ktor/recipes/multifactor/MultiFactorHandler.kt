@@ -64,7 +64,7 @@ open class MultiFactorHandler(
             accessToken = principal.accessToken,
             userDataInJWT = sessions.getJwtData(
                 user = superTokens.getUserById(user.id),
-                tenantId = null,
+                tenantId = call.tenantId,
                 recipeId = RECIPE_MULTI_FACTOR_AUTH,
                 multiAuthFactor = null,
                 accessToken = principal.accessToken,

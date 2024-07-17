@@ -277,7 +277,7 @@ open class PasswordlessHandler(
                 accessToken = user.accessToken,
                 userDataInJWT = sessions.getJwtData(
                     user = superTokens.getUserById(user.id),
-                    tenantId = null,
+                    tenantId = call.tenantId,
                     recipeId = RECIPE_PASSWORDLESS,
                     multiAuthFactor = when {
                         codeData.any { it.email != null } -> if (isInputCode) {

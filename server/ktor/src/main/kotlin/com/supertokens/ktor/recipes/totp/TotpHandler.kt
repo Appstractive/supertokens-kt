@@ -130,7 +130,7 @@ open class TotpHandler(
                         accessToken = token,
                         userDataInJWT = sessions.getJwtData(
                             user = superTokens.getUserById(user.id),
-                            tenantId = null,
+                            tenantId = call.tenantId,
                             recipeId = RECIPE_TOTP,
                             multiAuthFactor = AuthFactor.TOTP,
                             accessToken = token,
@@ -170,7 +170,7 @@ open class TotpHandler(
                         accessToken = token,
                         userDataInJWT = sessions.getJwtData(
                             user = superTokens.getUserById(user.id),
-                            tenantId = null,
+                            tenantId = call.tenantId,
                             recipeId = RECIPE_TOTP,
                             multiAuthFactor = AuthFactor.TOTP,
                             accessToken = token,
