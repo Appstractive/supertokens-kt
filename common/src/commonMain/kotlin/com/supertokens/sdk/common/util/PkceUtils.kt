@@ -14,8 +14,9 @@ fun generateCodeVerifier(): String {
 
 fun generateCodeChallenge(verifier: String): String {
   val bytes = verifier.encodeToByteArray()
-  SHA256().update(bytes, 0, bytes.size)
-  return SHA256().digest(bytes).encodeForPKCE()
+  val sha = SHA256()
+  sha.update(bytes, 0, bytes.size)
+  return sha.digest(bytes).encodeForPKCE()
 }
 
 @OptIn(ExperimentalEncodingApi::class)

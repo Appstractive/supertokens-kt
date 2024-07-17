@@ -5,7 +5,7 @@ import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
 import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import io.ktor.client.call.body
-import io.ktor.client.request.get
+import io.ktor.client.request.post
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.JsonObject
@@ -59,7 +59,8 @@ abstract class OAuthProvider<out C : OAuthProviderConfig>(
                 authCode?.let { set("code", it) }
 
                 redirectUrl?.let { set("redirect_uri", it) }
-              })
+              },
+      )
 
   override fun getAuthorizationEndpoint(redirectUrl: String): ProviderEndpoint =
       ProviderEndpoint(
@@ -70,14 +71,16 @@ abstract class OAuthProvider<out C : OAuthProviderConfig>(
                 set("client_id", clientId)
                 set("redirect_uri", redirectUrl)
                 authParams?.forEach { (key, value) -> set(key, value) }
-              })
+              },
+      )
 
   open suspend fun convertTokenResponse(jsonObject: JsonObject): ThirdPartyTokensDTO =
       ThirdPartyTokensDTO(
           accessToken =
               jsonObject["access_token"]?.jsonPrimitive?.content
                   ?: throw RuntimeException(
-                      "'access_token' not in response for ${this::class.simpleName}"),
+                      "'access_token' not in response for ${this::class.simpleName}",
+                  ),
           idToken = jsonObject["id_token"]?.jsonPrimitive?.content,
       )
 
@@ -89,11 +92,13 @@ abstract class OAuthProvider<out C : OAuthProviderConfig>(
     val code =
         parameters["code"]
             ?: throw RuntimeException("'code' not in parameters for ${this::class.simpleName}")
-    val response = superTokens.client.get(getAccessTokenEndpoint(code, redirectUrl).fullUrl)
+    val response = superTokens.client.post(getAccessTokenEndpoint(code, redirectUrl).fullUrl)
 
     if (response.status != HttpStatusCode.OK) {
       throw SuperTokensStatusException(
-          SuperTokensStatus.WrongCredentialsError, response.bodyAsText())
+          SuperTokensStatus.WrongCredentialsError,
+          response.bodyAsText(),
+      )
     }
 
     val body = response.body<JsonObject>()

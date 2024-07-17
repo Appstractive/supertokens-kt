@@ -54,7 +54,8 @@ open class ThirdPartyHandler(
           provider.getTokens(
               parameters = it.redirectURIQueryParams,
               pkceCodeVerifier = it.pkceCodeVerifier,
-              redirectUrl = it.redirectURIOnProviderDashboard)
+              redirectUrl = it.redirectURIOnProviderDashboard,
+          )
         } ?: body.oAuthTokens ?: throw BadRequestException()
 
     val userInfo = provider.getUserInfo(tokens)

@@ -178,11 +178,7 @@ fun Application.module() {
               clientId = "123456"
               keyId = "keyid"
               privateKey =
-                  "-----BEGIN EC PRIVATE KEY-----\n" +
-                      "MHcCAQEEIA15hjyZS/pWzMgI4SOlwKbbG4/c+3vQcFCfQaRhoFbzoAoGCCqGSM49\n" +
-                      "AwEHoUQDQgAEkrYPIhuxDLQg8QKQnnto8JUFb13yWpY+venFhEzjhBwMgFl3oueT\n" +
-                      "oQJf/l9sIYMIXc6gVnMg/lGEWv0ZANcYqg==\n" +
-                      "-----END EC PRIVATE KEY-----"
+                  "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgMKZfBMuF5CyRyXAiQaYew+j3U+bQ5oRtqb/3SujLlZGgCgYIKoZIzj0DAQehRANCAAQoYTJsktscfGFwAm40TH2648sGmHS5qvti8tvRcXF6v5Gu0fecAPooXDFqn63ZfStZjQm/3cMsPWwDKo3QryFm"
               teamId = "teamid"
             }
           }
