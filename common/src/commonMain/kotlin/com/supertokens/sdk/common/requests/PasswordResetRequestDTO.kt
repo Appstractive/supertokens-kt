@@ -7,7 +7,7 @@ typealias PasswordResetRequest = PasswordResetRequestDTO
 
 @Serializable
 data class PasswordResetRequestDTO(
-    val method: String,
+    val method: String = "token",
     val token: String?,
     val formFields: List<FormFieldDTO>,
 )
