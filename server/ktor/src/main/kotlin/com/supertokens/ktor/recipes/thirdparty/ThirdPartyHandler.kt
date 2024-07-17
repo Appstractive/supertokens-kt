@@ -17,6 +17,7 @@ import com.supertokens.sdk.common.util.generateCodeVerifier
 import com.supertokens.sdk.recipes.thirdparty.providers.Provider
 import com.supertokens.sdk.recipes.thirdparty.providers.ThirdPartyUserInfo
 import io.ktor.http.URLProtocol
+import io.ktor.http.path
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.request.receive
@@ -101,7 +102,8 @@ open class ThirdPartyHandler(
         SignInUpResponseDTO(
             user = response.user,
             createdNewUser = response.createdNewUser,
-        ))
+        ),
+    )
   }
 
   /**
@@ -123,7 +125,8 @@ open class ThirdPartyHandler(
             urlWithQueryParams =
                 provider.getAuthorizationEndpoint(redirectURIOnProviderDashboard).fullUrl,
             pkceCodeVerifier = generateCodeVerifier(),
-        ))
+        ),
+    )
   }
 
   /**
@@ -183,6 +186,7 @@ open class ThirdPartyHandler(
     call.respondRedirect {
       protocol = URLProtocol.HTTPS
       host = call.frontend.host
+      path(call.frontend.path)
     }
   }
 }
