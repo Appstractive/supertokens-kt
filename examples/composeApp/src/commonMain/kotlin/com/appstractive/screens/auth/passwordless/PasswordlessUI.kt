@@ -38,112 +38,102 @@ fun PasswordlessView(
     modifier: Modifier,
     state: PasswordlessScreen.State,
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Passwordless",
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        state.eventSink(PasswordlessScreen.Event.GoBack)
-                    }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-            )
-        }
-    ) {
+  Scaffold(
+      modifier = modifier,
+      topBar = {
+        TopAppBar(
+            title = {
+              Text(
+                  text = "Passwordless",
+              )
+            },
+            navigationIcon = {
+              IconButton(onClick = { state.eventSink(PasswordlessScreen.Event.GoBack) }) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+              }
+            },
+        )
+      }) {
         Column(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize()
-                .padding(8.dp)
-                .verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier.padding(it)
+                    .fillMaxSize()
+                    .padding(8.dp)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when (state) {
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              when (state) {
                 is PasswordlessScreen.State.ConfirmCode -> CodeInput(state)
                 is PasswordlessScreen.State.SignIn -> EmailOrPhone(state)
+              }
             }
-        }
-    }
+      }
 }
 
 @Composable
 private fun EmailOrPhone(state: PasswordlessScreen.State.SignIn) {
-    var email: TextFieldValue by rememberRetained {
-        mutableStateOf(TextFieldValue("test@test.de"))
+  var email: TextFieldValue by rememberRetained { mutableStateOf(TextFieldValue("test@test.de")) }
+
+  Spacer(modifier = Modifier.height(20.dp))
+  TextField(
+      label = { Text(text = "Email") },
+      value = email,
+      onValueChange = { email = it },
+  )
+
+  Spacer(modifier = Modifier.height(20.dp))
+
+  Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+    Button(
+        enabled = !isLoading(),
+        onClick = {
+          state.eventSink(
+              PasswordlessScreen.Event.SignIn(
+                  email = email.text,
+              ))
+        },
+        shape = RoundedCornerShape(50.dp),
+        modifier = Modifier.fillMaxWidth().height(50.dp),
+    ) {
+      Text(text = "Submit")
     }
-
-    Spacer(modifier = Modifier.height(20.dp))
-    TextField(
-        label = { Text(text = "Email") },
-        value = email,
-        onValueChange = { email = it },
-    )
-
-    Spacer(modifier = Modifier.height(20.dp))
-
-    Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-        Button(
-            enabled = !isLoading(),
-            onClick = {
-                state.eventSink(
-                    PasswordlessScreen.Event.SignIn(
-                        email = email.text,
-                    )
-                )
-            },
-            shape = RoundedCornerShape(50.dp), modifier = Modifier.fillMaxWidth().height(50.dp),
-        ) {
-            Text(text = "Submit")
-        }
-    }
+  }
 }
 
 @Composable
 private fun CodeInput(state: PasswordlessScreen.State.ConfirmCode) {
-    var code: TextFieldValue by rememberRetained {
-        mutableStateOf(TextFieldValue())
+  var code: TextFieldValue by rememberRetained { mutableStateOf(TextFieldValue()) }
+
+  Spacer(modifier = Modifier.height(20.dp))
+  TextField(
+      label = { Text(text = "Code") },
+      value = code,
+      onValueChange = { code = it },
+  )
+
+  Spacer(modifier = Modifier.height(20.dp))
+
+  Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+    Button(
+        enabled = !isLoading(),
+        onClick = { state.eventSink(PasswordlessScreen.Event.ConfirmCode(code = code.text)) },
+        shape = RoundedCornerShape(50.dp),
+        modifier = Modifier.fillMaxWidth().height(50.dp),
+    ) {
+      Text(text = "Submit")
     }
+  }
 
-    Spacer(modifier = Modifier.height(20.dp))
-    TextField(
-        label = { Text(text = "Code") },
-        value = code,
-        onValueChange = { code = it },
-    )
+  Spacer(modifier = Modifier.height(20.dp))
 
-    Spacer(modifier = Modifier.height(20.dp))
-
-    Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-        Button(
-            enabled = !isLoading(),
-            onClick = {
-                state.eventSink(PasswordlessScreen.Event.ConfirmCode(code = code.text))
-            },
-            shape = RoundedCornerShape(50.dp), modifier = Modifier.fillMaxWidth().height(50.dp),
-        ) {
-            Text(text = "Submit")
-        }
+  Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+    Button(
+        enabled = !isLoading(),
+        onClick = { state.eventSink(PasswordlessScreen.Event.GoBack) },
+        shape = RoundedCornerShape(50.dp),
+        modifier = Modifier.fillMaxWidth().height(50.dp),
+    ) {
+      Text(text = "Cancel")
     }
-
-    Spacer(modifier = Modifier.height(20.dp))
-
-    Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-        Button(
-            enabled = !isLoading(),
-            onClick = {
-                state.eventSink(PasswordlessScreen.Event.GoBack)
-            },
-            shape = RoundedCornerShape(50.dp), modifier = Modifier.fillMaxWidth().height(50.dp),
-        ) {
-            Text(text = "Cancel")
-        }
-    }
+  }
 }

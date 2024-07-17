@@ -43,153 +43,138 @@ fun EmailPassword(
     modifier: Modifier,
     state: EmailPasswordScreen.State,
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Email/Password")
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        state.eventSink(EmailPasswordScreen.Event.GoBack)
-                    }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-            )
-        }
-    ) {
+  Scaffold(
+      modifier = modifier,
+      topBar = {
+        TopAppBar(
+            title = { Text("Email/Password") },
+            navigationIcon = {
+              IconButton(onClick = { state.eventSink(EmailPasswordScreen.Event.GoBack) }) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+              }
+            },
+        )
+      }) {
         Column(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize()
-                .padding(8.dp)
-                .verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier.padding(it)
+                    .fillMaxSize()
+                    .padding(8.dp)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            SignIn(state)
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              SignIn(state)
 
-            Spacer(modifier = Modifier.height(20.dp))
+              Spacer(modifier = Modifier.height(20.dp))
 
-            SignUp(state)
-        }
-    }
-
+              SignUp(state)
+            }
+      }
 }
 
 @Composable
 fun SignIn(
     state: EmailPasswordScreen.State,
 ) {
-    var email: TextFieldValue by rememberRetained {
-        mutableStateOf(TextFieldValue("test@test.de"))
+  var email: TextFieldValue by rememberRetained { mutableStateOf(TextFieldValue("test@test.de")) }
+  var password: TextFieldValue by rememberRetained { mutableStateOf(TextFieldValue("a1234567")) }
+
+  Text(
+      text = "SignIn",
+      style = TextStyle(fontSize = 32.sp),
+  )
+
+  Spacer(modifier = Modifier.height(20.dp))
+  TextField(
+      label = { Text(text = "Username") },
+      value = email,
+      onValueChange = { email = it },
+  )
+
+  Spacer(modifier = Modifier.height(20.dp))
+  TextField(
+      label = { Text(text = "Password") },
+      value = password,
+      visualTransformation = PasswordVisualTransformation(),
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+      onValueChange = { password = it },
+  )
+
+  Spacer(modifier = Modifier.height(20.dp))
+
+  Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+    Button(
+        enabled = !isLoading(),
+        onClick = {
+          state.eventSink(
+              EmailPasswordScreen.Event.SignIn(
+                  email = email.text,
+                  password = password.text,
+              ))
+        },
+        shape = RoundedCornerShape(50.dp),
+        modifier = Modifier.fillMaxWidth().height(50.dp),
+    ) {
+      Text(text = "Submit")
     }
-    var password: TextFieldValue by rememberRetained {
-        mutableStateOf(TextFieldValue("a1234567"))
-    }
-
-    Text(
-        text = "SignIn",
-        style = TextStyle(fontSize = 32.sp),
-    )
-
-    Spacer(modifier = Modifier.height(20.dp))
-    TextField(
-        label = { Text(text = "Username") },
-        value = email,
-        onValueChange = { email = it },
-    )
-
-    Spacer(modifier = Modifier.height(20.dp))
-    TextField(
-        label = { Text(text = "Password") },
-        value = password,
-        visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        onValueChange = { password = it },
-    )
-
-    Spacer(modifier = Modifier.height(20.dp))
-
-    Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-        Button(
-            enabled = !isLoading(),
-            onClick = {
-                state.eventSink(
-                    EmailPasswordScreen.Event.SignIn(
-                        email = email.text,
-                        password = password.text,
-                    )
-                )
-            },
-            shape = RoundedCornerShape(50.dp), modifier = Modifier.fillMaxWidth().height(50.dp),
-        ) {
-            Text(text = "Submit")
-        }
-    }
+  }
 }
 
 @Composable
 fun SignUp(
     state: EmailPasswordScreen.State,
 ) {
-    var email: TextFieldValue by rememberRetained {
-        mutableStateOf(TextFieldValue("test@test.de"))
+  var email: TextFieldValue by rememberRetained { mutableStateOf(TextFieldValue("test@test.de")) }
+  var password: TextFieldValue by rememberRetained { mutableStateOf(TextFieldValue("a1234567")) }
+  var passwordConfirm: TextFieldValue by rememberRetained {
+    mutableStateOf(TextFieldValue("a1234567"))
+  }
+
+  Text(
+      text = "SignUp",
+      style = TextStyle(fontSize = 32.sp),
+  )
+
+  Spacer(modifier = Modifier.height(20.dp))
+  TextField(
+      label = { Text(text = "Username") },
+      value = email,
+      onValueChange = { email = it },
+  )
+
+  Spacer(modifier = Modifier.height(20.dp))
+  TextField(
+      label = { Text(text = "Password") },
+      value = password,
+      visualTransformation = PasswordVisualTransformation(),
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+      onValueChange = { password = it },
+  )
+
+  Spacer(modifier = Modifier.height(20.dp))
+  TextField(
+      label = { Text(text = "Confirm Password") },
+      value = passwordConfirm,
+      visualTransformation = PasswordVisualTransformation(),
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+      onValueChange = { passwordConfirm = it },
+  )
+
+  Spacer(modifier = Modifier.height(20.dp))
+  Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+    Button(
+        enabled = !isLoading(),
+        onClick = {
+          state.eventSink(
+              EmailPasswordScreen.Event.SignUp(
+                  email = email.text,
+                  password = password.text,
+              ))
+        },
+        shape = RoundedCornerShape(50.dp),
+        modifier = Modifier.fillMaxWidth().height(50.dp),
+    ) {
+      Text(text = "Submit")
     }
-    var password: TextFieldValue by rememberRetained {
-        mutableStateOf(TextFieldValue("a1234567"))
-    }
-    var passwordConfirm: TextFieldValue by rememberRetained {
-        mutableStateOf(TextFieldValue("a1234567"))
-    }
-
-    Text(
-        text = "SignUp",
-        style = TextStyle(fontSize = 32.sp),
-    )
-
-    Spacer(modifier = Modifier.height(20.dp))
-    TextField(
-        label = { Text(text = "Username") },
-        value = email,
-        onValueChange = { email = it },
-    )
-
-    Spacer(modifier = Modifier.height(20.dp))
-    TextField(
-        label = { Text(text = "Password") },
-        value = password,
-        visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        onValueChange = { password = it },
-    )
-
-    Spacer(modifier = Modifier.height(20.dp))
-    TextField(
-        label = { Text(text = "Confirm Password") },
-        value = passwordConfirm,
-        visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        onValueChange = { passwordConfirm = it },
-    )
-
-    Spacer(modifier = Modifier.height(20.dp))
-    Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-        Button(
-            enabled = !isLoading(),
-            onClick = {
-                state.eventSink(
-                    EmailPasswordScreen.Event.SignUp(
-                        email = email.text,
-                        password = password.text,
-                    )
-                )
-            },
-            shape = RoundedCornerShape(50.dp), modifier = Modifier.fillMaxWidth().height(50.dp),
-        ) {
-            Text(text = "Submit")
-        }
-    }
+  }
 }

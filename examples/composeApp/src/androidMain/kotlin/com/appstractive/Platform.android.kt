@@ -16,7 +16,7 @@ actual fun getPlatformDialogProperties(
     decorFitsSystemWindows: Boolean,
     usePlatformInsets: Boolean,
     scrimColor: Color
-): DialogProperties  =
+): DialogProperties =
     DialogProperties(
         dismissOnBackPress = dismissOnBackPress,
         dismissOnClickOutside = dismissOnClickOutside,
@@ -26,10 +26,10 @@ actual fun getPlatformDialogProperties(
 
 @Composable
 internal actual fun getNavigator(backstack: BackStack<out BackStack.Record>): Navigator {
-    val circuitNavigator = rememberCircuitNavigator(backstack)
-    val context = LocalContext.current
-    return rememberAndroidScreenAwareNavigator(
-        delegate = circuitNavigator,
-        context = context,
-    )
+  val circuitNavigator = rememberCircuitNavigator(backstack)
+  val context = LocalContext.current
+  return rememberAndroidScreenAwareNavigator(
+      delegate = circuitNavigator,
+      context = context,
+  )
 }

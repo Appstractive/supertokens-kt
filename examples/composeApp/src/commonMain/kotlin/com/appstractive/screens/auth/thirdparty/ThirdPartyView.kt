@@ -15,22 +15,20 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ThirdParty() {
-    Column(
-        modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+  Column(
+      modifier = Modifier.padding(20.dp),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "Third Party SignInUp",
             style = TextStyle(fontSize = 32.sp),
         )
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = "TODO",
-                style = TextStyle(fontSize = 48.sp),
-            )
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+          Text(
+              text = "TODO",
+              style = TextStyle(fontSize = 48.sp),
+          )
         }
-    }
+      }
 }

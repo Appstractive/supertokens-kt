@@ -21,44 +21,42 @@ import com.supertokens.sdk.recipes.totp.Totp
 import com.supertokens.sdk.superTokensClient
 
 interface Dependencies {
-    val superTokensClient: SuperTokensClient
+  val superTokensClient: SuperTokensClient
 
-    val circuit: Circuit
+  val circuit: Circuit
 }
 
-var dependencies = object: Dependencies {
-    override val superTokensClient = superTokensClient("https://auth.appstractive.cloud") {
-        recipe(Session)
-        recipe(EmailPassword)
-        recipe(Passwordless)
-        recipe(EmailVerification)
-        recipe(ThirdParty) {
-            provider(Google) {
-                redirectUri = "localhost"
-            }
-        }
-        recipe(Totp)
-        recipe(MultiFactorAuth)
+var dependencies =
+    object : Dependencies {
+      override val superTokensClient =
+          superTokensClient("https://auth.appstractive.cloud") {
+            recipe(Session)
+            recipe(EmailPassword)
+            recipe(Passwordless)
+            recipe(EmailVerification)
+            recipe(ThirdParty) { provider(Google) { redirectUri = "localhost" } }
+            recipe(Totp)
+            recipe(MultiFactorAuth)
+          }
+
+      override val circuit =
+          Circuit.Builder()
+              .addPresenterFactory(
+                  AppScreenPresenterFactory(),
+                  AuthScreenPresenterFactory(),
+                  MfaScreenPresenterFactory(),
+                  HomeScreenPresenterFactory(),
+              )
+              .addUiFactory(
+                  AppScreenUiFactory(),
+                  AuthScreenUiFactory(),
+                  MfaScreenUiFactory(),
+                  HomeScreenUiFactory(),
+              )
+              .build()
     }
-
-    override val circuit =
-        Circuit.Builder()
-            .addPresenterFactory(
-                AppScreenPresenterFactory(),
-                AuthScreenPresenterFactory(),
-                MfaScreenPresenterFactory(),
-                HomeScreenPresenterFactory(),
-            )
-            .addUiFactory(
-                AppScreenUiFactory(),
-                AuthScreenUiFactory(),
-                MfaScreenUiFactory(),
-                HomeScreenUiFactory(),
-            )
-            .build()
-}
 
 val LocalDependencies =
     staticCompositionLocalOf<Dependencies> {
-        throw IllegalStateException("No Dependencies Provided")
+      throw IllegalStateException("No Dependencies Provided")
     }

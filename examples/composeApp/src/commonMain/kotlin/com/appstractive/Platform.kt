@@ -15,5 +15,4 @@ expect fun getPlatformDialogProperties(
     scrimColor: Color = Color.Black.copy(alpha = 0.5f),
 ): DialogProperties
 
-@Composable
-internal expect fun getNavigator(backstack: BackStack<out BackStack.Record>): Navigator
+@Composable internal expect fun getNavigator(backstack: BackStack<out BackStack.Record>): Navigator

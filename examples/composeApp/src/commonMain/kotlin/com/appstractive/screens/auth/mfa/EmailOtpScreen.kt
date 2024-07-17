@@ -23,19 +23,21 @@ import com.supertokens.sdk.recipes.passwordless.PasswordlessSignUpData
 
 @CommonParcelize
 data object EmailOtpScreen : Screen {
-    data class State(
-        val email: String?,
-        val emailSend: Boolean,
-        val eventSink: (Event) -> Unit = {},
-    ): CircuitUiState
+  data class State(
+      val email: String?,
+      val emailSend: Boolean,
+      val eventSink: (Event) -> Unit = {},
+  ) : CircuitUiState
 
-    sealed interface Event : CircuitUiEvent {
-        data object SendEmail : Event
-        data class ConfirmCode(
-            val code: String,
-        ) : Event
-        data object GoBack : Event
-    }
+  sealed interface Event : CircuitUiEvent {
+    data object SendEmail : Event
+
+    data class ConfirmCode(
+        val code: String,
+    ) : Event
+
+    data object GoBack : Event
+  }
 }
 
 @Composable
@@ -43,30 +45,30 @@ fun EmailOtpScreenPresenter(
     navigator: Navigator,
     superTokensClient: SuperTokensClient = LocalDependencies.current.superTokensClient,
 ): EmailOtpScreen.State {
-    val apiCallController = rememberApiCallController()
-    val claims by superTokensClient.claimsRepository.claims.collectAsState()
-    var signUpData by remember { mutableStateOf<PasswordlessSignUpData?>(null) }
+  val apiCallController = rememberApiCallController()
+  val claims by superTokensClient.claimsRepository.claims.collectAsState()
+  var signUpData by remember { mutableStateOf<PasswordlessSignUpData?>(null) }
 
-    return EmailOtpScreen.State(
-        email = claims?.email,
-        emailSend = signUpData != null,
-    ) {
-        when (it) {
-            EmailOtpScreen.Event.GoBack -> navigator.pop()
-            is EmailOtpScreen.Event.ConfirmCode -> apiCallController.call {
-                superTokensClient.signInWith(PasswordlessInputCode) {
-                    preAuthSessionId = signUpData?.preAuthSessionId
-                    deviceId = signUpData?.deviceId
-                    userInputCode = it.code
-                }
+  return EmailOtpScreen.State(
+      email = claims?.email,
+      emailSend = signUpData != null,
+  ) {
+    when (it) {
+      EmailOtpScreen.Event.GoBack -> navigator.pop()
+      is EmailOtpScreen.Event.ConfirmCode ->
+          apiCallController.call {
+            superTokensClient.signInWith(PasswordlessInputCode) {
+              preAuthSessionId = signUpData?.preAuthSessionId
+              deviceId = signUpData?.deviceId
+              userInputCode = it.code
+            }
 
-                navigator.resetRoot(HomeScreen)
-            }
-            EmailOtpScreen.Event.SendEmail -> apiCallController.call {
-                signUpData = superTokensClient.signUpWith(Passwordless) {
-                    email = claims?.email
-                }
-            }
-        }
+            navigator.resetRoot(HomeScreen)
+          }
+      EmailOtpScreen.Event.SendEmail ->
+          apiCallController.call {
+            signUpData = superTokensClient.signUpWith(Passwordless) { email = claims?.email }
+          }
     }
+  }
 }

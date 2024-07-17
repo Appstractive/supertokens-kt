@@ -17,39 +17,40 @@ import com.slack.circuit.runtime.screen.Screen
 @CommonParcelize
 data object AuthScreen : Screen {
 
-    data class State(
-        val eventSink: (Event) -> Unit = {},
-    ) : CircuitUiState
+  data class State(
+      val eventSink: (Event) -> Unit = {},
+  ) : CircuitUiState
 
-    sealed interface Event : CircuitUiEvent {
-        data object GotoEmailPassword : Event
-        data object GotoPasswordless : Event
-    }
+  sealed interface Event : CircuitUiEvent {
+    data object GotoEmailPassword : Event
+
+    data object GotoPasswordless : Event
+  }
 }
 
 @Composable
 fun AuthScreenPresenter(
     navigator: Navigator,
 ): AuthScreen.State {
-    return AuthScreen.State {
-        when (it) {
-            AuthScreen.Event.GotoEmailPassword -> navigator.goTo(EmailPasswordScreen)
-            AuthScreen.Event.GotoPasswordless -> navigator.goTo(PasswordlessScreen)
-        }
+  return AuthScreen.State {
+    when (it) {
+      AuthScreen.Event.GotoEmailPassword -> navigator.goTo(EmailPasswordScreen)
+      AuthScreen.Event.GotoPasswordless -> navigator.goTo(PasswordlessScreen)
     }
+  }
 }
 
 class AuthScreenPresenterFactory : Presenter.Factory {
-    override fun create(
-        screen: Screen,
-        navigator: Navigator,
-        context: CircuitContext,
-    ): Presenter<*>? {
-        return when (screen) {
-            is AuthScreen -> presenterOf { AuthScreenPresenter(navigator) }
-            is EmailPasswordScreen -> presenterOf { EmailPasswordScreenPresenter(navigator = navigator) }
-            is PasswordlessScreen -> presenterOf { PasswordlessScreenPresenter(navigator = navigator) }
-            else -> null
-        }
+  override fun create(
+      screen: Screen,
+      navigator: Navigator,
+      context: CircuitContext,
+  ): Presenter<*>? {
+    return when (screen) {
+      is AuthScreen -> presenterOf { AuthScreenPresenter(navigator) }
+      is EmailPasswordScreen -> presenterOf { EmailPasswordScreenPresenter(navigator = navigator) }
+      is PasswordlessScreen -> presenterOf { PasswordlessScreenPresenter(navigator = navigator) }
+      else -> null
     }
+  }
 }

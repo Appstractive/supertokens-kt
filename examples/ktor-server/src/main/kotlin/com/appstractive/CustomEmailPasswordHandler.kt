@@ -7,16 +7,16 @@ import kotlinx.coroutines.CoroutineScope
 
 class CustomEmailPasswordHandler(
     scope: CoroutineScope,
-): EmailPasswordHandler(scope) {
+) : EmailPasswordHandler(scope) {
 
-    private val defaultEmailPasswordHandler = EmailPasswordHandler(scope)
+  private val defaultEmailPasswordHandler = EmailPasswordHandler(scope)
 
-    override suspend fun PipelineContext<Unit, ApplicationCall>.signIn() {
-        // TODO we can't use super.signin() at the moment (see https://youtrack.jetbrains.com/issue/KT-11488)
-        with(defaultEmailPasswordHandler) {
-            // call default implementation
-            signIn()
-        }
+  override suspend fun PipelineContext<Unit, ApplicationCall>.signIn() {
+    // TODO we can't use super.signin() at the moment (see
+    // https://youtrack.jetbrains.com/issue/KT-11488)
+    with(defaultEmailPasswordHandler) {
+      // call default implementation
+      signIn()
     }
-
+  }
 }

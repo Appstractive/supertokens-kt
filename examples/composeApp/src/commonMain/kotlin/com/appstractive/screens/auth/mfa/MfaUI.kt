@@ -30,87 +30,80 @@ fun MfaView(
     modifier: Modifier,
     state: MfaScreen.State,
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Multi Factor Auth")
-                },
-                actions = {
-                    IconButton(onClick = {
-                        state.eventSink(MfaScreen.Event.Refresh)
-                    }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
-                    }
-                }
-            )
-        }
-    ) {
+  Scaffold(
+      modifier = modifier,
+      topBar = {
+        TopAppBar(
+            title = { Text("Multi Factor Auth") },
+            actions = {
+              IconButton(onClick = { state.eventSink(MfaScreen.Event.Refresh) }) {
+                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+              }
+            })
+      }) {
         Column(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize(),
+            modifier = Modifier.padding(it).fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterVertically)
-        ) {
-            OutlinedButton(
-                enabled = state.mfaStatus?.factors?.next?.contains(AuthFactor.TOTP.key) == true,
-                onClick = { state.eventSink(MfaScreen.Event.GotoTotp) },
-            ) {
+            verticalArrangement =
+                Arrangement.spacedBy(8.dp, alignment = Alignment.CenterVertically)) {
+              OutlinedButton(
+                  enabled = state.mfaStatus?.factors?.next?.contains(AuthFactor.TOTP.key) == true,
+                  onClick = { state.eventSink(MfaScreen.Event.GotoTotp) },
+              ) {
                 Text("TOTP")
-            }
-            OutlinedButton(
-                enabled = state.mfaStatus?.factors?.next?.any { it == AuthFactor.OTP_EMAIL.key } == true,
-                onClick = { state.eventSink(MfaScreen.Event.GotoEmailOtp) },
-            ) {
+              }
+              OutlinedButton(
+                  enabled =
+                      state.mfaStatus?.factors?.next?.any { it == AuthFactor.OTP_EMAIL.key } ==
+                          true,
+                  onClick = { state.eventSink(MfaScreen.Event.GotoEmailOtp) },
+              ) {
                 Text("Email OTP")
-            }
-            OutlinedButton(
-                enabled = state.mfaStatus?.factors?.next?.any { it == AuthFactor.OTP_PHONE.key } == true,
-                onClick = { state.eventSink(MfaScreen.Event.GotoEmailOtp) },
-            ) {
+              }
+              OutlinedButton(
+                  enabled =
+                      state.mfaStatus?.factors?.next?.any { it == AuthFactor.OTP_PHONE.key } ==
+                          true,
+                  onClick = { state.eventSink(MfaScreen.Event.GotoEmailOtp) },
+              ) {
                 Text("Phone OTP")
+              }
+              TextButton(onClick = { state.eventSink(MfaScreen.Event.Cancel) }) { Text("Cancel") }
             }
-            TextButton(onClick = { state.eventSink(MfaScreen.Event.Cancel) }) {
-                Text("Cancel")
-            }
-
-        }
-    }
+      }
 }
 
 class MfaScreenUiFactory : Ui.Factory {
-    override fun create(
-        screen: Screen,
-        context: CircuitContext,
-    ): Ui<*>? {
-        return when (screen) {
-            is MfaScreen ->
-                ui<MfaScreen.State> { state, modifier ->
-                    MfaView(
-                        state = state,
-                        modifier = modifier,
-                    )
-                }
+  override fun create(
+      screen: Screen,
+      context: CircuitContext,
+  ): Ui<*>? {
+    return when (screen) {
+      is MfaScreen ->
+          ui<MfaScreen.State> { state, modifier ->
+            MfaView(
+                state = state,
+                modifier = modifier,
+            )
+          }
 
-            is EmailOtpScreen ->
-                ui<EmailOtpScreen.State> { state, modifier ->
-                    EmailOtpView(
-                        state = state,
-                        modifier = modifier,
-                    )
-                }
+      is EmailOtpScreen ->
+          ui<EmailOtpScreen.State> { state, modifier ->
+            EmailOtpView(
+                state = state,
+                modifier = modifier,
+            )
+          }
 
-            is TotpScreen ->
-                ui<TotpScreen.State> { state, modifier ->
-                    TotpView(
-                        state = state,
-                        modifier = modifier,
-                    )
-                }
+      is TotpScreen ->
+          ui<TotpScreen.State> { state, modifier ->
+            TotpView(
+                state = state,
+                modifier = modifier,
+            )
+          }
 
-            else -> null
-        }
+      else -> null
     }
+  }
 }

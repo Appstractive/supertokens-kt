@@ -30,14 +30,13 @@ fun Home(
     modifier: Modifier,
     state: HomeScreen.State,
 ) {
-    val isLoading by isLoading.collectAsState()
-    val scope = rememberCoroutineScope()
+  val isLoading by isLoading.collectAsState()
+  val scope = rememberCoroutineScope()
 
-    Column(
-        modifier = modifier.padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+  Column(
+      modifier = modifier.padding(20.dp),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "Hello ${state.claims?.email ?: state.claims?.phoneNumber ?: state.claims?.sub}",
             style = TextStyle(fontSize = 32.sp),
@@ -49,36 +48,33 @@ fun Home(
         )
 
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-            Button(
-                enabled = isLoading == 0,
-                onClick = {
-                    scope.launch {
-                        state.eventSink(HomeScreen.Event.Logout)
-                    }
-                },
-                shape = RoundedCornerShape(50.dp), modifier = Modifier.fillMaxWidth().height(50.dp),
-            ) {
-                Text(text = "SignOut")
-            }
+          Button(
+              enabled = isLoading == 0,
+              onClick = { scope.launch { state.eventSink(HomeScreen.Event.Logout) } },
+              shape = RoundedCornerShape(50.dp),
+              modifier = Modifier.fillMaxWidth().height(50.dp),
+          ) {
+            Text(text = "SignOut")
+          }
         }
-    }
+      }
 }
 
 class HomeScreenUiFactory : Ui.Factory {
-    override fun create(
-        screen: Screen,
-        context: CircuitContext,
-    ): Ui<*>? {
-        return when (screen) {
-            is HomeScreen ->
-                ui<HomeScreen.State> { state, modifier ->
-                    Home(
-                        state = state,
-                        modifier = modifier,
-                    )
-                }
+  override fun create(
+      screen: Screen,
+      context: CircuitContext,
+  ): Ui<*>? {
+    return when (screen) {
+      is HomeScreen ->
+          ui<HomeScreen.State> { state, modifier ->
+            Home(
+                state = state,
+                modifier = modifier,
+            )
+          }
 
-            else -> null
-        }
+      else -> null
     }
+  }
 }

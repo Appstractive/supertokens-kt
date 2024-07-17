@@ -27,16 +27,15 @@ import io.ktor.client.statement.bodyAsText
 @CommonParcelize
 data object HomeScreen : Screen {
 
-    data class State(
-        val claims: AccessTokenClaims?,
-        val privateApiResponse: String?,
-        val eventSink: (Event) -> Unit = {},
-    ) : CircuitUiState
+  data class State(
+      val claims: AccessTokenClaims?,
+      val privateApiResponse: String?,
+      val eventSink: (Event) -> Unit = {},
+  ) : CircuitUiState
 
-    sealed interface Event : CircuitUiEvent {
-        data object Logout : Event
-    }
-
+  sealed interface Event : CircuitUiEvent {
+    data object Logout : Event
+  }
 }
 
 @Composable
@@ -44,41 +43,40 @@ fun HomeScreenPresenter(
     navigator: Navigator,
     superTokensClient: SuperTokensClient = LocalDependencies.current.superTokensClient,
 ): HomeScreen.State {
-    val apiCallController = rememberApiCallController()
-    var privateApiResponse: String? by rememberRetained() {
-        mutableStateOf(null)
-    }
-    val claims by superTokensClient.claimsRepository.claims.collectAsState()
+  val apiCallController = rememberApiCallController()
+  var privateApiResponse: String? by rememberRetained() { mutableStateOf(null) }
+  val claims by superTokensClient.claimsRepository.claims.collectAsState()
 
-    LaunchedEffect(superTokensClient) {
-        apiCallController.call {
-            val response = superTokensClient.apiClient.get("/private")
-            privateApiResponse = response.bodyAsText()
-        }
+  LaunchedEffect(superTokensClient) {
+    apiCallController.call {
+      val response = superTokensClient.apiClient.get("/private")
+      privateApiResponse = response.bodyAsText()
     }
+  }
 
-    return HomeScreen.State(
-        claims = claims,
-        privateApiResponse = privateApiResponse,
-    ) {
-        when(it) {
-            HomeScreen.Event.Logout -> apiCallController.call {
-                superTokensClient.signOut()
-                navigator.resetRoot(AuthScreen)
-            }
-        }
+  return HomeScreen.State(
+      claims = claims,
+      privateApiResponse = privateApiResponse,
+  ) {
+    when (it) {
+      HomeScreen.Event.Logout ->
+          apiCallController.call {
+            superTokensClient.signOut()
+            navigator.resetRoot(AuthScreen)
+          }
     }
+  }
 }
 
 class HomeScreenPresenterFactory : Presenter.Factory {
-    override fun create(
-        screen: Screen,
-        navigator: Navigator,
-        context: CircuitContext,
-    ): Presenter<*>? {
-        return when (screen) {
-            is HomeScreen -> presenterOf { HomeScreenPresenter(navigator) }
-            else -> null
-        }
+  override fun create(
+      screen: Screen,
+      navigator: Navigator,
+      context: CircuitContext,
+  ): Presenter<*>? {
+    return when (screen) {
+      is HomeScreen -> presenterOf { HomeScreenPresenter(navigator) }
+      else -> null
     }
+  }
 }

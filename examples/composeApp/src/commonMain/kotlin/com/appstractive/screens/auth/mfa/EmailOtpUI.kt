@@ -33,66 +33,54 @@ fun EmailOtpView(
     modifier: Modifier,
     state: EmailOtpScreen.State,
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("TOTP")
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        state.eventSink(EmailOtpScreen.Event.GoBack)
-                    }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-            )
-        }
-    ) {
+  Scaffold(
+      modifier = modifier,
+      topBar = {
+        TopAppBar(
+            title = { Text("TOTP") },
+            navigationIcon = {
+              IconButton(onClick = { state.eventSink(EmailOtpScreen.Event.GoBack) }) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+              }
+            },
+        )
+      }) {
         Column(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize(),
+            modifier = Modifier.padding(it).fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterVertically)
-        ) {
-            if (state.email != null) {
+            verticalArrangement =
+                Arrangement.spacedBy(8.dp, alignment = Alignment.CenterVertically)) {
+              if (state.email != null) {
                 Text("Confirm Login with ${state.email}")
 
                 Button(
-                    onClick = {
-                        state.eventSink(EmailOtpScreen.Event.SendEmail)
-                    },
+                    onClick = { state.eventSink(EmailOtpScreen.Event.SendEmail) },
                 ) {
-                    Text(if (state.emailSend) "Resend OTP" else "Send OTP")
+                  Text(if (state.emailSend) "Resend OTP" else "Send OTP")
                 }
 
-                var otp by rememberRetained {
-                    mutableStateOf(TextFieldValue())
-                }
+                var otp by rememberRetained { mutableStateOf(TextFieldValue()) }
 
                 TextField(
                     enabled = state.emailSend,
                     label = { Text(text = "Code") },
                     value = otp,
                     onValueChange = { otp = it },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                    ),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                        ),
                 )
 
                 Button(
                     enabled = state.emailSend && otp.text.isNotEmpty(),
-                    onClick = {
-                        state.eventSink(EmailOtpScreen.Event.ConfirmCode(otp.text))
-                    },
+                    onClick = { state.eventSink(EmailOtpScreen.Event.ConfirmCode(otp.text)) },
                 ) {
-                    Text("Confirm")
+                  Text("Confirm")
                 }
-            } else {
+              } else {
                 CircularProgressIndicator()
+              }
             }
-        }
-    }
+      }
 }

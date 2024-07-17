@@ -25,71 +25,57 @@ fun Auth(
     modifier: Modifier,
     state: AuthScreen.State,
 ) {
-    Scaffold(
-        modifier = modifier,
-    ) { padding ->
+  Scaffold(
+      modifier = modifier,
+  ) { padding ->
+    Column(
+        modifier = Modifier.padding(padding).fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterVertically)) {
+          OutlinedButton(onClick = { state.eventSink(AuthScreen.Event.GotoEmailPassword) }) {
+            Text("Email/Password")
+          }
 
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterVertically)
-        ) {
-            OutlinedButton(onClick = {
-                state.eventSink(AuthScreen.Event.GotoEmailPassword)
-            }) {
-                Text("Email/Password")
-            }
+          OutlinedButton(onClick = { state.eventSink(AuthScreen.Event.GotoPasswordless) }) {
+            Text("Passwordless")
+          }
 
-            OutlinedButton(onClick = {
-                state.eventSink(AuthScreen.Event.GotoPasswordless)
-            }) {
-                Text("Passwordless")
-            }
-
-            OutlinedButton(
-                enabled = false,
-                onClick = {
-
-                }) {
-                Text("ThirdParty")
-            }
+          OutlinedButton(enabled = false, onClick = {}) { Text("ThirdParty") }
         }
-    }
+  }
 }
 
 class AuthScreenUiFactory : Ui.Factory {
-    override fun create(
-        screen: Screen,
-        context: CircuitContext,
-    ): Ui<*>? {
-        return when (screen) {
-            is AuthScreen ->
-                ui<AuthScreen.State> { state, modifier ->
-                    Auth(
-                        state = state,
-                        modifier = modifier,
-                    )
-                }
+  override fun create(
+      screen: Screen,
+      context: CircuitContext,
+  ): Ui<*>? {
+    return when (screen) {
+      is AuthScreen ->
+          ui<AuthScreen.State> { state, modifier ->
+            Auth(
+                state = state,
+                modifier = modifier,
+            )
+          }
 
-            is EmailPasswordScreen ->
-                ui<EmailPasswordScreen.State> { state, modifier ->
-                    EmailPassword(
-                        state = state,
-                        modifier = modifier,
-                    )
-                }
+      is EmailPasswordScreen ->
+          ui<EmailPasswordScreen.State> { state, modifier ->
+            EmailPassword(
+                state = state,
+                modifier = modifier,
+            )
+          }
 
-            is PasswordlessScreen ->
-                ui<PasswordlessScreen.State> { state, modifier ->
-                    PasswordlessView(
-                        state = state,
-                        modifier = modifier,
-                    )
-                }
+      is PasswordlessScreen ->
+          ui<PasswordlessScreen.State> { state, modifier ->
+            PasswordlessView(
+                state = state,
+                modifier = modifier,
+            )
+          }
 
-            else -> null
-        }
+      else -> null
     }
+  }
 }
