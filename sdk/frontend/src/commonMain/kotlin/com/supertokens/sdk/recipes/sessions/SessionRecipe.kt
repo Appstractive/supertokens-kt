@@ -87,7 +87,7 @@ class SessionRecipe(
       claimsRepository.getClaims()?.let { claims -> authRepository.setLoggedIn(claims.sub) }
 
       if (config.refreshTokensOnStart) {
-        runCatching { refreshTokens() }
+        runCatching { refreshTokens() }.onFailure { it.printStackTrace() }
       }
     }
   }
@@ -125,7 +125,7 @@ class SessionRecipe(
               if (token.isNotBlank()) {
                 updateAccessTokenUseCase.updateAccessToken(token)
               } else if (!it.request.url.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
-                signOut()
+                signOut(clearServerSession = false)
               }
             }
 
@@ -133,14 +133,15 @@ class SessionRecipe(
               if (token.isNotBlank()) {
                 updateRefreshTokenUseCase.updateRefreshToken(token)
               } else if (!it.request.url.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
-                signOut()
+                signOut(clearServerSession = false)
               }
             }
           }
         }
       }
 
-  suspend fun signOut() = logoutUseCase.signOut()
+  suspend fun signOut(clearServerSession: Boolean = true) =
+      logoutUseCase.signOut(clearServerSession = clearServerSession)
 }
 
 object Session : RecipeBuilder<SessionRecipeConfig, SessionRecipe>() {
@@ -154,4 +155,5 @@ object Session : RecipeBuilder<SessionRecipeConfig, SessionRecipe>() {
   }
 }
 
-suspend fun SuperTokensClient.signOut() = getRecipe<SessionRecipe>().signOut()
+suspend fun SuperTokensClient.signOut(clearServerSession: Boolean = true) =
+    getRecipe<SessionRecipe>().signOut(clearServerSession = clearServerSession)

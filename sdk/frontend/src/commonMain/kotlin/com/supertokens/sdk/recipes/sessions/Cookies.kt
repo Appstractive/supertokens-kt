@@ -23,7 +23,7 @@ internal fun defaultCookieStorage(
           COOKIE_REFRESH_TOKEN -> {
             val token = cookie.value
             if (token.isBlank() && !requestUrl.fullPath.endsWith(Routes.Session.SIGN_OUT)) {
-              sessionRecipe.signOut()
+              sessionRecipe.signOut(clearServerSession = false)
             } else {
               sessionRecipe.updateRefreshTokenUseCase.updateRefreshToken(token)
             }

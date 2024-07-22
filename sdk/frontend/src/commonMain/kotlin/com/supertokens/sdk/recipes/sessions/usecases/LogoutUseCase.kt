@@ -11,13 +11,15 @@ class LogoutUseCase(
     private val sessionRecipe: SessionRecipe,
 ) {
 
-  suspend fun signOut() {
-    with(sessionRecipe.superTokens.apiClient) {
-      runCatching { post(Routes.Session.SIGN_OUT) }
+  suspend fun signOut(clearServerSession: Boolean = true) {
+    if(clearServerSession) {
+      with(sessionRecipe.superTokens.apiClient) {
+        runCatching { post(Routes.Session.SIGN_OUT) }
 
-      pluginOrNull(Auth)?.let { bearerAuth ->
-        bearerAuth.providers.filterIsInstance<BearerAuthProvider>().forEach { provider ->
-          provider.clearToken()
+        pluginOrNull(Auth)?.let { bearerAuth ->
+          bearerAuth.providers.filterIsInstance<BearerAuthProvider>().forEach { provider ->
+            provider.clearToken()
+          }
         }
       }
     }
