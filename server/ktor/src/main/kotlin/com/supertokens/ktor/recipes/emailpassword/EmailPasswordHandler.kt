@@ -42,9 +42,52 @@ import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-suspend fun ApplicationCall.validateFormFields(
+suspend fun ApplicationCall.validateSignUpFormFields(
     fields: List<FormFieldDTO>,
-    success: suspend (email: String, password: String) -> Unit = { _, _ -> },
+    success: suspend (email: String, password: String) -> Unit,
+) {
+  val invalidFormFields = getInvalidFormFields(fields, emailPassword.formFields)
+
+  if (invalidFormFields.isNotEmpty()) {
+    return respond(
+        HttpStatusCode.BadRequest,
+        SignInResponseDTO(
+            status =
+                when {
+                  invalidFormFields.any { it.id == FORM_FIELD_PASSWORD_ID } ->
+                      SuperTokensStatus.PasswordPolicyViolatedError
+
+                  else -> SuperTokensStatus.FormFieldError
+                }.value,
+            formFields =
+                invalidFormFields.map {
+                  FormFieldErrorDTO(
+                      id = it.id,
+                      error = "Invalid value: ${it.value}",
+                  )
+                },
+        ),
+    )
+  }
+
+  val email = fields.getEmailField()?.value
+  val password = fields.getPasswordField()?.value
+
+  if (email == null || password == null) {
+    return respond(
+        HttpStatusCode.BadRequest,
+        SignInResponseDTO(
+            status = SuperTokensStatus.WrongCredentialsError.value,
+        ),
+    )
+  }
+
+  success.invoke(email, password)
+}
+
+suspend fun ApplicationCall.validateChangePasswordFormFields(
+    fields: List<FormFieldDTO>,
+    success: suspend (password: String, newPassword: String) -> Unit,
 ) {
   val invalidFormFields = getInvalidFormFields(fields, emailPassword.formFields)
 
@@ -66,21 +109,24 @@ suspend fun ApplicationCall.validateFormFields(
                       id = it.id,
                       error = "Invalid value: ${it.value}",
                   )
-                }))
+                },
+        ),
+    )
   }
 
-  val email = fields.getEmailField()?.value
   val password = fields.getPasswordField()?.value
+  val newPassword = fields.getNewPasswordField()?.value
 
-  if (email == null || password == null) {
+  if (password == null || newPassword == null) {
     return respond(
-        HttpStatusCode.Unauthorized,
+        HttpStatusCode.BadRequest,
         SignInResponseDTO(
             status = SuperTokensStatus.WrongCredentialsError.value,
-        ))
+        ),
+    )
   }
 
-  success.invoke(email, password)
+  success.invoke(password, newPassword)
 }
 
 open class EmailPasswordHandler(
@@ -154,7 +200,7 @@ open class EmailPasswordHandler(
     val body = call.receive<FormFieldRequestDTO>()
     val tenantId = call.tenantId
 
-    call.validateFormFields(body.formFields) { email, password ->
+    call.validateSignUpFormFields(body.formFields) { email, password ->
       val user = emailPassword.signUp(email, password, tenantId)
 
       with(userHandler) { onUserSignedUp(user) }
@@ -316,53 +362,24 @@ open class EmailPasswordHandler(
     var user = superTokens.getUserById(call.requirePrincipal<AuthenticatedUser>().id)
     val body = call.receive<PasswordChangeRequestDTO>()
 
-    val currentPassword: String =
-        body.formFields.getPasswordField()?.value
-            ?: return call.respond(
-                SignInResponseDTO(
-                    status = SuperTokensStatus.FormFieldError.value,
-                    formFields =
-                        listOf(
-                            FormFieldErrorDTO(
-                                id = FORM_FIELD_PASSWORD_ID,
-                                error = "Password missing",
-                            ),
-                        ),
-                ),
-            )
+    call.validateChangePasswordFormFields(body.formFields) { password, newPassword ->
+      val email =
+          user.email ?: throw SuperTokensStatusException(SuperTokensStatus.UnknownEMailError)
+      // will throw an exception if wrong
+      user =
+          emailPassword.signIn(
+              email = email,
+              password = password,
+              tenantId = call.tenantId,
+          )
 
-    val newPassword: String =
-        body.formFields.getNewPasswordField()?.value
-            ?: return call.respond(
-                SignInResponseDTO(
-                    status = SuperTokensStatus.FormFieldError.value,
-                    formFields =
-                        listOf(
-                            FormFieldErrorDTO(
-                                id = FORM_FIELD_PASSWORD_ID,
-                                error = "New Password missing",
-                            ),
-                        ),
-                ),
-            )
+      val status = superTokens.updatePassword(user.id, newPassword)
 
-    val email = user.email ?: throw SuperTokensStatusException(SuperTokensStatus.UnknownEMailError)
-    // will throw an exception if wrong
-    user =
-        emailPassword.signIn(
-            email = email,
-            password = currentPassword,
-            tenantId = call.tenantId,
-        )
+      if (status != SuperTokensStatus.OK) {
+        throw SuperTokensStatusException(status)
+      }
 
-    call.validateFormFields(body.formFields)
-
-    val status = superTokens.updatePassword(user.id, newPassword)
-
-    if (status != SuperTokensStatus.OK) {
-      throw SuperTokensStatusException(status)
+      call.respond(StatusResponseDTO())
     }
-
-    call.respond(StatusResponseDTO())
   }
 }
