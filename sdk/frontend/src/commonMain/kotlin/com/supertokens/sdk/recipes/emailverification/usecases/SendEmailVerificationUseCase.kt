@@ -9,7 +9,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.http.appendEncodedPathSegments
 
-class SendEmailVerificationUseCase(
+internal class SendEmailVerificationUseCase(
     private val client: HttpClient,
     private val tenantId: String?,
 ) {

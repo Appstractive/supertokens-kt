@@ -27,7 +27,7 @@ class EmailPasswordRecipe(
   private val emailPasswordSignInUseCase by lazy {
     EmailPasswordSignInUseCase(
         client = superTokens.apiClient,
-        authRepository = superTokens.authRepository,
+        userRepository = superTokens.userRepository,
         tenantId = superTokens.tenantId,
     )
   }
@@ -35,7 +35,7 @@ class EmailPasswordRecipe(
   private val emailPasswordSignUpUseCase by lazy {
     EmailPasswordSignUpUseCase(
         client = superTokens.apiClient,
-        authRepository = superTokens.authRepository,
+        userRepository = superTokens.userRepository,
         tenantId = superTokens.tenantId,
     )
   }

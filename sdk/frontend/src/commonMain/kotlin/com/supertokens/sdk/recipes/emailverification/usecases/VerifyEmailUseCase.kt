@@ -11,7 +11,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.appendEncodedPathSegments
 
-class VerifyEmailUseCase(
+internal class VerifyEmailUseCase(
     private val client: HttpClient,
     private val tenantId: String?,
 ) {

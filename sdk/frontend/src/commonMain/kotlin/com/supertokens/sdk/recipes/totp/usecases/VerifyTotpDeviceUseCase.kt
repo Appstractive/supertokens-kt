@@ -10,7 +10,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
-class VerifyTotpDeviceUseCase(
+internal class VerifyTotpDeviceUseCase(
     private val client: HttpClient,
 ) {
 

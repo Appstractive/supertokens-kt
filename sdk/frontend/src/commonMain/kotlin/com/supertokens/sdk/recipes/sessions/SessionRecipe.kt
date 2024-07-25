@@ -4,7 +4,6 @@ import com.supertokens.sdk.SuperTokensClient
 import com.supertokens.sdk.common.HEADER_ACCESS_TOKEN
 import com.supertokens.sdk.common.HEADER_REFRESH_TOKEN
 import com.supertokens.sdk.common.Routes
-import com.supertokens.sdk.getDefaultSettings
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
@@ -50,10 +49,16 @@ class SessionRecipe(
 
   val authRepository: AuthRepository by lazy { config.authRepository ?: AuthRepositoryImpl() }
   val tokensRepository: TokensRepository by lazy {
-    config.tokensRepository ?: TokensRepositorySettings(getDefaultSettings())
+    config.tokensRepository
+        ?: TokensRepositorySettings(
+            settings = superTokens.settings,
+        )
   }
   val claimsRepository: ClaimsRepository by lazy {
-    config.claimsRepository ?: ClaimsRepositorySettings(getDefaultSettings())
+    config.claimsRepository
+        ?: ClaimsRepositorySettings(
+            settings = superTokens.settings,
+        )
   }
 
   internal val refreshTokensUseCase by lazy {
@@ -77,6 +82,7 @@ class SessionRecipe(
   internal val logoutUseCase by lazy {
     LogoutUseCase(
         sessionRecipe = this,
+        userRepository = superTokens.userRepository,
     )
   }
 

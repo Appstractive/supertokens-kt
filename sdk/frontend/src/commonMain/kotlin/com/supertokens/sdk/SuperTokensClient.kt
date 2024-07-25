@@ -5,6 +5,8 @@ import com.supertokens.sdk.recipes.BuildRecipe
 import com.supertokens.sdk.recipes.Recipe
 import com.supertokens.sdk.recipes.RecipeBuilder
 import com.supertokens.sdk.recipes.RecipeConfig
+import com.supertokens.sdk.recipes.core.respositories.UserRepository
+import com.supertokens.sdk.recipes.core.respositories.UserRepositoryImpl
 import com.supertokens.sdk.recipes.sessions.SessionRecipe
 import com.supertokens.sdk.recipes.sessions.repositories.AuthRepository
 import com.supertokens.sdk.recipes.sessions.repositories.AuthState
@@ -43,6 +45,10 @@ class SuperTokensClientConfig(
 
   var clientName: String = "MyMobileApp"
 
+  var userRepository: UserRepository? = null
+
+  var settings: Settings? = null
+
   val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
   var recipes: List<BuildRecipe> = emptyList()
@@ -70,6 +76,10 @@ class SuperTokensClient(
   val tenantId: String?
     get() = config.tenantId
 
+  val settings: Settings by lazy {
+    config.settings ?: getDefaultSettings()
+  }
+
   val recipes: List<Recipe<*>> = config.recipes.map { it.invoke(this) }
 
   @OptIn(ExperimentalSerializationApi::class)
@@ -82,7 +92,8 @@ class SuperTokensClient(
               explicitNulls = false
               encodeDefaults = true
               ignoreUnknownKeys = true
-            })
+            },
+        )
       }
 
       recipes.forEach { with(it) { configureClient() } }
@@ -99,6 +110,12 @@ class SuperTokensClient(
 
   val authRepository: AuthRepository
     get() = getRecipe<SessionRecipe>().authRepository
+
+  val userRepository: UserRepository by lazy {
+    config.userRepository ?: UserRepositoryImpl(
+        settings = settings,
+    )
+  }
 
   val tokenRepository: TokensRepository
     get() = getRecipe<SessionRecipe>().tokensRepository

@@ -43,6 +43,7 @@ class PasswordlessRecipe(
     PasswordlessLinkCodeSignInUseCase(
         client = superTokens.apiClient,
         tenantId = superTokens.tenantId,
+        userRepository = superTokens.userRepository,
     )
   }
 
@@ -50,6 +51,7 @@ class PasswordlessRecipe(
     PasswordlessInputCodeSignInUseCase(
         client = superTokens.apiClient,
         tenantId = superTokens.tenantId,
+        userRepository = superTokens.userRepository,
     )
   }
 

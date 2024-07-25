@@ -13,7 +13,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.appendEncodedPathSegments
 
-class PasswordlessEmailSignUpUseCase(
+internal class PasswordlessEmailSignUpUseCase(
     private val client: HttpClient,
     private val tenantId: String?,
 ) {

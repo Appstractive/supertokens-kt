@@ -42,6 +42,7 @@ class ThirdPartyRecipe(
     ThirdPartyAuthCodeSignInUseCase(
         client = superTokens.apiClient,
         tenantId = superTokens.tenantId,
+        userRepository = superTokens.userRepository,
     )
   }
 
@@ -49,6 +50,7 @@ class ThirdPartyRecipe(
     ThirdPartyTokenSignInUseCase(
         client = superTokens.apiClient,
         tenantId = superTokens.tenantId,
+        userRepository = superTokens.userRepository,
     )
   }
 

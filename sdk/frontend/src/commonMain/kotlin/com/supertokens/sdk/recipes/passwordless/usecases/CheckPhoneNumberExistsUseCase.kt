@@ -13,7 +13,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.appendEncodedPathSegments
 
-class CheckPhoneNumberExistsUseCase(
+internal class CheckPhoneNumberExistsUseCase(
     private val client: HttpClient,
     private val tenantId: String?,
 ) {

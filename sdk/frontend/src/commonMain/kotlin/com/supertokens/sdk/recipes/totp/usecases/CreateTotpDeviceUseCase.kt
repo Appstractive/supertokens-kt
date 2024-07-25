@@ -17,7 +17,7 @@ data class CreateTotpDeviceResult(
     val secret: String,
 )
 
-class CreateTotpDeviceUseCase(
+internal class CreateTotpDeviceUseCase(
     private val client: HttpClient,
 ) {
 

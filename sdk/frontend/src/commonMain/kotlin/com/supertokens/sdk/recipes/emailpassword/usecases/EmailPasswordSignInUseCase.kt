@@ -10,16 +10,16 @@ import com.supertokens.sdk.common.requests.FormFieldDTO
 import com.supertokens.sdk.common.requests.FormFieldRequestDTO
 import com.supertokens.sdk.common.responses.SignInResponseDTO
 import com.supertokens.sdk.common.toStatus
-import com.supertokens.sdk.recipes.sessions.repositories.AuthRepository
+import com.supertokens.sdk.recipes.core.respositories.UserRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.appendEncodedPathSegments
 
-class EmailPasswordSignInUseCase(
+internal class EmailPasswordSignInUseCase(
     private val client: HttpClient,
-    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
     private val tenantId: String?,
 ) {
 
@@ -31,7 +31,8 @@ class EmailPasswordSignInUseCase(
                 listOfNotNull(
                     tenantId,
                     Routes.EmailPassword.SIGN_IN,
-                ))
+                ),
+            )
           }
           setBody(
               FormFieldRequestDTO(
@@ -46,13 +47,16 @@ class EmailPasswordSignInUseCase(
                               value = password,
                           ),
                       ),
-              ))
+              ),
+          )
         }
 
     val body = response.body<SignInResponseDTO>()
 
     return when (body.status) {
-      SuperTokensStatus.OK.value -> checkNotNull(body.user)
+      SuperTokensStatus.OK.value -> checkNotNull(body.user).also {
+        userRepository.updateUser(it)
+      }
       else -> throw SuperTokensStatusException(body.status.toStatus())
     }
   }

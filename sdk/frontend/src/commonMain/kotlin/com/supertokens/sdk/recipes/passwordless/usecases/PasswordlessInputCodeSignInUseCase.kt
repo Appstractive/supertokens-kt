@@ -7,15 +7,17 @@ import com.supertokens.sdk.common.requests.ConsumePasswordlessCodeRequestDTO
 import com.supertokens.sdk.common.responses.SignInUpResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.models.SignInData
+import com.supertokens.sdk.recipes.core.respositories.UserRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.appendEncodedPathSegments
 
-class PasswordlessInputCodeSignInUseCase(
-    private val client: HttpClient,
-    private val tenantId: String?,
+internal class PasswordlessInputCodeSignInUseCase(
+  private val client: HttpClient,
+  private val tenantId: String?,
+  private val userRepository: UserRepository,
 ) {
 
   suspend fun signIn(
@@ -47,7 +49,9 @@ class PasswordlessInputCodeSignInUseCase(
         SignInData(
             user = checkNotNull(body.user),
             createdNewUser = checkNotNull(body.createdNewUser),
-        )
+        ).also {
+          userRepository.updateUser(it.user)
+        }
       }
       else -> throw SuperTokensStatusException(status)
     }

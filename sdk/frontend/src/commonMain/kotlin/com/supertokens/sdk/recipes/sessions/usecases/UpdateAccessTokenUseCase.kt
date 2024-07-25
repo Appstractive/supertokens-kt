@@ -2,7 +2,7 @@ package com.supertokens.sdk.recipes.sessions.usecases
 
 import com.supertokens.sdk.recipes.sessions.SessionRecipe
 
-class UpdateAccessTokenUseCase(
+internal class UpdateAccessTokenUseCase(
     private val sessionRecipe: SessionRecipe,
 ) {
 

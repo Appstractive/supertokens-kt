@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'supertokens_sdk_frontend'
-    spec.version                  = '1.4.2'
+    spec.version                  = '1.4.3'
     spec.homepage                 = 'https://github.com/Appstractive/supertokens-kt'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''

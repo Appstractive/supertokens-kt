@@ -12,7 +12,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.appendEncodedPathSegments
 
-class CheckEmailExistsUseCase(
+internal class CheckEmailExistsUseCase(
     private val client: HttpClient,
     private val recipeId: String,
     private val tenantId: String?,

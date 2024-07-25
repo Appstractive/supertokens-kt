@@ -11,17 +11,17 @@ import com.supertokens.sdk.common.requests.FormFieldRequestDTO
 import com.supertokens.sdk.common.responses.SignInResponseDTO
 import com.supertokens.sdk.common.toStatus
 import com.supertokens.sdk.handlers.FormFieldException
-import com.supertokens.sdk.recipes.sessions.repositories.AuthRepository
+import com.supertokens.sdk.recipes.core.respositories.UserRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.appendEncodedPathSegments
 
-class EmailPasswordSignUpUseCase(
-    private val client: HttpClient,
-    private val authRepository: AuthRepository,
-    private val tenantId: String?,
+internal class EmailPasswordSignUpUseCase(
+  private val client: HttpClient,
+  private val userRepository: UserRepository,
+  private val tenantId: String?,
 ) {
 
   suspend fun signUp(email: String, password: String): User {
@@ -32,7 +32,8 @@ class EmailPasswordSignUpUseCase(
                 listOfNotNull(
                     tenantId,
                     Routes.EmailPassword.SIGN_UP,
-                ))
+                ),
+            )
           }
           setBody(
               FormFieldRequestDTO(
@@ -47,13 +48,16 @@ class EmailPasswordSignUpUseCase(
                               value = password,
                           ),
                       ),
-              ))
+              ),
+          )
         }
 
     val body = response.body<SignInResponseDTO>()
 
     return when (body.status) {
-      SuperTokensStatus.OK.value -> checkNotNull(body.user)
+      SuperTokensStatus.OK.value -> checkNotNull(body.user).also {
+        userRepository.updateUser(it)
+      }
       SuperTokensStatus.FormFieldError.value ->
           throw FormFieldException(errors = checkNotNull(body.formFields))
 

@@ -15,7 +15,7 @@ import io.ktor.client.request.post
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.setCookie
 
-class RefreshTokensUseCase(
+internal class RefreshTokensUseCase(
     private val sessionRecipe: SessionRecipe,
 ) {
 

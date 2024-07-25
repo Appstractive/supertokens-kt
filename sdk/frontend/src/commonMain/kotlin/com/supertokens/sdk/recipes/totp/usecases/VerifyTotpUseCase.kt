@@ -20,7 +20,7 @@ data class InvalidTotpLimitException(
     val retryAfterMs: Long,
 ) : SuperTokensStatusException(SuperTokensStatus.InvalidTotpCodeError)
 
-class VerifyTotpUseCase(
+internal class VerifyTotpUseCase(
     private val client: HttpClient,
 ) {
 

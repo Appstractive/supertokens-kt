@@ -4,8 +4,10 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
 import com.supertokens.sdk.common.claims.AccessTokenClaims
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
+@OptIn(ExperimentalSerializationApi::class)
 class ClaimsRepositorySettings(
     private val settings: Settings,
     override val decoder: Json = Json {

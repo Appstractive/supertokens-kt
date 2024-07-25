@@ -14,7 +14,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.appendEncodedPathSegments
 
-class PasswordResetUseCase(
+internal class PasswordResetUseCase(
     private val client: HttpClient,
     private val tenantId: String?,
 ) {

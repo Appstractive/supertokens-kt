@@ -1,5 +1,8 @@
 package com.supertokens.sdk.common.models
 
+import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
+import com.supertokens.sdk.common.RECIPE_PASSWORDLESS
+import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -41,3 +44,12 @@ data class User(
   val phoneNumber: String?
     get() = phoneNumbers?.firstOrNull()
 }
+
+val User.isEmailPassword: Boolean
+  get() = loginMethods?.any { it.recipeId == RECIPE_EMAIL_PASSWORD } ?: false
+
+val User.isThirdParty: Boolean
+  get() = loginMethods?.any { it.recipeId == RECIPE_THIRD_PARTY } ?: false
+
+val User.isPasswordless: Boolean
+  get() = loginMethods?.any { it.recipeId == RECIPE_PASSWORDLESS } ?: false
