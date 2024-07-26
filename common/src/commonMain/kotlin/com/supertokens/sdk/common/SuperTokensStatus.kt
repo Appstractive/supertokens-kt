@@ -31,6 +31,9 @@ sealed class SuperTokensStatus(val value: String) {
 
   data object EmailAlreadyVerifiedError : SuperTokensStatus("EMAIL_ALREADY_VERIFIED_ERROR")
 
+  data object EmailVerificationInvalidTokenError :
+      SuperTokensStatus("EMAIL_VERIFICATION_INVALID_TOKEN_ERROR")
+
   data object PasswordlessRestartFlowError : SuperTokensStatus("RESTART_FLOW_ERROR")
 
   data object PasswordlessCodeAlreadyUsedError :
@@ -90,6 +93,8 @@ fun String.toStatus(): SuperTokensStatus {
     SuperTokensStatus.TryRefreshTokenError.value -> SuperTokensStatus.TryRefreshTokenError
     SuperTokensStatus.FormFieldError.value -> SuperTokensStatus.FormFieldError
     SuperTokensStatus.EmailAlreadyVerifiedError.value -> SuperTokensStatus.EmailAlreadyVerifiedError
+    SuperTokensStatus.EmailVerificationInvalidTokenError.value ->
+        SuperTokensStatus.EmailVerificationInvalidTokenError
     SuperTokensStatus.PasswordlessRestartFlowError.value ->
         SuperTokensStatus.PasswordlessRestartFlowError
     SuperTokensStatus.PasswordlessCodeAlreadyUsedError.value ->

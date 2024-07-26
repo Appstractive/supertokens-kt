@@ -114,7 +114,8 @@ class EmailVerificationRecipe(
           setBody(
               VerifyEmailTokenRequestDTO(
                   token = token,
-              ))
+              ),
+          )
         }
 
     return response

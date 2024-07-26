@@ -75,7 +75,8 @@ open class EmailVerificationHandler(
                   isHtml = true,
                   subject = superTokens.appConfig.name,
                   toEmail = email,
-              ))
+              ),
+          )
         }
       }
     }
