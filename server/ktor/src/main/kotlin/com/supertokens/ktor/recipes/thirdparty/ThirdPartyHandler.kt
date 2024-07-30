@@ -9,7 +9,7 @@ import com.supertokens.ktor.utils.frontend
 import com.supertokens.ktor.utils.setSessionInResponse
 import com.supertokens.ktor.utils.tenantId
 import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.common.requests.ThirdPartySignInUpRequestDTO
 import com.supertokens.sdk.common.responses.AuthorizationUrlResponseDTO
 import com.supertokens.sdk.common.responses.SignInUpResponseDTO
@@ -47,7 +47,9 @@ open class ThirdPartyHandler(
    */
   open suspend fun PipelineContext<Unit, ApplicationCall>.signInUp() {
     val body = call.receive<ThirdPartySignInUpRequestDTO>()
-    val provider = thirdParty.getProviderById(body.thirdPartyId) ?: throw NotFoundException()
+    val provider =
+        thirdParty.getProvider(id = body.thirdPartyId, clientType = body.clientType)
+            ?: throw NotFoundException()
 
     val tokens =
         body.redirectURIInfo?.let {
@@ -118,8 +120,13 @@ open class ThirdPartyHandler(
     val thirdPartyId = call.parameters["thirdPartyId"] ?: throw NotFoundException()
     val redirectURIOnProviderDashboard =
         call.parameters["redirectURIOnProviderDashboard"] ?: throw NotFoundException()
+    val clientType = call.parameters["clientType"]
 
-    val provider = thirdParty.getProviderById(thirdPartyId) ?: throw NotFoundException()
+    val provider =
+        thirdParty.getProvider(
+            id = thirdPartyId,
+            clientType = clientType,
+        ) ?: throw NotFoundException()
 
     call.respond(
         AuthorizationUrlResponseDTO(
@@ -138,7 +145,11 @@ open class ThirdPartyHandler(
    *   Driver Interface</a>
    */
   open suspend fun PipelineContext<Unit, ApplicationCall>.appleAuthCallback() {
-    val provider = thirdParty.getProviderById(ThirdPartyProvider.APPLE) ?: throw NotFoundException()
+    val provider =
+        thirdParty.getProvider(
+            ThirdPartyAuth.APPLE,
+            clientType = ThirdPartyAuth.ClientType.WEB,
+        ) ?: throw NotFoundException()
     val formParameters = call.receiveParameters()
     val code =
         formParameters["code"]

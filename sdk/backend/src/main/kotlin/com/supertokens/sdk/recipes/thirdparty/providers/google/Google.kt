@@ -3,7 +3,7 @@ package com.supertokens.sdk.recipes.thirdparty.providers.google
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
@@ -26,7 +26,7 @@ class GoogleProvider(
     config: GoogleConfig,
 ) : OAuthProvider<GoogleConfig>(superTokens, config) {
 
-  override val id = ThirdPartyProvider.GOOGLE
+  override val id = ThirdPartyAuth.GOOGLE
   override val authUrl = AUTH_URL
   override val tokenUrl = TOKEN_URL
   override val defaultScopes = listOf("https://www.googleapis.com/auth/userinfo.email")

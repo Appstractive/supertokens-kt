@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokensClient
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.recipes.thirdparty.Provider
 import com.supertokens.sdk.recipes.thirdparty.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.ProviderConfig
@@ -14,13 +14,13 @@ class ProviderApple(
     config: ProviderConfig,
 ) :
     Provider<ProviderConfig>(
-        id = ThirdPartyProvider.APPLE,
+        id = ThirdPartyAuth.APPLE,
         config = config,
     )
 
 object Apple : ProviderBuilder<ProviderConfig, ProviderApple>() {
 
-  const val id = ThirdPartyProvider.APPLE
+  const val id = ThirdPartyAuth.APPLE
 
   object AuthCode : ThirdPartySignInAuthCode(id)
 

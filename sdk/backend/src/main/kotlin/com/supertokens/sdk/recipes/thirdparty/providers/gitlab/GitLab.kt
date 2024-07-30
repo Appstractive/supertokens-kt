@@ -3,7 +3,7 @@ package com.supertokens.sdk.recipes.thirdparty.providers.gitlab
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
@@ -28,7 +28,7 @@ class GitLabProvider(
     config: GitLabConfig,
 ) : OAuthProvider<GitLabConfig>(superTokens, config) {
 
-  override val id = ThirdPartyProvider.GITLAB
+  override val id = ThirdPartyAuth.GITLAB
   override val authUrl = "${config.baseUrl}$AUTH_PATH"
   override val tokenUrl = "${config.baseUrl}$TOKEN_PATH"
   override val defaultScopes =

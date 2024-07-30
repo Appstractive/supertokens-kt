@@ -7,7 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProviderConfig
@@ -79,11 +79,9 @@ class AppleConfig : OAuthProviderConfig() {
 class AppleProvider(
     private val superTokens: SuperTokens,
     private val config: AppleConfig,
-) : Provider<AppleConfig>() {
+) : Provider<AppleConfig>(config) {
 
-  override val id = ThirdPartyProvider.APPLE
-
-  override val isDefault = config.isDefault
+  override val id = ThirdPartyAuth.APPLE
 
   val clientSecret: String
     get() = config.clientSecret
@@ -161,7 +159,10 @@ class AppleProvider(
   val jwkProvider = UrlJwkProvider(URL("https://appleid.apple.com/auth/keys"))
 
   override suspend fun getUserInfo(tokenResponse: ThirdPartyTokensDTO): ThirdPartyUserInfo {
-    val idToken = tokenResponse.idToken ?: throw RuntimeException("No IdToken in TokenResponse")
+    val idToken = tokenResponse.idToken ?: throw SuperTokensStatusException(
+        SuperTokensStatus.WrongCredentialsError,
+        "No IdToken in TokenResponse",
+    )
 
     val decoded = JWT.decode(idToken)
     val keyId = decoded.keyId

@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokensClient
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.recipes.thirdparty.Provider
 import com.supertokens.sdk.recipes.thirdparty.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.ProviderConfig
@@ -14,13 +14,13 @@ class ProviderBitbucket(
     config: ProviderConfig,
 ) :
     Provider<ProviderConfig>(
-        id = ThirdPartyProvider.BITBUCKET,
+        id = ThirdPartyAuth.BITBUCKET,
         config = config,
     )
 
 object Bitbucket : ProviderBuilder<ProviderConfig, ProviderBitbucket>() {
 
-  const val id = ThirdPartyProvider.BITBUCKET
+  const val id = ThirdPartyAuth.BITBUCKET
 
   object AuthCode : ThirdPartySignInAuthCode(id)
 

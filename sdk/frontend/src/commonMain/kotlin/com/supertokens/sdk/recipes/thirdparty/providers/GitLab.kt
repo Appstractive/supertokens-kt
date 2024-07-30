@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokensClient
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.recipes.thirdparty.Provider
 import com.supertokens.sdk.recipes.thirdparty.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.ProviderConfig
@@ -14,13 +14,13 @@ class ProviderGitLab(
     config: ProviderConfig,
 ) :
     Provider<ProviderConfig>(
-        id = ThirdPartyProvider.GITLAB,
+        id = ThirdPartyAuth.GITLAB,
         config = config,
     )
 
 object GitLab : ProviderBuilder<ProviderConfig, ProviderGitLab>() {
 
-  const val id = ThirdPartyProvider.GITLAB
+  const val id = ThirdPartyAuth.GITLAB
 
   object AuthCode : ThirdPartySignInAuthCode(id)
 

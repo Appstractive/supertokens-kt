@@ -40,7 +40,7 @@ object Claims {
   const val MFA_VERIFIED = "v"
 }
 
-object ThirdPartyProvider {
+object ThirdPartyAuth {
 
   const val APPLE = "apple"
   const val BITBUCKET = "bitbucket"
@@ -48,4 +48,9 @@ object ThirdPartyProvider {
   const val GITHUB = "github"
   const val GITLAB = "gitlab"
   const val GOOGLE = "google"
+
+  object ClientType {
+    const val WEB = "web"
+    const val APP = "app"
+  }
 }

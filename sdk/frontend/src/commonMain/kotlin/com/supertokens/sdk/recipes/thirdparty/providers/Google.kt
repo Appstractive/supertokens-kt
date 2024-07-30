@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokensClient
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.recipes.thirdparty.Provider
 import com.supertokens.sdk.recipes.thirdparty.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.ProviderConfig
@@ -14,13 +14,13 @@ class ProviderGoogle(
     config: ProviderConfig,
 ) :
     Provider<ProviderConfig>(
-        id = ThirdPartyProvider.GOOGLE,
+        id = ThirdPartyAuth.GOOGLE,
         config = config,
     )
 
 object Google : ProviderBuilder<ProviderConfig, ProviderGoogle>() {
 
-  const val id = ThirdPartyProvider.GOOGLE
+  const val id = ThirdPartyAuth.GOOGLE
 
   object AuthCode : ThirdPartySignInAuthCode(id)
 

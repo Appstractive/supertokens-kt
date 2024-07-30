@@ -68,7 +68,8 @@ class ThirdPartyRecipe(
                           id = email,
                           isVerified = isVerified,
                       ),
-              ))
+              ),
+          )
         }
 
     return response
@@ -85,15 +86,19 @@ class ThirdPartyRecipe(
         }
   }
 
-  fun getProviderById(id: String): Provider<*>? =
-      providers
-          .filter { it.id == id }
-          .let { it.firstOrNull { provider -> provider.isDefault } ?: it.firstOrNull() }
+  fun getProvider(id: String, clientType: String? = null): Provider<*>? =
+      getProvidersById(id = id).let {
+        it.firstOrNull { provider -> provider.clientType == clientType }
+            ?: it.firstOrNull { provider -> provider.isDefault }
+            ?: it.firstOrNull()
+      }
 
-  fun getProviderByClientId(clientId: String): Provider<*>? =
-      providers
-          .filter { it.clientId == clientId }
-          .let { it.firstOrNull { provider -> provider.isDefault } }
+  fun getProviderById(id: String): Provider<*>? =
+      getProvidersById(id = id).let {
+        it.firstOrNull { provider -> provider.isDefault } ?: it.firstOrNull()
+      }
+
+  fun getProvidersById(id: String): List<Provider<*>> = providers.filter { it.id == id }
 
   companion object {
     const val PATH_SIGN_IN_UP = "/recipe/signinup"

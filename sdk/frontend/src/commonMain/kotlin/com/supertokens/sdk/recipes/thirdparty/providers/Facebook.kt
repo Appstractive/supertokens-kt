@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokensClient
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.recipes.thirdparty.Provider
 import com.supertokens.sdk.recipes.thirdparty.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.ProviderConfig
@@ -14,13 +14,13 @@ class ProviderFacebook(
     config: ProviderConfig,
 ) :
     Provider<ProviderConfig>(
-        id = ThirdPartyProvider.FACEBOOK,
+        id = ThirdPartyAuth.FACEBOOK,
         config = config,
     )
 
 object Facebook : ProviderBuilder<ProviderConfig, ProviderFacebook>() {
 
-  const val id = ThirdPartyProvider.FACEBOOK
+  const val id = ThirdPartyAuth.FACEBOOK
 
   object AuthCode : ThirdPartySignInAuthCode(id)
 

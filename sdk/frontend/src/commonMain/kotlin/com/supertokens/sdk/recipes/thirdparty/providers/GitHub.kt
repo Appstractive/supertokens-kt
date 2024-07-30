@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokensClient
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.recipes.thirdparty.Provider
 import com.supertokens.sdk.recipes.thirdparty.ProviderBuilder
 import com.supertokens.sdk.recipes.thirdparty.ProviderConfig
@@ -14,13 +14,13 @@ class ProviderGitHub(
     config: ProviderConfig,
 ) :
     Provider<ProviderConfig>(
-        id = ThirdPartyProvider.GITHUB,
+        id = ThirdPartyAuth.GITHUB,
         config = config,
     )
 
 object GitHub : ProviderBuilder<ProviderConfig, ProviderGitHub>() {
 
-  const val id = ThirdPartyProvider.GITHUB
+  const val id = ThirdPartyAuth.GITHUB
 
   object AuthCode : ThirdPartySignInAuthCode(id)
 

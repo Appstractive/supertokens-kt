@@ -13,6 +13,7 @@ import kotlinx.serialization.json.jsonPrimitive
 
 abstract class OAuthProviderConfig : ProviderConfig {
   override var isDefault = false
+  override var clientType: String? = null
   var scopes: List<String>? = null
   var clientId: String? = null
   open val clientSecret: String? = null
@@ -21,9 +22,8 @@ abstract class OAuthProviderConfig : ProviderConfig {
 abstract class OAuthProvider<out C : OAuthProviderConfig>(
     internal val superTokens: SuperTokens,
     internal val config: C
-) : Provider<C>() {
+) : Provider<C>(config) {
 
-  override val isDefault = config.isDefault
   val scopes by lazy {
     buildList {
       addAll(defaultScopes)

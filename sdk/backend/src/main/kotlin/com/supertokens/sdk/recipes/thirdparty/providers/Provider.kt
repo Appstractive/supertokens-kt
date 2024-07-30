@@ -31,13 +31,15 @@ data class ProviderEndpoint(
 @SuperTokensProviderDslMarker
 interface ProviderConfig {
   val isDefault: Boolean
+  val clientType: String?
 }
 
-abstract class Provider<out C : ProviderConfig> {
+abstract class Provider<out C : ProviderConfig>(config: C) {
 
   abstract val id: String
   abstract val clientId: String
-  abstract val isDefault: Boolean
+  val isDefault: Boolean = config.isDefault
+  val clientType: String? = config.clientType
 
   abstract fun getAccessTokenEndpoint(authCode: String?, redirectUrl: String?): ProviderEndpoint
 

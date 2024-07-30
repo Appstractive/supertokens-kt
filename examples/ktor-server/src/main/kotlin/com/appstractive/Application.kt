@@ -12,6 +12,7 @@ import com.supertokens.sdk.EndpointConfig
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.RECIPE_EMAIL_PASSWORD
 import com.supertokens.sdk.common.RECIPE_THIRD_PARTY
+import com.supertokens.sdk.common.ThirdPartyAuth.ClientType
 import com.supertokens.sdk.common.models.AuthFactor
 import com.supertokens.sdk.common.models.PasswordlessMode
 import com.supertokens.sdk.common.models.User
@@ -170,8 +171,26 @@ fun Application.module() {
             }
 
             provider(Google) {
+              isDefault = true
               clientId = "123456"
               clientSecret = "abcdef"
+              clientType = ClientType.WEB
+            }
+
+            provider(Google) {
+              clientId = "123456"
+              clientSecret = "abcdef"
+              clientType = ClientType.APP
+            }
+
+            provider(Apple) {
+              isDefault = true
+              clientId = "123456"
+              keyId = "keyid"
+              privateKey =
+                  "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgMKZfBMuF5CyRyXAiQaYew+j3U+bQ5oRtqb/3SujLlZGgCgYIKoZIzj0DAQehRANCAAQoYTJsktscfGFwAm40TH2648sGmHS5qvti8tvRcXF6v5Gu0fecAPooXDFqn63ZfStZjQm/3cMsPWwDKo3QryFm"
+              teamId = "teamid"
+              clientType = ClientType.WEB
             }
 
             provider(Apple) {
@@ -180,6 +199,7 @@ fun Application.module() {
               privateKey =
                   "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgMKZfBMuF5CyRyXAiQaYew+j3U+bQ5oRtqb/3SujLlZGgCgYIKoZIzj0DAQehRANCAAQoYTJsktscfGFwAm40TH2648sGmHS5qvti8tvRcXF6v5Gu0fecAPooXDFqn63ZfStZjQm/3cMsPWwDKo3QryFm"
               teamId = "teamid"
+              clientType = ClientType.APP
             }
           }
 

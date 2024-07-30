@@ -16,7 +16,7 @@ internal class GetThirdPartyAuthUrlUseCase(
     private val tenantId: String?,
 ) {
 
-  suspend fun getAuthUrl(provider: Provider<*>): String {
+  suspend fun getAuthUrl(provider: Provider<*>, clientType: String? = null): String {
     val response =
         client.get {
           url {
@@ -24,10 +24,16 @@ internal class GetThirdPartyAuthUrlUseCase(
                 listOfNotNull(
                     tenantId,
                     Routes.ThirdParty.AUTH_URL,
-                ))
+                ),
+            )
             parameters.append("thirdPartyId", provider.id)
             parameters.append(
-                "redirectURIOnProviderDashboard", checkNotNull(provider.config.redirectUri))
+                "redirectURIOnProviderDashboard",
+                checkNotNull(provider.config.redirectUri),
+            )
+            clientType?.let {
+              parameters.append("clientType", it)
+            }
           }
         }
 

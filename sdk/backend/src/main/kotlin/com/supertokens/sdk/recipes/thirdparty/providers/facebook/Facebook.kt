@@ -3,7 +3,7 @@ package com.supertokens.sdk.recipes.thirdparty.providers.facebook
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
@@ -25,7 +25,7 @@ class FacebookProvider(
     config: FacebookConfig,
 ) : OAuthProvider<FacebookConfig>(superTokens, config) {
 
-  override val id = ThirdPartyProvider.FACEBOOK
+  override val id = ThirdPartyAuth.FACEBOOK
 
   override val authUrl = AUTH_URL
   override val tokenUrl = TOKEN_URL
@@ -50,7 +50,8 @@ class FacebookProvider(
             ThirdPartyEmail(
                 id = body.email,
                 isVerified = true,
-            ))
+            ),
+    )
   }
 
   companion object {

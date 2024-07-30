@@ -3,7 +3,7 @@ package com.supertokens.sdk.recipes.thirdparty.providers.github
 import com.supertokens.sdk.SuperTokens
 import com.supertokens.sdk.common.SuperTokensStatus
 import com.supertokens.sdk.common.SuperTokensStatusException
-import com.supertokens.sdk.common.ThirdPartyProvider
+import com.supertokens.sdk.common.ThirdPartyAuth
 import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import com.supertokens.sdk.recipes.thirdparty.providers.OAuthProvider
@@ -28,7 +28,7 @@ class GitHubProvider(
     config: GitHubConfig,
 ) : OAuthProvider<GitHubConfig>(superTokens, config) {
 
-  override val id = ThirdPartyProvider.GITHUB
+  override val id = ThirdPartyAuth.GITHUB
   override val authUrl = AUTH_URL
   override val tokenUrl = TOKEN_URL
   override val defaultScopes =
