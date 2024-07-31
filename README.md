@@ -1,7 +1,6 @@
 # SuperTokens Kotlin SDK
 
-**_Unofficial_** implementations of **[SuperTokens](https://github.com/supertokens/supertokens-core)
-** SDKs for Kotlin (Multiplatform*).
+**_Unofficial_** implementations of **[SuperTokens](https://github.com/supertokens/supertokens-core)** SDKs for Kotlin (Multiplatform*).
 
 Supported **Driver Interfaces**:
 
