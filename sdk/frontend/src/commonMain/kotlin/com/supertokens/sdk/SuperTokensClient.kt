@@ -13,7 +13,7 @@ import com.supertokens.sdk.recipes.sessions.repositories.AuthState
 import com.supertokens.sdk.recipes.sessions.repositories.ClaimsRepository
 import com.supertokens.sdk.recipes.sessions.repositories.TokensRepository
 import io.ktor.client.HttpClient
-import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.header
@@ -40,8 +40,26 @@ class SuperTokensClientConfig(
 
   var tenantId: String? = null
 
-  // Modify the http client config used by the SDK
-  var clientConfig: HttpClientConfig<*>.() -> Unit = {}
+  /**
+   * HTTP client used by the SDK (be sure to install
+   * [ContentNegotiation](https://ktor.io/docs/client-serialization.html) with json support).
+   *
+   * @see <a href="https://ktor.io/docs/client-serialization.html">ContentNegotiation</a>
+   */
+  @OptIn(ExperimentalSerializationApi::class)
+  var client: HttpClient =
+      HttpClient(CIO) {
+        install(ContentNegotiation) {
+          json(
+              Json {
+                isLenient = true
+                explicitNulls = false
+                encodeDefaults = true
+                ignoreUnknownKeys = true
+              },
+          )
+        }
+      }
 
   var clientName: String = "MyMobileApp"
 
@@ -76,29 +94,13 @@ class SuperTokensClient(
   val tenantId: String?
     get() = config.tenantId
 
-  val settings: Settings by lazy {
-    config.settings ?: getDefaultSettings()
-  }
+  val settings: Settings by lazy { config.settings ?: getDefaultSettings() }
 
   val recipes: List<Recipe<*>> = config.recipes.map { it.invoke(this) }
 
-  @OptIn(ExperimentalSerializationApi::class)
   val apiClient by lazy {
-    HttpClient {
-      install(ContentNegotiation) {
-        json(
-            Json {
-              isLenient = true
-              explicitNulls = false
-              encodeDefaults = true
-              ignoreUnknownKeys = true
-            },
-        )
-      }
-
+    config.client.config {
       recipes.forEach { with(it) { configureClient() } }
-
-      config.clientConfig(this)
 
       defaultRequest {
         url(config.apiBaseUrl)
@@ -112,9 +114,10 @@ class SuperTokensClient(
     get() = getRecipe<SessionRecipe>().authRepository
 
   val userRepository: UserRepository by lazy {
-    config.userRepository ?: UserRepositoryImpl(
-        settings = settings,
-    )
+    config.userRepository
+        ?: UserRepositoryImpl(
+            settings = settings,
+        )
   }
 
   val tokenRepository: TokensRepository
