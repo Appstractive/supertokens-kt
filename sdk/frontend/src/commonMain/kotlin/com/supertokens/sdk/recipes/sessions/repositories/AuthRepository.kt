@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.asStateFlow
 
 sealed class AuthState {
 
+  val isLoggedIn: Boolean
+    get()= this !is Unauthenticated
+
   // no local accesstoken saved
   data object Unauthenticated : AuthState()
 

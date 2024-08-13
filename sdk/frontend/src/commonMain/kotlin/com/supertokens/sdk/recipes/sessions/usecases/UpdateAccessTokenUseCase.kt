@@ -9,6 +9,7 @@ internal class UpdateAccessTokenUseCase(
   suspend fun updateAccessToken(token: String) {
     sessionRecipe.tokensRepository.setAccessToken(token)
     sessionRecipe.claimsRepository.setClaimsFromJwt(token)
+    sessionRecipe.clearClientTokens()
 
     sessionRecipe.claimsRepository.getUserId()?.let {
       sessionRecipe.authRepository.setAuthenticated(

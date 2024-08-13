@@ -8,5 +8,6 @@ internal class UpdateRefreshTokenUseCase(
 
   suspend fun updateRefreshToken(token: String) {
     sessionRecipe.tokensRepository.setRefreshToken(token)
+    sessionRecipe.clearClientTokens()
   }
 }

@@ -22,12 +22,15 @@ import io.ktor.client.call.HttpClientCall
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.Sender
 import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.plugin
+import io.ktor.client.plugins.pluginOrNull
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.post
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.fullPath
 
@@ -94,6 +97,19 @@ class SessionRecipe(
 
       if (config.refreshTokensOnStart) {
         runCatching { refreshTokens() }.onFailure { it.printStackTrace() }
+      }
+    }
+  }
+
+  /**
+   * Clears tokens from the http client. They will then be re-initialized on the next request.
+   */
+  internal fun clearClientTokens() {
+    with(superTokens.apiClient) {
+      pluginOrNull(Auth)?.let { bearerAuth ->
+        bearerAuth.providers.filterIsInstance<BearerAuthProvider>().forEach { provider ->
+          provider.clearToken()
+        }
       }
     }
   }

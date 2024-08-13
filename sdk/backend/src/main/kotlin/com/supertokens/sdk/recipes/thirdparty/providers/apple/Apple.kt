@@ -66,13 +66,11 @@ class AppleConfig : OAuthProviderConfig() {
   override val clientSecret: String
     get() =
         createAppleToken(
-            teamId = teamId ?: throw RuntimeException("teamId not configured for Apple provider"),
-            keyId = keyId ?: throw RuntimeException("keyId not configured for Apple provider"),
+            teamId = checkNotNull(teamId) { "teamId not configured for Apple provider" },
+            keyId = checkNotNull(keyId) { "keyId not configured for Apple provider" },
             privateKey =
-                privateKey
-                    ?: throw RuntimeException("privateKey not configured for Apple provider"),
-            clientId =
-                clientId ?: throw RuntimeException("clientId not configured for Apple provider"),
+                checkNotNull(privateKey) { "privateKey not configured for Apple provider" },
+            clientId = checkNotNull(clientId) { "clientId not configured for Apple provider" },
         )
 }
 
@@ -159,10 +157,12 @@ class AppleProvider(
   val jwkProvider = UrlJwkProvider(URL("https://appleid.apple.com/auth/keys"))
 
   override suspend fun getUserInfo(tokenResponse: ThirdPartyTokensDTO): ThirdPartyUserInfo {
-    val idToken = tokenResponse.idToken ?: throw SuperTokensStatusException(
-        SuperTokensStatus.WrongCredentialsError,
-        "No IdToken in TokenResponse",
-    )
+    val idToken =
+        tokenResponse.idToken
+            ?: throw SuperTokensStatusException(
+                SuperTokensStatus.WrongCredentialsError,
+                "No IdToken in TokenResponse",
+            )
 
     val decoded = JWT.decode(idToken)
     val keyId = decoded.keyId
