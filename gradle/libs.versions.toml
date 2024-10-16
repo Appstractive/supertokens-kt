@@ -25,7 +25,7 @@ jwt-rsa = "0.22.1"
 slf4j = "1.6.1"
 
 mail = "1.6.0"
-freemarker = "2.3.32"
+freemarker = "2.3.33"
 
 circuit = "0.20.0"
 settings = "1.1.1"
