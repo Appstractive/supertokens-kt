@@ -22,7 +22,7 @@ kotlin-coroutines = "1.8.0"
 jwt = "4.4.0"
 jwt-rsa = "0.22.1"
 
-slf4j = "1.6.1"
+slf4j = "2.0.16"
 
 mail = "1.6.0"
 freemarker = "2.3.32"
