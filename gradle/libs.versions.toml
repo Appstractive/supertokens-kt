@@ -4,7 +4,7 @@ agp = "8.2.2" # https://developer.android.com/studio/releases/gradle-plugin
 compose = "1.6.10" # https://github.com/JetBrains/compose-jb
 
 coreKtx = "1.13.1" # https://developer.android.com/jetpack/androidx/releases/core
-appcompat = "1.6.1" # https://developer.android.com/jetpack/androidx/releases/appcompat
+appcompat = "1.7.0" # https://developer.android.com/jetpack/androidx/releases/appcompat
 activity = "1.9.0" # https://developer.android.com/jetpack/androidx/releases/activity
 
 targetSdk = "34"
