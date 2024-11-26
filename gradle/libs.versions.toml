@@ -16,7 +16,7 @@ android-crypto = "1.1.0-alpha06"
 
 ktor_version = "2.3.9"
 
-kotlin-serialization = "1.6.3"
+kotlin-serialization = "1.7.3"
 kotlin-coroutines = "1.8.0"
 
 jwt = "4.4.0"
