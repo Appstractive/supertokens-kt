@@ -30,7 +30,7 @@ freemarker = "2.3.33"
 circuit = "0.20.0"
 settings = "1.1.1"
 
-totp = "2.4.0"
+totp = "2.4.1"
 
 random = "0.2.0"
 hash = "0.4.0"
