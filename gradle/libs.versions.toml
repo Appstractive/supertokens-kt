@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.0.0" # https://kotlinlang.org/docs/releases.html#release-details
+kotlin = "2.1.0" # https://kotlinlang.org/docs/releases.html#release-details
 agp = "8.2.2" # https://developer.android.com/studio/releases/gradle-plugin
 compose = "1.6.10" # https://github.com/JetBrains/compose-jb
 
