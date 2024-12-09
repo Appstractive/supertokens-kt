@@ -32,7 +32,7 @@ settings = "1.1.1"
 
 totp = "2.4.1"
 
-random = "0.2.0"
+random = "0.3.2"
 hash = "0.4.0"
 
 [libraries]
