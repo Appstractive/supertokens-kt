@@ -7,11 +7,12 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
+import io.ktor.server.routing.RoutingContext
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 
 open class CoreHandler(
-    protected val scope: CoroutineScope,
+  protected val scope: CoroutineScope,
 ) {
 
   /**
@@ -21,7 +22,7 @@ open class CoreHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/emailExists">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.emailExists() {
+  open suspend fun RoutingContext.emailExists() {
     val email = call.parameters["email"] ?: return call.respond(HttpStatusCode.NotFound)
 
     val response = runCatching { call.superTokens.getUsersByEMail(email) }
@@ -29,7 +30,8 @@ open class CoreHandler(
     call.respond(
         ExistsResponseDTO(
             exists = response.isSuccess,
-        ))
+        ),
+    )
   }
 
   /**
@@ -39,14 +41,15 @@ open class CoreHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessPhoneNumberExists">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.phoneNumberExists() {
+  open suspend fun RoutingContext.phoneNumberExists() {
     val phoneNumber = call.parameters["phoneNumber"] ?: return call.respond(HttpStatusCode.NotFound)
 
     val response = runCatching { call.superTokens.getUsersByPhoneNumber(phoneNumber) }
 
     call.respond(
-        ExistsResponseDTO(
-            exists = response.isSuccess,
-        ))
+            ExistsResponseDTO(
+                    exists = response.isSuccess,
+            ),
+    )
   }
 }

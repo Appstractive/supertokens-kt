@@ -14,6 +14,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
+import io.ktor.server.routing.RoutingContext
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 
@@ -28,7 +29,7 @@ open class SessionHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Session%20Recipe/signout">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.signOut() {
+  open suspend fun RoutingContext.signOut() {
     val user = call.requirePrincipal<AuthenticatedUser>()
     val session = sessions.getSession(user.sessionHandle)
     sessions.removeSessions(
@@ -46,7 +47,7 @@ open class SessionHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Session%20Recipe/refresh">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.refresh() {
+  open suspend fun RoutingContext.refresh() {
     val refreshToken =
         call.request.headers[HEADER_REFRESH_TOKEN]
             ?: call.request.cookies[COOKIE_REFRESH_TOKEN]

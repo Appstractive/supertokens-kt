@@ -39,6 +39,7 @@ import io.ktor.server.application.call
 import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.RoutingContext
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -48,11 +49,11 @@ open class PasswordlessHandler(
 ) {
 
   /** Override this to convert to localized duration */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.convertToTimeString(duration: Long) =
+  open suspend fun RoutingContext.convertToTimeString(duration: Long) =
       "${(duration / 1000 / 60).toInt()} minutes"
 
   /** Override this to send localized mails */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.getTemplateName(
+  open suspend fun RoutingContext.getTemplateName(
       emailService: EmailService
   ) =
       when (passwordless.flowType) {
@@ -62,13 +63,13 @@ open class PasswordlessHandler(
             emailService.magicLinkOtpLoginTemplateName
       }
 
-  open suspend fun PipelineContext<Unit, ApplicationCall>.createMagicLinkUrl(
+  open suspend fun RoutingContext.createMagicLinkUrl(
       frontend: EndpointConfig,
       codeData: PasswordlessCodeData
   ): String =
       "${frontend.fullUrl}verify?preAuthSessionId=${codeData.preAuthSessionId}#${codeData.linkCode}"
 
-  open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginMail(
+  open suspend fun RoutingContext.sendLoginMail(
       email: String,
       codeData: PasswordlessCodeData
   ): PasswordlessCodeData {
@@ -131,7 +132,7 @@ open class PasswordlessHandler(
     return codeData
   }
 
-  open suspend fun PipelineContext<Unit, ApplicationCall>.sendLoginSms(
+  open suspend fun RoutingContext.sendLoginSms(
       phoneNumber: String,
       codeData: PasswordlessCodeData
   ): PasswordlessCodeData {
@@ -146,7 +147,7 @@ open class PasswordlessHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessSignInUpStart">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.startSignInUp() {
+  open suspend fun RoutingContext.startSignInUp() {
     val body = call.receive<StartPasswordlessSignInUpRequestDTO>()
     val tenantId = call.tenantId
 
@@ -176,7 +177,7 @@ open class PasswordlessHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessSignInUpResend">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.resendCode() {
+  open suspend fun RoutingContext.resendCode() {
     val body = call.receive<ResendPasswordlessCodeRequestDTO>()
     val tenantId = call.tenantId
 
@@ -199,7 +200,7 @@ open class PasswordlessHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/Passwordless%20Recipe/passwordlessSignInUpConsume">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.consumeCode() {
+  open suspend fun RoutingContext.consumeCode() {
     val body = call.receive<ConsumePasswordlessCodeRequestDTO>()
     val tenantId = call.tenantId
 
@@ -222,7 +223,7 @@ open class PasswordlessHandler(
     }
   }
 
-  protected open suspend fun PipelineContext<Unit, ApplicationCall>.consumeCodeFirstFactor(
+  protected open suspend fun RoutingContext.consumeCodeFirstFactor(
       body: ConsumePasswordlessCodeRequestDTO,
       tenantId: String?,
       codeData: List<PasswordlessDevices>,
@@ -262,7 +263,7 @@ open class PasswordlessHandler(
         ))
   }
 
-  protected open suspend fun PipelineContext<Unit, ApplicationCall>.consumeCodeSecondFactorFactor(
+  protected open suspend fun RoutingContext.consumeCodeSecondFactorFactor(
       body: ConsumePasswordlessCodeRequestDTO,
       tenantId: String?,
       codeData: List<PasswordlessDevices>,
@@ -323,7 +324,7 @@ open class PasswordlessHandler(
         ))
   }
 
-  private suspend fun PipelineContext<Unit, ApplicationCall>.exchangeCode(
+  private suspend fun RoutingContext.exchangeCode(
       body: ConsumePasswordlessCodeRequestDTO,
       tenantId: String?,
       codeData: List<PasswordlessDevices>,

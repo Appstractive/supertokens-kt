@@ -28,13 +28,13 @@ dependencies {
 
 application { mainClass.set("com.appstractive.ApplicationKt") }
 
-tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "17" }
+tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "21" }
 
 ktor {
   docker {
     localImageName.set("supertokens-ktor-example")
     imageTag.set(version.toString())
-    jreVersion.set(JavaVersion.VERSION_17)
+    jreVersion.set(JavaVersion.VERSION_21)
 
     externalRegistry.set(
         object : io.ktor.plugin.features.DockerImageRegistry {

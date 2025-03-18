@@ -1,7 +1,7 @@
 package com.supertokens.sdk.recipes.thirdparty.providers
 
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.SuperTokensProviderDslMarker
+import com.supertokens.sdk.SuperTokensDslMarker
 import com.supertokens.sdk.common.responses.ThirdPartyTokensDTO
 import com.supertokens.sdk.recipes.thirdparty.ThirdPartyRecipe
 import java.net.URLEncoder
@@ -28,7 +28,7 @@ data class ProviderEndpoint(
             "$url?${params.map { "${it.key}=${URLEncoder.encode(it.value, "UTF-8")}" }.joinToString("&")}"
 }
 
-@SuperTokensProviderDslMarker
+@SuperTokensDslMarker
 interface ProviderConfig {
   val isDefault: Boolean
   val clientType: String?

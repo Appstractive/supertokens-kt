@@ -1,11 +1,11 @@
 package com.supertokens.sdk.recipes
 
 import com.supertokens.sdk.SuperTokens
-import com.supertokens.sdk.SuperTokensRecipeDslMarker
+import com.supertokens.sdk.SuperTokensDslMarker
 import com.supertokens.sdk.common.models.AuthFactor
 import com.supertokens.sdk.common.models.User
 
-@SuperTokensRecipeDslMarker interface RecipeConfig
+@SuperTokensDslMarker interface RecipeConfig
 
 interface Recipe<C : RecipeConfig> {
 

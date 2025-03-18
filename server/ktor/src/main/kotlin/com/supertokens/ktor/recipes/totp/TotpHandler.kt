@@ -23,20 +23,18 @@ import com.supertokens.sdk.core.getUserById
 import io.ktor.http.URLProtocol
 import io.ktor.http.parameters
 import io.ktor.http.path
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.util.url
-import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 
 open class TotpHandler(
-    protected val scope: CoroutineScope,
+  protected val scope: CoroutineScope,
 ) {
 
   /** A call to GET /totp/device/list */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.getDevices() {
+  open suspend fun RoutingContext.getDevices() {
     val user = call.requirePrincipal<AuthenticatedUser>()
 
     val devices = totp.getDevices(userId = user.id)
@@ -52,11 +50,12 @@ open class TotpHandler(
                       verified = it.verified,
                   )
                 },
-        ))
+        ),
+    )
   }
 
   /** A call to POST /totp/device */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.createDevice() {
+  open suspend fun RoutingContext.createDevice() {
     val user = call.requirePrincipal<AuthenticatedUser>()
     val body = call.receive<TotpDeviceRequestDTO>()
 
@@ -81,11 +80,12 @@ open class TotpHandler(
                     append("issuer", issuer)
                   }
                 },
-        ))
+        ),
+    )
   }
 
   /** A call to POST /totp/device/remove */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.removeDevice() {
+  open suspend fun RoutingContext.removeDevice() {
     val user = call.requirePrincipal<AuthenticatedUser>()
     val body = call.receive<TotpDeviceRequestDTO>()
 
@@ -98,11 +98,12 @@ open class TotpHandler(
     call.respond(
         RemoveTotpDeviceResponseDTO(
             didDeviceExist = didExist,
-        ))
+        ),
+    )
   }
 
   /** A call to POST /totp/device/verify */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.verifyDevice() {
+  open suspend fun RoutingContext.verifyDevice() {
     val user = call.requirePrincipal<AuthenticatedUser>()
     val body = call.receive<VerifyTotpDeviceRequestDTO>()
 
@@ -129,7 +130,8 @@ open class TotpHandler(
                           recipeId = RECIPE_TOTP,
                           multiAuthFactor = AuthFactor.TOTP,
                           accessToken = token,
-                      ))
+                      ),
+              )
 
           setSessionInResponse(
               accessToken = newSession.accessToken,
@@ -142,7 +144,7 @@ open class TotpHandler(
   }
 
   /** A call to POST /totp/verify */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.verify() {
+  open suspend fun RoutingContext.verify() {
     val user = call.requirePrincipal<AuthenticatedUser>()
     val body = call.receive<VerifyTotpRequestDTO>()
 
@@ -169,7 +171,8 @@ open class TotpHandler(
                           recipeId = RECIPE_TOTP,
                           multiAuthFactor = AuthFactor.TOTP,
                           accessToken = token,
-                      ))
+                      ),
+              )
 
           setSessionInResponse(
               accessToken = newSession.accessToken,

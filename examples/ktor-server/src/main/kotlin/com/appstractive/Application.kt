@@ -41,7 +41,7 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.*
 import io.ktor.server.auth.authenticate
 import io.ktor.server.cio.*
-import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond

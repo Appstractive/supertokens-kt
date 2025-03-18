@@ -17,7 +17,10 @@ val javadocJar: TaskProvider<Jar> by
       from(dokkaHtml.outputDirectory)
     }
 
-java { withSourcesJar() }
+java {
+  targetCompatibility = JavaVersion.VERSION_21
+  withSourcesJar()
+}
 
 dependencies {
   api(projects.sdk.supertokensSdkBackend)
@@ -46,19 +49,22 @@ dependencies {
   testImplementation(libs.test.kotlin)
 }
 
-tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "17" }
+tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "21" }
 
 publishing {
   repositories {
-    maven {
-      name = "oss"
-      val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-      val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-      url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+    if(extra.has("mavenUser")) {
+      maven {
+        name = "oss"
+        val releasesRepoUrl =
+            uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+        val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
 
-      credentials {
-        username = extra["mavenUser"].toString()
-        password = extra["mavenPassword"].toString()
+        credentials {
+          username = extra.get("mavenUser")?.toString()
+          password = extra.get("mavenPassword")?.toString()
+        }
       }
     }
   }

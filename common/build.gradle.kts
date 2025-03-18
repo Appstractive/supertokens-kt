@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
   kotlin("multiplatform")
   kotlin("native.cocoapods")
@@ -22,10 +24,14 @@ val javadocJar: TaskProvider<Jar> by
     }
 
 kotlin {
-  androidTarget()
-  jvm("jvm") { compilations.all { kotlinOptions.jvmTarget = "17" } }
+  androidTarget {
+    compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
+    publishLibraryVariants("release", "debug")
+  }
+  jvm("jvm") { compilerOptions { jvmTarget.set(JvmTarget.JVM_21) } }
 
-  ios()
+  iosX64()
+  iosArm64()
   iosSimulatorArm64()
 
   mingwX64("win")
@@ -44,51 +50,38 @@ kotlin {
   }
 
   sourceSets {
-    val commonMain by getting {
+    commonMain.dependencies {
+      implementation(libs.kotlin.serialization)
+      implementation(libs.kotlin.serialization.json)
+      implementation(libs.kotlin.random)
+      implementation(libs.kotlin.hash.sha)
+    }
+    commonTest.dependencies {
       dependencies {
-        implementation(libs.kotlin.serialization)
-        implementation(libs.kotlin.serialization.json)
-        implementation(libs.kotlin.random)
-        implementation(libs.kotlin.hash.sha)
+        implementation(kotlin("test"))
       }
     }
-    val commonTest by getting { dependencies { implementation(kotlin("test")) } }
   }
-
-  val publicationsFromMainHost =
-      listOf(
-          jvm("jvm").name,
-          mingwX64("win").name,
-          linuxX64("linux64").name,
-          linuxArm64("linuxArm64").name,
-          "kotlinMultiplatform",
-      )
 
   publishing {
     repositories {
-      maven {
-        name = "oss"
-        val releasesRepoUrl =
-            uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-        val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-        url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+      if(extra.has("mavenUser")) {
+        maven {
+          name = "oss"
+          val releasesRepoUrl =
+              uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+          val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+          url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
 
-        credentials {
-          username = extra["mavenUser"].toString()
-          password = extra["mavenPassword"].toString()
+          credentials {
+            username = extra.get("mavenUser")?.toString()
+            password = extra.get("mavenPassword")?.toString()
+          }
         }
       }
     }
 
     publications {
-      matching { it.name in publicationsFromMainHost }
-          .all {
-            val targetPublication = this@all
-            tasks.withType<AbstractPublishToMaven>().matching {
-              it.publication == targetPublication
-            }
-          }
-
       withType<MavenPublication> {
         version = rootProject.version.toString()
         artifact(javadocJar)
@@ -140,7 +133,7 @@ android {
   namespace = "com.supertokens"
   defaultConfig { minSdk = libs.versions.minSdk.get().toInt() }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
 }

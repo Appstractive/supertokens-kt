@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
   kotlin("multiplatform")
   kotlin("native.cocoapods")
@@ -22,12 +24,18 @@ val javadocJar: TaskProvider<Jar> by
     }
 
 kotlin {
-  androidTarget { publishLibraryVariants("release", "debug") }
-  jvm("jvm") { compilations.all { kotlinOptions.jvmTarget = "17" } }
+  jvmToolchain(21)
 
+  androidTarget {
+    compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
+    publishLibraryVariants("release", "debug")
+  }
   iosX64()
   iosArm64()
   iosSimulatorArm64()
+  jvm("jvm") {
+    compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
+  }
 
   cocoapods {
     summary = "SuperTokens frontend SDK"
@@ -41,79 +49,56 @@ kotlin {
   }
 
   sourceSets {
-    val commonMain by getting {
-      dependencies {
-        api(projects.supertokensSdkCommon)
+    commonMain.dependencies {
+      api(projects.supertokensSdkCommon)
 
-        implementation(libs.kotlin.serialization)
-        implementation(libs.kotlin.serialization.json)
-        implementation(libs.kotlin.coroutines)
+      implementation(libs.kotlin.serialization)
+      implementation(libs.kotlin.serialization.json)
+      implementation(libs.kotlin.coroutines)
 
-        implementation(libs.ktor.serialization)
+      implementation(libs.ktor.serialization)
 
-        api(libs.ktor.client.core)
-        implementation(libs.ktor.client.cio)
-        implementation(libs.ktor.client.contentnegotiation)
-        implementation(libs.ktor.client.serialization)
-        implementation(libs.ktor.client.json)
-        implementation(libs.ktor.client.logging)
-        api(libs.ktor.client.auth)
+      api(libs.ktor.client.core)
+      implementation(libs.ktor.client.cio)
+      implementation(libs.ktor.client.contentnegotiation)
+      implementation(libs.ktor.client.serialization)
+      implementation(libs.ktor.client.json)
+      implementation(libs.ktor.client.logging)
+      api(libs.ktor.client.auth)
 
-        implementation(libs.jwt)
-        implementation(libs.settings)
-      }
+      implementation(libs.jwt)
+      implementation(libs.settings)
     }
-    val commonTest by getting { dependencies { implementation(kotlin("test")) } }
-    val androidMain by getting {
-      dependencies {
-        implementation(libs.android.startup)
-        implementation(libs.android.crypto)
-      }
+    commonTest.dependencies {
+      implementation(kotlin("test"))
     }
-    val iosX64Main by getting
-    val iosArm64Main by getting
-    val iosSimulatorArm64Main by getting
-    val iosMain by creating {
-      dependsOn(commonMain)
-      iosX64Main.dependsOn(this)
-      iosArm64Main.dependsOn(this)
-      iosSimulatorArm64Main.dependsOn(this)
+    androidMain.dependencies {
+      implementation(libs.android.startup)
+      implementation(libs.android.crypto)
     }
-    val jvmMain by getting
+    iosMain.dependencies {
+    }
   }
-
-  val publicationsFromMainHost =
-      listOf(
-          androidTarget(),
-          jvm("jvm").name,
-          "kotlinMultiplatform",
-      )
 
   publishing {
     repositories {
-      maven {
-        name = "oss"
-        val releasesRepoUrl =
-            uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-        val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-        url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+      if(extra.has("mavenUser")) {
+        maven {
+          name = "oss"
+          val releasesRepoUrl =
+              uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+          val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+          url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
 
-        credentials {
-          username = extra["mavenUser"].toString()
-          password = extra["mavenPassword"].toString()
+          credentials {
+            username = extra.get("mavenUser")?.toString()
+            password = extra.get("mavenPassword")?.toString()
+          }
         }
       }
     }
 
     publications {
-      matching { it.name in publicationsFromMainHost }
-          .all {
-            val targetPublication = this@all
-            tasks.withType<AbstractPublishToMaven>().matching {
-              it.publication == targetPublication
-            }
-          }
-
       withType<MavenPublication> {
         artifactId = "supertokens-sdk-frontend"
         version = rootProject.version.toString()
@@ -175,7 +160,7 @@ android {
 
   defaultConfig { minSdk = libs.versions.minSdk.get().toInt() }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
 }

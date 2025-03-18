@@ -24,6 +24,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
+import io.ktor.server.routing.RoutingContext
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 
@@ -31,7 +32,7 @@ open class ThirdPartyHandler(
     protected val scope: CoroutineScope,
 ) {
 
-  open suspend fun PipelineContext<Unit, ApplicationCall>.handleMissingEmail(
+  open suspend fun RoutingContext.handleMissingEmail(
       provider: Provider<*>,
       userInfo: ThirdPartyUserInfo
   ): String {
@@ -45,7 +46,7 @@ open class ThirdPartyHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/ThirdParty%20Recipe/signInUp">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.signInUp() {
+  open suspend fun RoutingContext.signInUp() {
     val body = call.receive<ThirdPartySignInUpRequestDTO>()
     val provider =
         thirdParty.getProvider(id = body.thirdPartyId, clientType = body.clientType)
@@ -116,7 +117,7 @@ open class ThirdPartyHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/ThirdParty%20Recipe/authorisationUrl">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.getAuthorizationUrl() {
+  open suspend fun RoutingContext.getAuthorizationUrl() {
     val thirdPartyId = call.parameters["thirdPartyId"] ?: throw NotFoundException()
     val redirectURIOnProviderDashboard =
         call.parameters["redirectURIOnProviderDashboard"] ?: throw NotFoundException()
@@ -144,7 +145,7 @@ open class ThirdPartyHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/ThirdParty%20Recipe/thirdPartyCallbackApple">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.appleAuthCallback() {
+  open suspend fun RoutingContext.appleAuthCallback() {
     val provider =
         thirdParty.getProvider(
             ThirdPartyAuth.APPLE,

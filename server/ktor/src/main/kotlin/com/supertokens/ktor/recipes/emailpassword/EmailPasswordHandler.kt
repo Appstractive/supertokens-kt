@@ -38,6 +38,7 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.RoutingContext
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -140,7 +141,7 @@ open class EmailPasswordHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/signIn">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.signIn() {
+  open suspend fun RoutingContext.signIn() {
     val body = call.receive<FormFieldRequestDTO>()
     val tenantId = call.tenantId
 
@@ -196,7 +197,7 @@ open class EmailPasswordHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/signUp">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.signUp() {
+  open suspend fun RoutingContext.signUp() {
     val body = call.receive<FormFieldRequestDTO>()
     val tenantId = call.tenantId
 
@@ -246,11 +247,11 @@ open class EmailPasswordHandler(
       "${frontend.fullUrl}reset-password?token=$token"
 
   /** Override this to send localized mails */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.getResetPasswordTemplateName(
+  open suspend fun RoutingContext.getResetPasswordTemplateName(
       emailService: EmailService
   ) = emailService.passwordResetTemplateName
 
-  open suspend fun PipelineContext<Unit, ApplicationCall>.sendPasswordResetMail(email: String) {
+  open suspend fun RoutingContext.sendPasswordResetMail(email: String) {
     val frontend = call.frontend
 
     emailPassword.emailService?.let {
@@ -302,7 +303,7 @@ open class EmailPasswordHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/passwordResetToken">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.passwordResetWithToken() {
+  open suspend fun RoutingContext.passwordResetWithToken() {
     val body = call.receive<FormFieldRequestDTO>()
 
     val emailField = body.formFields.getEmailField()
@@ -319,7 +320,7 @@ open class EmailPasswordHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailPassword%20Recipe/passwordReset">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.resetPassword() {
+  open suspend fun RoutingContext.resetPassword() {
     val body = call.receive<PasswordResetRequestDTO>()
 
     when (body.method) {
@@ -358,7 +359,7 @@ open class EmailPasswordHandler(
     }
   }
 
-  open suspend fun PipelineContext<Unit, ApplicationCall>.changePassword() {
+  open suspend fun RoutingContext.changePassword() {
     var user = superTokens.getUserById(call.requirePrincipal<AuthenticatedUser>().id)
     val body = call.receive<PasswordChangeRequestDTO>()
 

@@ -44,6 +44,7 @@ import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.application
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -197,6 +198,8 @@ val SuperTokensAttributeKey = AttributeKey<SuperTokens>("SuperTokens")
 val ApplicationCall.superTokens: SuperTokens
   get() = application.attributes[SuperTokensAttributeKey]
 val PipelineContext<Unit, ApplicationCall>.superTokens: SuperTokens
-  get() = application.attributes[SuperTokensAttributeKey]
+  get() = context.attributes[SuperTokensAttributeKey]
 val Route.superTokens: SuperTokens
   get() = application.attributes[SuperTokensAttributeKey]
+val RoutingContext.superTokens: SuperTokens
+  get() = call.application.attributes[SuperTokensAttributeKey]

@@ -22,15 +22,14 @@ import io.ktor.client.call.HttpClientCall
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.Sender
 import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.authProvider
 import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.plugin
-import io.ktor.client.plugins.pluginOrNull
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.post
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.fullPath
 
@@ -46,22 +45,22 @@ class SessionRecipeConfig : RecipeConfig {
 }
 
 class SessionRecipe(
-    internal val superTokens: SuperTokensClient,
-    private val config: SessionRecipeConfig,
+  internal val superTokens: SuperTokensClient,
+  private val config: SessionRecipeConfig,
 ) : Recipe<SessionRecipeConfig> {
 
   val authRepository: AuthRepository by lazy { config.authRepository ?: AuthRepositoryImpl() }
   val tokensRepository: TokensRepository by lazy {
     config.tokensRepository
-        ?: TokensRepositorySettings(
-            settings = superTokens.settings,
-        )
+      ?: TokensRepositorySettings(
+          settings = superTokens.settings,
+      )
   }
   val claimsRepository: ClaimsRepository by lazy {
     config.claimsRepository
-        ?: ClaimsRepositorySettings(
-            settings = superTokens.settings,
-        )
+      ?: ClaimsRepositorySettings(
+          settings = superTokens.settings,
+      )
   }
 
   internal val refreshTokensUseCase by lazy {
@@ -106,11 +105,7 @@ class SessionRecipe(
    */
   internal fun clearClientTokens() {
     with(superTokens.apiClient) {
-      pluginOrNull(Auth)?.let { bearerAuth ->
-        bearerAuth.providers.filterIsInstance<BearerAuthProvider>().forEach { provider ->
-          provider.clearToken()
-        }
-      }
+      authProvider<BearerAuthProvider>()?.clearToken()
     }
   }
 
@@ -121,9 +116,9 @@ class SessionRecipe(
     install(HttpCookies) {
       storage =
           config.cookiesStorage
-              ?: defaultCookieStorage(
-                  sessionRecipe = this@SessionRecipe,
-              )
+            ?: defaultCookieStorage(
+                sessionRecipe = this@SessionRecipe,
+            )
     }
 
     install(Auth) {
@@ -169,7 +164,7 @@ class SessionRecipe(
 object Session : RecipeBuilder<SessionRecipeConfig, SessionRecipe>() {
 
   override fun install(
-      configure: SessionRecipeConfig.() -> Unit
+    configure: SessionRecipeConfig.() -> Unit
   ): (SuperTokensClient) -> SessionRecipe {
     val config = SessionRecipeConfig().apply(configure)
 

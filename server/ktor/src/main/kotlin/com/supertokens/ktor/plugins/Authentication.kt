@@ -15,6 +15,7 @@ import io.ktor.server.auth.Principal
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.auth.parseAuthorizationHeader
+import io.ktor.server.routing.RoutingContext
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
 
@@ -86,4 +87,6 @@ val AccessTokenAttributeKey = AttributeKey<String>("AccessToken")
 val ApplicationCall.accessToken: String?
   get() = attributes.getOrNull(AccessTokenAttributeKey)
 val PipelineContext<Unit, ApplicationCall>.accessToken: String?
+  get() = call.accessToken
+val RoutingContext.accessToken: String?
   get() = call.accessToken

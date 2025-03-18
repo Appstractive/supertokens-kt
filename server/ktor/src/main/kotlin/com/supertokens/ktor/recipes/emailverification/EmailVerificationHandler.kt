@@ -22,29 +22,27 @@ import com.supertokens.sdk.ingredients.email.EmailContent
 import com.supertokens.sdk.ingredients.email.EmailService
 import com.supertokens.sdk.recipes.emailverification.models.EmailVerificationTemplate
 import com.supertokens.sdk.recipes.session.getSessions
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.util.pipeline.PipelineContext
+import io.ktor.server.routing.RoutingContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 open class EmailVerificationHandler(
-    protected val scope: CoroutineScope,
+  protected val scope: CoroutineScope,
 ) {
 
-  open suspend fun PipelineContext<Unit, ApplicationCall>.createVerificationLink(
-      frontend: EndpointConfig,
-      token: String
+  open suspend fun RoutingContext.createVerificationLink(
+    frontend: EndpointConfig,
+    token: String
   ) = "${frontend.fullUrl}verify-email?token=$token"
 
   /** Override this to send localized mails */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.getResetPasswordTemplateName(
-      emailService: EmailService
+  open suspend fun RoutingContext.getResetPasswordTemplateName(
+    emailService: EmailService
   ) = emailService.emailVerificationTemplateName
 
-  open suspend fun PipelineContext<Unit, ApplicationCall>.sendVerificationMail(email: String) {
+  open suspend fun RoutingContext.sendVerificationMail(email: String) {
     val frontend = call.frontend
 
     emailVerification.emailService?.let {
@@ -89,7 +87,7 @@ open class EmailVerificationHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailVerification%20Recipe/verifyEmailToken">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.sendEmailVerification() {
+  open suspend fun RoutingContext.sendEmailVerification() {
     val principal = call.requirePrincipal<AuthenticatedUser>()
     val user = superTokens.getUserById(principal.id)
 
@@ -109,7 +107,7 @@ open class EmailVerificationHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailVerification%20Recipe/verifyEmail">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.verifyEmail() {
+  open suspend fun RoutingContext.verifyEmail() {
     val body = call.receive<VerifyEmailTokenRequestDTO>()
     val tenantId = call.tenantId
 
@@ -162,7 +160,7 @@ open class EmailVerificationHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.16.0#/EmailVerification%20Recipe/getVerifyEmail">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.checkEmailVerified() {
+  open suspend fun RoutingContext.checkEmailVerified() {
     val user = call.requirePrincipal<AuthenticatedUser>()
     val email = superTokens.getUserById(user.id).email
     val isVerified = emailVerification.isVerified(user.id, email)
@@ -186,8 +184,9 @@ open class EmailVerificationHandler(
     }
 
     call.respond(
-        VerifyEmailResponseDTO(
-            isVerified = isVerified,
-        ))
+            VerifyEmailResponseDTO(
+                    isVerified = isVerified,
+            ),
+    )
   }
 }

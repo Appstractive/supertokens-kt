@@ -23,12 +23,11 @@ import com.supertokens.sdk.common.responses.PhoneStatusDTO
 import com.supertokens.sdk.core.getUserById
 import com.supertokens.sdk.recipes.totp.getTotpDevices
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.application
-import io.ktor.server.application.call
 import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.application
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
@@ -39,12 +38,14 @@ val MfaHandlerAttributeKey = AttributeKey<MultiFactorHandler>("MfaHandler")
 val ApplicationCall.mfaHandler: MultiFactorHandler
   get() = application.attributes[MfaHandlerAttributeKey]
 val PipelineContext<Unit, ApplicationCall>.mfaHandler: MultiFactorHandler
-  get() = application.attributes[MfaHandlerAttributeKey]
+  get() = context.attributes[MfaHandlerAttributeKey]
 val Route.mfaHandler: MultiFactorHandler
   get() = application.attributes[MfaHandlerAttributeKey]
+val RoutingContext.mfaHandler: MultiFactorHandler
+  get() = call.application.attributes[MfaHandlerAttributeKey]
 
 open class MultiFactorHandler(
-    protected val scope: CoroutineScope,
+  protected val scope: CoroutineScope,
 ) {
   open fun publicMfaRoutes(basePath: String = "/") =
       listOf(
@@ -63,7 +64,7 @@ open class MultiFactorHandler(
    *   href="https://app.swaggerhub.com/apis/supertokens/FDI/1.19.0#/MultiFactorAuth%20Recipe/getMFAInfo">Frontend
    *   Driver Interface</a>
    */
-  open suspend fun PipelineContext<Unit, ApplicationCall>.checkMfaStatus() {
+  open suspend fun RoutingContext.checkMfaStatus() {
     val principal = call.requirePrincipal<AuthenticatedUser>()
     val user = superTokens.getUserById(userId = principal.id)
 
@@ -78,7 +79,8 @@ open class MultiFactorHandler(
                         recipeId = RECIPE_MULTI_FACTOR_AUTH,
                         multiAuthFactor = null,
                         accessToken = principal.accessToken,
-                    ))
+                    ),
+            )
             .also {
               setSessionInResponse(
                   accessToken = it.accessToken,
@@ -101,7 +103,7 @@ open class MultiFactorHandler(
 
     val passwordLessMethods =
         user.loginMethods?.filter { it.recipeId == RECIPE_PASSWORDLESS && it.verified }
-            ?: emptyList()
+          ?: emptyList()
     val hasPasswordless = isPasswordlessEnabled && passwordLessMethods.isNotEmpty()
     val hasPasswordlessEmail = hasPasswordless && passwordLessMethods.any { it.email != null }
 
@@ -149,13 +151,14 @@ open class MultiFactorHandler(
                 ),
             emails = EmailsStatusDTO(),
             phoneNumbers = PhoneStatusDTO(),
-        ))
+        ),
+    )
   }
 
-  open fun PipelineContext<Unit, ApplicationCall>.getAlreadySetup(
-      hasTotpDevice: Boolean,
-      hasPasswordlessEmail: Boolean,
-      hasPasswordlessPhone: Boolean,
+  open fun RoutingContext.getAlreadySetup(
+    hasTotpDevice: Boolean,
+    hasPasswordlessEmail: Boolean,
+    hasPasswordlessPhone: Boolean,
   ): List<String> {
     return buildList {
       if (isTotpEnabled && hasTotpDevice) {
@@ -167,7 +170,7 @@ open class MultiFactorHandler(
             PasswordlessMode.MAGIC_LINK -> add(AuthFactor.LINK_EMAIL.key)
             PasswordlessMode.USER_INPUT_CODE -> add(AuthFactor.OTP_EMAIL.key)
             PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK ->
-                addAll(listOf(AuthFactor.LINK_EMAIL.key, AuthFactor.OTP_EMAIL.key))
+              addAll(listOf(AuthFactor.LINK_EMAIL.key, AuthFactor.OTP_EMAIL.key))
           }
         }
 
@@ -176,17 +179,17 @@ open class MultiFactorHandler(
             PasswordlessMode.MAGIC_LINK -> add(AuthFactor.LINK_PHONE.key)
             PasswordlessMode.USER_INPUT_CODE -> add(AuthFactor.OTP_PHONE.key)
             PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK ->
-                addAll(listOf(AuthFactor.LINK_PHONE.key, AuthFactor.OTP_PHONE.key))
+              addAll(listOf(AuthFactor.LINK_PHONE.key, AuthFactor.OTP_PHONE.key))
           }
         }
       }
     }
   }
 
-  open fun PipelineContext<Unit, ApplicationCall>.getAllowedToSetup(
-      hasTotpDevice: Boolean,
-      hasPasswordlessEmail: Boolean,
-      hasPasswordlessPhone: Boolean,
+  open fun RoutingContext.getAllowedToSetup(
+    hasTotpDevice: Boolean,
+    hasPasswordlessEmail: Boolean,
+    hasPasswordlessPhone: Boolean,
   ): List<String> {
     return buildList {
       if (isTotpEnabled && !hasTotpDevice) {
@@ -198,7 +201,7 @@ open class MultiFactorHandler(
             PasswordlessMode.MAGIC_LINK -> add(AuthFactor.LINK_EMAIL.key)
             PasswordlessMode.USER_INPUT_CODE -> add(AuthFactor.OTP_EMAIL.key)
             PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK ->
-                addAll(listOf(AuthFactor.LINK_EMAIL.key, AuthFactor.OTP_EMAIL.key))
+              addAll(listOf(AuthFactor.LINK_EMAIL.key, AuthFactor.OTP_EMAIL.key))
           }
         }
 
@@ -207,7 +210,7 @@ open class MultiFactorHandler(
             PasswordlessMode.MAGIC_LINK -> add(AuthFactor.LINK_PHONE.key)
             PasswordlessMode.USER_INPUT_CODE -> add(AuthFactor.OTP_PHONE.key)
             PasswordlessMode.USER_INPUT_CODE_AND_MAGIC_LINK ->
-                addAll(listOf(AuthFactor.LINK_PHONE.key, AuthFactor.OTP_PHONE.key))
+              addAll(listOf(AuthFactor.LINK_PHONE.key, AuthFactor.OTP_PHONE.key))
           }
         }
       }
@@ -215,7 +218,7 @@ open class MultiFactorHandler(
   }
 
   open suspend fun ApplicationCall.checkMfaAuth(
-      credential: JWTCredential,
+    credential: JWTCredential,
   ): Boolean {
     if (!isMultiFactorAuthEnabled) {
       return true
@@ -232,9 +235,9 @@ open class MultiFactorHandler(
     }
 
     if (path == "${superTokens.appConfig.api.path}${Routes.Totp.CREATE_DEVICE}" &&
-        mustAddTotpDevice(
-            credential = credential,
-        )) {
+      mustAddTotpDevice(
+          credential = credential,
+      )) {
       return true
     }
 
@@ -242,7 +245,7 @@ open class MultiFactorHandler(
   }
 
   open suspend fun ApplicationCall.mustAddTotpDevice(
-      credential: JWTCredential,
+    credential: JWTCredential,
   ): Boolean {
     val requiredSecondFactors =
         multiFactorAuth.getRequiredMultiFactors(

@@ -12,11 +12,12 @@ import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
+import io.ktor.server.routing.RoutingContext
 import io.ktor.util.date.GMTDate
 import io.ktor.util.date.getTimeMillis
 import io.ktor.util.pipeline.PipelineContext
 
-fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
+fun RoutingContext.setSessionInResponse(
     accessToken: Token,
     refreshToken: Token? = null,
     antiCsrfToken: String? = null,
@@ -98,7 +99,7 @@ fun PipelineContext<Unit, ApplicationCall>.setSessionInResponse(
   }
 }
 
-fun PipelineContext<Unit, ApplicationCall>.clearSessionInResponse() {
+fun RoutingContext.clearSessionInResponse() {
   setSessionInResponse(
       accessToken = Token(),
       refreshToken = Token(),
