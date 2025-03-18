@@ -14,7 +14,7 @@ minSdk = "24"
 android-startup = "1.1.1"
 android-crypto = "1.1.0-alpha06"
 
-ktor_version = "2.3.9"
+ktor_version = "3.0.0"
 
 kotlin-serialization = "1.7.3"
 kotlin-coroutines = "1.8.0"
