@@ -27,7 +27,7 @@ slf4j = "1.6.1"
 mail = "1.6.0"
 freemarker = "2.3.33"
 
-circuit = "0.20.0"
+circuit = "0.27.0"
 settings = "1.1.1"
 
 totp = "2.4.1"
